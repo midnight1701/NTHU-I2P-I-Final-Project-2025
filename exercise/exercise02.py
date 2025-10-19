@@ -2,7 +2,7 @@
 Exercise 2: Hello Green
 
 Task:
-- Successfully render the screen to become green
+- Successfully update the screen to become green and red
 - python exercise/exercise02.py
 '''
 import pygame
@@ -17,7 +17,12 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
     
+    pygame.time.wait(10)
     screen.fill((0, 255, 0))
-    pygame.display.flip()
+    '''TODO: Flip Display'''
+    
+    pygame.time.wait(10)
+    screen.fill((255, 0, 0))
+    '''TODO: Flip Display'''
          
          
