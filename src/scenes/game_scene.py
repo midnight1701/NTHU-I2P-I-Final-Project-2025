@@ -5,7 +5,8 @@ import time
 from src.scenes.scene import Scene
 from src.core import GameManager, OnlineManager
 from src.utils import Logger, PositionCamera, GameSettings, Position
-from src.core.services import sound_manager
+from src.interface.components import Button
+from src.core.services import sound_manager, scene_manager
 from src.sprites import Sprite
 from typing import override
 
@@ -13,6 +14,9 @@ class GameScene(Scene):
     game_manager: GameManager
     online_manager: OnlineManager | None
     sprite_online: Sprite
+    setting_button: Button
+    bag_button: Button
+
     
     def __init__(self):
         super().__init__()
@@ -29,6 +33,12 @@ class GameScene(Scene):
         else:
             self.online_manager = None
         self.sprite_online = Sprite("ingame_ui/options1.png", (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
+
+        self.setting_button = Button(
+            "UI/button_setting.png", "UI/button_setting_hover.png",
+            1200, 20, 50, 50,
+            lambda: scene_manager.change_scene("setting")
+        )
         
         
     @override
@@ -55,7 +65,8 @@ class GameScene(Scene):
             
         # Update others
         self.game_manager.bag.update(dt)
-        
+        self.setting_button.update(dt)
+
         if self.game_manager.player is not None and self.online_manager is not None:
             _ = self.online_manager.update(
                 self.game_manager.player.position.x, 
@@ -84,6 +95,7 @@ class GameScene(Scene):
             enemy.draw(screen, camera)
 
         self.game_manager.bag.draw(screen)
+        self.setting_button.draw(screen)
         
         if self.online_manager and self.game_manager.player:
             list_online = self.online_manager.get_list_players()

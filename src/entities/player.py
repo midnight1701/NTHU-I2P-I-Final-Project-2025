@@ -48,19 +48,19 @@ class Player(Entity):
         '''
 
         if input_manager.key_down(pg.K_LEFT) or input_manager.key_down(pg.K_a):
-            dis.x -= self.speed * dt
+            dis.x -= dt
             self.animation.switch("left")
             self.direction = Direction.LEFT
         if input_manager.key_down(pg.K_RIGHT) or input_manager.key_down(pg.K_d):
-            dis.x += self.speed * dt
+            dis.x += dt
             self.animation.switch("right")
             self.direction = Direction.RIGHT
         if input_manager.key_down(pg.K_UP) or input_manager.key_down(pg.K_w):
-            dis.y -= self.speed * dt
+            dis.y -= dt
             self.animation.switch("up")
             self.direction = Direction.UP
         if input_manager.key_down(pg.K_DOWN) or input_manager.key_down(pg.K_s):
-            dis.y += self.speed * dt
+            dis.y += dt
             self.animation.switch("down")
             self.direction = Direction.DOWN
 
@@ -80,8 +80,6 @@ class Player(Entity):
         tp = self.game_manager.current_map.check_teleport(self.position)
         if tp:
             dest = tp.destination
-            if dest == "gym.tmx":
-                self.map_x, self.map_y = self.position.x, self.position.y
             self.game_manager.switch_map(dest)
 
         super().update(dt)
