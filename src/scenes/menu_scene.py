@@ -12,6 +12,7 @@ class MenuScene(Scene):
     background: BackgroundSprite
     # Buttons
     play_button: Button
+    setting_button: Button
     
     def __init__(self):
         super().__init__()
@@ -22,6 +23,12 @@ class MenuScene(Scene):
             "UI/button_play.png", "UI/button_play_hover.png",
             px + 50, py, 100, 100,
             lambda: scene_manager.change_scene("game")
+        )
+
+        self.setting_button = Button(
+            "UI/button_setting.png", "UI/button_setting_hover.png",
+            px - 150, py, 100, 100,
+            lambda: scene_manager.change_scene("setting")
         )
         
     @override
@@ -35,12 +42,11 @@ class MenuScene(Scene):
 
     @override
     def update(self, dt: float) -> None:
-        if input_manager.key_pressed(pg.K_SPACE):
-            scene_manager.change_scene("game")
-            return
         self.play_button.update(dt)
+        self.setting_button.update(dt)
 
     @override
     def draw(self, screen: pg.Surface) -> None:
         self.background.draw(screen)
         self.play_button.draw(screen)
+        self.setting_button.draw(screen)

@@ -67,7 +67,10 @@ class GameManager:
             self.next_map = ""
             self.should_change_scene = False
             if self.player:
-                self.player.position = self.maps[self.current_map_key].spawn
+                if self.current_map_key == "map.tmx":
+                    self.player.position = Position(24 * 64, 24 * 64)
+                else:
+                    self.player.position = self.maps[self.current_map_key].spawn
             
     def check_collision(self, rect: pg.Rect) -> bool:
         if self.maps[self.current_map_key].check_collision(rect):

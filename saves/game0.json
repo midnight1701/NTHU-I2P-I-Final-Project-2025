@@ -15,6 +15,7 @@
         "y": 30
       }
     },
+
     {
       "path": "gym.tmx",
       "teleport": [
@@ -30,11 +31,13 @@
       }
     }
   ],
+
   "current_map": "map.tmx",
   "player": {
     "x": 16,
     "y": 30
   },
+
   "bag": {
     "monsters": [
       { "name": "Pikachu",   "hp": 85,  "max_hp": 100, "level": 25, "sprite_path": "menu_sprites/menusprite1.png" },

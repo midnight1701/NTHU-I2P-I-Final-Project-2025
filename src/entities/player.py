@@ -1,15 +1,19 @@
 from __future__ import annotations
 import pygame as pg
+from jedi.debug import speed
+
 from .entity import Entity
 from src.core.services import input_manager
-from src.utils import Position, PositionCamera, GameSettings, Logger
+from src.utils import Position, PositionCamera, GameSettings, Logger, Direction
 from src.core import GameManager
 import math
 from typing import override
 
 class Player(Entity):
-    speed: float = 4.0 * GameSettings.TILE_SIZE
+    speed: float = 3.0 * GameSettings.TILE_SIZE
     game_manager: GameManager
+    map_x: float
+    map_y: float
 
     def __init__(self, x: float, y: float, game_manager: GameManager) -> None:
         super().__init__(x, y, game_manager)
@@ -42,13 +46,44 @@ class Player(Entity):
         
         self.position = ...
         '''
-        
+
+        if input_manager.key_down(pg.K_LEFT) or input_manager.key_down(pg.K_a):
+            dis.x -= self.speed * dt
+            self.animation.switch("left")
+            self.direction = Direction.LEFT
+        if input_manager.key_down(pg.K_RIGHT) or input_manager.key_down(pg.K_d):
+            dis.x += self.speed * dt
+            self.animation.switch("right")
+            self.direction = Direction.RIGHT
+        if input_manager.key_down(pg.K_UP) or input_manager.key_down(pg.K_w):
+            dis.y -= self.speed * dt
+            self.animation.switch("up")
+            self.direction = Direction.UP
+        if input_manager.key_down(pg.K_DOWN) or input_manager.key_down(pg.K_s):
+            dis.y += self.speed * dt
+            self.animation.switch("down")
+            self.direction = Direction.DOWN
+
+        normalized = dis.distance_to(Position(0, 0))
+        if normalized != 0:
+            dis = Position(dis.x / normalized , dis.y / normalized)
+
+        if self.game_manager.check_collision(pg.Rect(self.position.x + dis.x * self.speed * dt, self.position.y + dis.y * self.speed * dt,
+                                                     GameSettings.TILE_SIZE, GameSettings.TILE_SIZE)):
+            pass
+        else:
+            self.position = Position(self.position.x + dis.x * self.speed * dt, self.position.y + dis.y * self.speed * dt)
+
+
+        print(self.position.x, self.position.y)
         # Check teleportation
         tp = self.game_manager.current_map.check_teleport(self.position)
         if tp:
             dest = tp.destination
+            if dest == "gym.tmx":
+                self.map_x, self.map_y = self.position.x, self.position.y
             self.game_manager.switch_map(dest)
-                
+
         super().update(dt)
 
     @override

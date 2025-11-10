@@ -43,7 +43,7 @@ class Entity:
         [TODO HACAKTHON 3]
         Implement the correct algorithm of player camera
         '''
-        return PositionCamera(int(self.position.x), int(self.position.y))
+        return PositionCamera(int(self.position.x // 2), int(self.position.y // 2))
         
     def to_dict(self) -> dict[str, object]:
         return {
