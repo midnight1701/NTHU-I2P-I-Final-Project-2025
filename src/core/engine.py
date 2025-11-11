@@ -53,6 +53,6 @@ class Engine:
         scene_manager.update(dt)
 
     def render(self):
-        self.screen.fill((0, 0, 0))     # Make sure the display is cleared
-        scene_manager.draw(self.screen) # Draw the current scene
-        pg.display.flip()               # Render the display
+
+        scene_manager.draw(self.screen)
+        pg.display.flip()

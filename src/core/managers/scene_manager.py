@@ -35,11 +35,12 @@ class SceneManager:
     def draw(self, screen: pg.Surface) -> None:
         if self._current_scene:
             self._current_scene.draw(screen)
+
             
     def _perform_scene_switch(self) -> None:
         if self._next_scene is None:
             return
-            
+
         # Exit current scene
         if self._current_scene:
             self._current_scene.exit()
