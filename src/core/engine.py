@@ -53,6 +53,7 @@ class Engine:
         scene_manager.update(dt)
 
     def render(self):
-
+        if not scene_manager.setting_enter_check:
+            self.screen.fill((0, 0, 0))
         scene_manager.draw(self.screen)
         pg.display.flip()

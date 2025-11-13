@@ -12,6 +12,7 @@ class SceneManager:
     def __init__(self):
         Logger.info("Initializing SceneManager")
         self._scenes = {}
+        self.setting_enter_check = False
         
     def register_scene(self, name: str, scene: Scene) -> None:
         self._scenes[name] = scene

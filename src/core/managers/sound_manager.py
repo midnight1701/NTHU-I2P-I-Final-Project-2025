@@ -6,6 +6,7 @@ class SoundManager:
         pg.mixer.init()
         pg.mixer.set_num_channels(GameSettings.MAX_CHANNELS)
         self.current_bgm = None
+        self.volume = GameSettings.AUDIO_VOLUME
         
     def play_bgm(self, filepath: str):
         if self.current_bgm:
@@ -14,7 +15,7 @@ class SoundManager:
         audio.set_volume(GameSettings.AUDIO_VOLUME)
         audio.play(-1)
         self.current_bgm = audio
-        
+
     def pause_all(self):
         pg.mixer.pause()
 
