@@ -7,9 +7,8 @@ from src.utils import GameSettings
 from src.sprites.background import SettingSprite
 from src.scenes.scene import Scene
 from src.interface.components import Button
-from src.core.services import scene_manager, sound_manager
+from src.core.services import scene_manager, sound_manager, input_manager
 from typing import override
-from src.scenes import game_scene
 
 
 class SettingScene(Scene):
@@ -37,6 +36,12 @@ class SettingScene(Scene):
             lambda: scene_manager._scenes["game"].game_manager.load("saves/new_save.json")
         )
 
+        self.close_button = Button(
+            "UI/UI_Flat_IconCross01a.png", "UI/UI_Flat_IconCross01a.png",
+            910, 200, 25, 25,
+            lambda: scene_manager.change_scene("game")
+        )
+
         self._slider = Slider(348, 285, 581, 32, 50.0, 0, 100,
                               "assets/images/UI/UI_Flat_FrameSlot03a.png")
 
@@ -58,6 +63,9 @@ class SettingScene(Scene):
     def exit(self) -> None:
         self.fade_check = False
         scene_manager.setting_enter_check = False
+        if scene_manager._next_scene == "menu" and scene_manager.current_game:
+            scene_manager.current_game = False
+
 
     @override
     def update(self, dt: float) -> None:
@@ -66,7 +74,13 @@ class SettingScene(Scene):
         self._checkbox.update()
         self.save_button.update(dt)
         self.load_button.update(dt)
-        sound_manager.current_bgm.set_volume(float(float(self._slider.volume()) / 100))
+
+        if scene_manager.current_game:
+            self.close_button.update(dt)
+
+        if sound_manager.current_bgm:
+            sound_manager.current_bgm.set_volume(float(float(self._slider.volume()) / 100))
+
 
     @override
     def draw(self, screen: pg.Surface) -> None:
@@ -74,8 +88,13 @@ class SettingScene(Scene):
         self.back_button.draw(screen)
         self._slider.draw(screen)
         self._checkbox.draw(screen)
-        self.save_button.draw(screen)
+
+        if scene_manager.current_game:
+            self.save_button.draw(screen)
         self.load_button.draw(screen)
+
+        if scene_manager.current_game:
+            self.close_button.draw(screen)
 
         text = self.font.render(f"Volume: {self._slider.volume()}", True, (255, 255, 255))
 

@@ -6,6 +6,7 @@ from .services import scene_manager, input_manager
 from src.scenes.menu_scene import MenuScene
 from src.scenes.game_scene import GameScene
 from src.scenes.setting_scene import SettingScene
+from src.scenes.bag_scene import BagScene
 
 
 class Engine:
@@ -28,6 +29,7 @@ class Engine:
         scene_manager.register_scene("menu", MenuScene())
         scene_manager.register_scene("game", GameScene())
         scene_manager.register_scene("setting", SettingScene())
+        scene_manager.register_scene("bag", BagScene())
         '''
         [TODO HACKATHON 5]
         Register the setting scene here
@@ -54,7 +56,7 @@ class Engine:
         scene_manager.update(dt)
 
     def render(self):
-        if not scene_manager.setting_enter_check:
+        if not scene_manager.setting_enter_check and not scene_manager.bag_enter_check:
             self.screen.fill((0, 0, 0))
         scene_manager.draw(self.screen)
         pg.display.flip()

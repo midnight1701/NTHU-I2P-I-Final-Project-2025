@@ -2,6 +2,7 @@ import pygame as pg
 import json
 from src.utils import GameSettings
 from src.utils.definition import Monster, Item
+from src.sprites.background import BagSprite
 
 
 class Bag:

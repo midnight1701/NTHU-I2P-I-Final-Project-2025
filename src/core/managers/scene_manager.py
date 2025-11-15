@@ -13,6 +13,7 @@ class SceneManager:
         Logger.info("Initializing SceneManager")
         self._scenes = {}
         self.setting_enter_check = False
+        self.bag_enter_check = False
         self._current_scene_name = ""
         self.current_menu = False
         self.current_game = False

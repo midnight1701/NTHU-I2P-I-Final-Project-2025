@@ -17,3 +17,11 @@ class SettingSprite(Sprite):
 
     def draw(self, screen: pg.Surface):
         screen.blit(self.image, (320, 180))
+
+
+class BagSprite(Sprite):
+    def __init__(self, image_path: str):
+        super().__init__(image_path, (GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT // 1.5))
+
+    def draw(self, screen: pg.Surface):
+        screen.blit(self.image, (320, 120))

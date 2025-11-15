@@ -40,8 +40,12 @@ class GameScene(Scene):
             1200, 20, 50, 50,
             lambda: scene_manager.change_scene("setting")
         )
-        
-        
+
+        self.bag_button = Button("UI/button_backpack.png", "UI/button_backpack_hover.png",
+                                 1140, 20, 50, 50,
+                                 lambda: scene_manager.change_scene("bag")
+                                 )
+
     @override
     def enter(self) -> None:
         if not scene_manager.current_game:
@@ -51,7 +55,6 @@ class GameScene(Scene):
 
     @override
     def exit(self) -> None:
-        scene_manager.current_game = False
         if self.online_manager:
             self.online_manager.exit()
         
@@ -69,6 +72,7 @@ class GameScene(Scene):
         # Update others
         self.game_manager.bag.update(dt)
         self.setting_button.update(dt)
+        self.bag_button.update(dt)
 
         if self.game_manager.player is not None and self.online_manager is not None:
             _ = self.online_manager.update(
@@ -98,7 +102,9 @@ class GameScene(Scene):
             enemy.draw(screen, camera)
 
         self.game_manager.bag.draw(screen)
+        self.bag_button.draw(screen)
         self.setting_button.draw(screen)
+
         
         if self.online_manager and self.game_manager.player:
             list_online = self.online_manager.get_list_players()

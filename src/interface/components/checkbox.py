@@ -2,7 +2,7 @@ from __future__ import annotations
 import pygame as pg
 
 from src.sprites import Sprite
-from src.core.services import input_manager
+from src.core.services import input_manager, sound_manager
 from src.utils import Logger
 from typing import Callable, override
 from src.interface.components.component import UIComponent
@@ -25,9 +25,10 @@ class Checkbox:
                 self.switched = not self.switched
                 if self.switched:
                     self.img = self.img_clicked
+                    sound_manager.pause_all()
                 else:
                     self.img = self.img_default
-
+                    sound_manager.resume_all()
 
     def draw(self, surface):
         _ = surface.blit(self.img.image, self.hitbox)
