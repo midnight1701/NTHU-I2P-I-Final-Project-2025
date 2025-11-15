@@ -1,6 +1,6 @@
 import pygame as pg
 
-
+from src.core import GameManager
 from src.utils.silder import Slider
 from src.interface.components.checkbox import Checkbox
 from src.utils import GameSettings
@@ -9,6 +9,7 @@ from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager
 from typing import override
+from src.scenes import game_scene
 
 
 class SettingScene(Scene):
@@ -20,16 +21,28 @@ class SettingScene(Scene):
         self.setting = SettingSprite("UI/UI_Flat_Frame03a.png")
         self.back_button = Button(
             "UI/button_back.png", "UI/button_back_hover.png",
-            350, 440, 75, 75,
+            350, 390, 75, 75,
             lambda: scene_manager.change_scene("menu")
         )
 
-        self._slider = Slider(348, 281, 581, 32, 50.0, 0, 100,
+        self.save_button = Button(
+            "UI/button_save.png", "UI/button_save_hover.png",
+            550, 390, 75, 75,
+            lambda: scene_manager._scenes["game"].game_manager.save("saves/new_save.json")
+        )
+
+        self.load_button = Button(
+            "UI/button_load.png", "UI/button_load_hover.png",
+            450, 390, 75, 75,
+            lambda: scene_manager._scenes["game"].game_manager.load("saves/new_save.json")
+        )
+
+        self._slider = Slider(348, 285, 581, 32, 50.0, 0, 100,
                               "assets/images/UI/UI_Flat_FrameSlot03a.png")
 
         self._checkbox = Checkbox("UI/UI_Flat_ToggleOff01a.png",
                                   "UI/UI_Flat_ToggleOn01a.png",
-                                  348, 321, 64,32)
+                                  480, 330, 64,32)
 
         self.fade = pg.Surface((GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT), pg.SRCALPHA)
         self.fade.fill((0, 0, 0, 50))
@@ -45,13 +58,14 @@ class SettingScene(Scene):
     def exit(self) -> None:
         self.fade_check = False
         scene_manager.setting_enter_check = False
-        pass
 
     @override
     def update(self, dt: float) -> None:
         self.back_button.update(dt)
         self._slider.silder_update()
         self._checkbox.update()
+        self.save_button.update(dt)
+        self.load_button.update(dt)
         sound_manager.current_bgm.set_volume(float(float(self._slider.volume()) / 100))
 
     @override
@@ -60,7 +74,11 @@ class SettingScene(Scene):
         self.back_button.draw(screen)
         self._slider.draw(screen)
         self._checkbox.draw(screen)
-        text = self.font.render(f"VOLUME: {self._slider.volume()}", True, (255, 255, 255))
+        self.save_button.draw(screen)
+        self.load_button.draw(screen)
+
+        text = self.font.render(f"Volume: {self._slider.volume()}", True, (255, 255, 255))
+
         screen.blit(text, (348, 260))
 
         if not self.fade_check:

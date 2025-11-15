@@ -13,6 +13,9 @@ class SceneManager:
         Logger.info("Initializing SceneManager")
         self._scenes = {}
         self.setting_enter_check = False
+        self._current_scene_name = ""
+        self.current_menu = False
+        self.current_game = False
         
     def register_scene(self, name: str, scene: Scene) -> None:
         self._scenes[name] = scene
@@ -21,6 +24,7 @@ class SceneManager:
         if scene_name in self._scenes:
             Logger.info(f"Changing scene to '{scene_name}'")
             self._next_scene = scene_name
+
         else:
             raise ValueError(f"Scene '{scene_name}' not found")
             
@@ -36,7 +40,6 @@ class SceneManager:
     def draw(self, screen: pg.Surface) -> None:
         if self._current_scene:
             self._current_scene.draw(screen)
-
             
     def _perform_scene_switch(self) -> None:
         if self._next_scene is None:

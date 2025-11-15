@@ -33,12 +33,17 @@ class MenuScene(Scene):
         
     @override
     def enter(self) -> None:
-        sound_manager.play_bgm("RBY 101 Opening (Part 1).ogg")
-        pass
+        if not scene_manager.current_menu:
+            sound_manager.play_bgm("RBY 101 Opening (Part 1).ogg")
+            scene_manager.current_menu = True
+
 
     @override
     def exit(self) -> None:
-        pass
+        if scene_manager._next_scene == "setting":
+            pass
+        else:
+            scene_manager.current_menu = False
 
     @override
     def update(self, dt: float) -> None:

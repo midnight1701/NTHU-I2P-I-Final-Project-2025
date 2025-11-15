@@ -7,6 +7,7 @@ from src.scenes.menu_scene import MenuScene
 from src.scenes.game_scene import GameScene
 from src.scenes.setting_scene import SettingScene
 
+
 class Engine:
 
     screen: pg.Surface              # Screen Display of the Game

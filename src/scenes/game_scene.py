@@ -21,8 +21,9 @@ class GameScene(Scene):
     def __init__(self):
         super().__init__()
         # Game Manager
-        manager = GameManager.load("saves/game0.json")
+        manager = GameManager.load("saves/new_save.json")
         if manager is None:
+            manager = GameManager.load("game0.json")
             Logger.error("Failed to load game manager")
             exit(1)
         self.game_manager = manager
@@ -43,12 +44,14 @@ class GameScene(Scene):
         
     @override
     def enter(self) -> None:
-        sound_manager.play_bgm("RBY 103 Pallet Town.ogg")
-        if self.online_manager:
-            self.online_manager.enter()
-        
+        if not scene_manager.current_game:
+            sound_manager.play_bgm("Against the Tide.mp3")
+            scene_manager.current_game = True
+
+
     @override
     def exit(self) -> None:
+        scene_manager.current_game = False
         if self.online_manager:
             self.online_manager.exit()
         

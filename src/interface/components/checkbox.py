@@ -14,6 +14,7 @@ class Checkbox:
         self.img_clicked = Sprite(img_clicked_path, (width, height))
         self.img = self.img_default
         self.hitbox = pg.Rect(x, y, width, height)
+        self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
 
         self.switched = False
 
@@ -30,5 +31,7 @@ class Checkbox:
 
     def draw(self, surface):
         _ = surface.blit(self.img.image, self.hitbox)
+        text = self.font.render(f"Mute: {"On" if self.switched else "Off"}", True, (255, 255, 255))
+        surface.blit(text, (348, 336))
 
 
