@@ -24,7 +24,7 @@ class Animation(Sprite):
         frame_w = sheet_w // n_keyframes
         frame_h = sheet_h // len(rows)
         
-        if (len(rows) <= 0 or n_keyframes <= 0):
+        if len(rows) <= 0 or n_keyframes <= 0:
             Logger.error("Invalid number of rows")
         
         self.animations = {}

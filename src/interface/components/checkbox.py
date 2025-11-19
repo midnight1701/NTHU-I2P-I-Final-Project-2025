@@ -25,10 +25,10 @@ class Checkbox:
                 self.switched = not self.switched
                 if self.switched:
                     self.img = self.img_clicked
-                    sound_manager.pause_all()
+                    sound_manager.volume = 0
                 else:
                     self.img = self.img_default
-                    sound_manager.resume_all()
+                    sound_manager.volume = 0.5
 
     def draw(self, surface):
         _ = surface.blit(self.img.image, self.hitbox)

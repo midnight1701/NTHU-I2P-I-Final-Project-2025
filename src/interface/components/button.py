@@ -68,47 +68,4 @@ class Button(UIComponent):
         _ = screen.blit(self.img_button.image, self.hitbox)
 
 
-def main():
-    import sys
-    import os
-    
-    pg.init()
 
-    WIDTH, HEIGHT = 800, 800
-    screen = pg.display.set_mode((WIDTH, HEIGHT))
-    pg.display.set_caption("Button Test")
-    clock = pg.time.Clock()
-    
-    bg_color = (0, 0, 0)
-    def on_button_click():
-        nonlocal bg_color
-        if bg_color == (0, 0, 0):
-            bg_color = (255, 255, 255)
-        else:
-            bg_color = (0, 0, 0)
-
-    running = True
-    dt = 0
-    
-    while running:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
-            input_manager.handle_events(event)
-        
-        dt = clock.tick(60) / 1000.0
-        button.update(dt)
-        
-        input_manager.reset()
-        
-        _ = screen.fill(bg_color)
-        
-        button.draw(screen)
-        
-        pg.display.flip()
-    
-    pg.quit()
-
-
-if __name__ == "__main__":
-    main()

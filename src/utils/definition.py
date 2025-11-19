@@ -1,4 +1,6 @@
 from pygame import Rect
+from torch.fx.experimental.proxy_tensor import has_proxy_slot
+
 from .settings import GameSettings
 from dataclasses import dataclass
 from enum import Enum
@@ -82,3 +84,11 @@ class Item(TypedDict):
     count: int
     sprite_path: str
 
+class MonsterBattle:
+    def __init__(self, name, hp, max_hp, level, atk, defense):
+        self.name = name
+        self.hp = hp
+        self.max_hp = max_hp
+        self.level = level
+        self.atk = atk
+        self.defense = defense

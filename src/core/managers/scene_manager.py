@@ -25,7 +25,6 @@ class SceneManager:
         if scene_name in self._scenes:
             Logger.info(f"Changing scene to '{scene_name}'")
             self._next_scene = scene_name
-
         else:
             raise ValueError(f"Scene '{scene_name}' not found")
             

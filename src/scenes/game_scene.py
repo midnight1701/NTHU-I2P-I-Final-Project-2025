@@ -1,7 +1,4 @@
 import pygame as pg
-import threading
-import time
-
 from src.scenes.scene import Scene
 from src.core import GameManager, OnlineManager
 from src.utils import Logger, PositionCamera, GameSettings, Position
@@ -21,7 +18,7 @@ class GameScene(Scene):
     def __init__(self):
         super().__init__()
         # Game Manager
-        manager = GameManager.load("saves/new_save.json")
+        manager = GameManager.load("saves/game0.json")
         if manager is None:
             manager = GameManager.load("game0.json")
             Logger.error("Failed to load game manager")
@@ -49,12 +46,13 @@ class GameScene(Scene):
     @override
     def enter(self) -> None:
         if not scene_manager.current_game:
-            sound_manager.play_bgm("Against the Tide.mp3")
+            sound_manager.play_bgm("RBY 103 Pallet Town.ogg")
             scene_manager.current_game = True
-
 
     @override
     def exit(self) -> None:
+        if scene_manager._next_scene == "battle":
+            scene_manager.current_game = False
         if self.online_manager:
             self.online_manager.exit()
         
@@ -84,14 +82,6 @@ class GameScene(Scene):
     @override
     def draw(self, screen: pg.Surface):        
         if self.game_manager.player:
-            '''
-            [TODO HACKATHON 3]
-            Implement the camera algorithm logic here
-            Right now it's hard coded, you need to follow the player's positions
-            you may use the below example, but the function still incorrect, you may trace the entity.py
-            
-            camera = self.game_manager.player.camera
-            '''
             camera = self.game_manager.player.camera
             self.game_manager.current_map.draw(screen, camera)
             self.game_manager.player.draw(screen, camera)
@@ -101,10 +91,8 @@ class GameScene(Scene):
         for enemy in self.game_manager.current_enemy_trainers:
             enemy.draw(screen, camera)
 
-        self.game_manager.bag.draw(screen)
         self.bag_button.draw(screen)
         self.setting_button.draw(screen)
-
         
         if self.online_manager and self.game_manager.player:
             list_online = self.online_manager.get_list_players()

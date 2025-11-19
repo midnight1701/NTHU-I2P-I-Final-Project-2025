@@ -26,7 +26,8 @@ class GameManager:
     
     def __init__(self, maps: dict[str, Map], start_map: str, 
                  player: Player | None,
-                 enemy_trainers: dict[str, list[EnemyTrainer]], 
+                 enemy_trainers: dict[str, list[EnemyTrainer]],
+                 enemy_monsters,
                  bag: Bag | None = None):
                      
         from src.data.bag import Bag
@@ -35,6 +36,7 @@ class GameManager:
         self.current_map_key = start_map
         self.player = player
         self.enemy_trainers = enemy_trainers
+        self.enemy_monster = enemy_monsters
         self.bag = bag if bag is not None else Bag([], [])
         
         # Check If you should change scene
@@ -143,7 +145,8 @@ class GameManager:
             maps, current_map,
             None, # Player
             trainers,
-            bag=None
+            bag=None,
+            enemy_monsters=None
         )
         gm.current_map_key = current_map
         
@@ -155,7 +158,7 @@ class GameManager:
         Logger.info("Loading Player")
         if data.get("player"):
             gm.player = Player.from_dict(data["player"], gm)
-        
+
         Logger.info("Loading bag")
         from src.data.bag import Bag as _Bag
         gm.bag = Bag.from_dict(data.get("bag", {})) if data.get("bag") else _Bag([], [])

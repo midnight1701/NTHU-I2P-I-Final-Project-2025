@@ -12,9 +12,12 @@ class SoundManager:
         if self.current_bgm:
             self.current_bgm.stop()
         audio = load_sound(filepath)
-        audio.set_volume(GameSettings.AUDIO_VOLUME)
+        audio.set_volume(self.volume)
         audio.play(-1)
         self.current_bgm = audio
+
+    def update(self):
+        self.current_bgm.set_volume(self.volume)
 
     def pause_all(self):
         pg.mixer.pause()
