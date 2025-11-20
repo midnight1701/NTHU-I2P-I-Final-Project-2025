@@ -10,8 +10,8 @@
         }
       ],
       "player": {
-        "x": 25.926400646087284,
-        "y": 28.09460649658739
+        "x": 16,
+        "y": 30
       },
       "enemy_trainers": [
         {
@@ -25,14 +25,14 @@
           "x": 54.0,
           "y": 16.0,
           "classification": "stationary",
-          "facing": "UP",
+          "facing": "DOWN",
           "max_tiles": 2
         },
         {
           "x": 31.0,
           "y": 31.0,
           "classification": "stationary",
-          "facing": "UP",
+          "facing": "DOWN",
           "max_tiles": 2
         }
       ]
@@ -57,16 +57,16 @@
         }
       ],
       "player": {
-        "x": 25.926400646087284,
-        "y": 28.09460649658739
+        "x": 12,
+        "y": 12
       },
       "enemy_trainers": []
     }
   ],
   "current_map": "map.tmx",
   "player": {
-    "x": 25.926400646087284,
-    "y": 28.09460649658739
+    "x": 28.024138415609517,
+    "y": 27.64812045379168
   },
   "bag": {
     "monsters": [
@@ -74,6 +74,8 @@
         "name": "Pikachu",
         "hp": 85,
         "max_hp": 100,
+        "atk": 20,
+        "def": 5,
         "level": 25,
         "sprite_path": "menu_sprites/menusprite1.png"
       },
@@ -81,6 +83,8 @@
         "name": "Charizard",
         "hp": 150,
         "max_hp": 200,
+        "atk": 20,
+        "def": 5,
         "level": 36,
         "sprite_path": "menu_sprites/menusprite2.png"
       },
@@ -88,6 +92,8 @@
         "name": "Blastoise",
         "hp": 120,
         "max_hp": 180,
+        "atk": 20,
+        "def": 5,
         "level": 32,
         "sprite_path": "menu_sprites/menusprite3.png"
       },
@@ -95,6 +101,8 @@
         "name": "Venusaur",
         "hp": 90,
         "max_hp": 160,
+        "atk": 20,
+        "def": 5,
         "level": 30,
         "sprite_path": "menu_sprites/menusprite4.png"
       },
@@ -102,6 +110,8 @@
         "name": "Gengar",
         "hp": 110,
         "max_hp": 140,
+        "atk": 20,
+        "def": 5,
         "level": 28,
         "sprite_path": "menu_sprites/menusprite5.png"
       },
@@ -109,8 +119,19 @@
         "name": "Dragonite",
         "hp": 180,
         "max_hp": 220,
+        "atk": 20,
+        "def": 5,
         "level": 40,
         "sprite_path": "menu_sprites/menusprite6.png"
+      },
+      {
+        "name": "Viper",
+        "hp": 120,
+        "max_hp": 160,
+        "atk": 20,
+        "def": 5,
+        "level": 10,
+        "sprite_path": "menu_sprites/menusprite11.png"
       }
     ],
     "items": [
@@ -126,7 +147,7 @@
       },
       {
         "name": "Pokeball",
-        "count": 10,
+        "count": 1,
         "sprite_path": "ingame_ui/ball.png"
       }
     ]

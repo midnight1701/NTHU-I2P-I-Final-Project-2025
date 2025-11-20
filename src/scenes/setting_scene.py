@@ -33,7 +33,7 @@ class SettingScene(Scene):
         self.load_button = Button(
             "UI/button_load.png", "UI/button_load_hover.png",
             450, 390, 75, 75,
-            lambda: scene_manager._scenes["game"].game_manager.load("saves/new_save.json")
+            lambda: scene_manager._scenes["game"].load_option(GameManager.load("saves/new_save.json"))
         )
 
         self.close_button = Button(

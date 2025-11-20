@@ -1,5 +1,6 @@
 import pygame as pg
 from pygame import K_ESCAPE, K_SPACE
+from src.scenes.battle_system import BattleSetup, BattleEnd, EnemyTurn, PlayerTurn
 
 from src.scenes.battle_system import BattleSystem
 from src.sprites import BackgroundSprite
@@ -7,7 +8,7 @@ from src.utils import GameSettings
 from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager, resource_manager
-from typing import override
+
 
 # noinspection PyMethodMayBeStatic
 class BattleScene(Scene):
@@ -44,7 +45,7 @@ class BattleScene(Scene):
 
         # Battle state...
         self.battle = BattleSystem(self.ally_info, self.enemy_info)
-        self.ally_setup, self.enemy_setup = False, False
+        self.displayed = False
 
 
         # Display monster info
@@ -52,74 +53,43 @@ class BattleScene(Scene):
         # Button in battle scene
         self.attack_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0],
                                     self.dialogue_rect.topleft[1], 100, 50,
-                                    lambda: self.battle.change_action("attack"))
+                                    lambda: self.battle.state.change_action("attack"))
         self.defend_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 130,
                                     self.dialogue_rect.topleft[1], 100, 50,
-                                    lambda: self.battle.change_action("defend"))
+                                    lambda: self.battle.state.change_action("defend"))
         self.run_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.dialogue_rect.topleft[0] + 260,
                                     self.dialogue_rect.topleft[1], 100, 50,
-                                    lambda: self.battle.change_action("run"))
+                                    lambda: self.battle.state.change_action("potion"))
         self.potion_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.dialogue_rect.topleft[0] + 390,
                                     self.dialogue_rect.topleft[1], 100, 50,
-                                    lambda: self.battle.change_action("potion"))
+                                    lambda: self.battle.state.change_action("run"))
 
-        self.button_text_rect = pg.rect
 
 
     def enter(self) -> None:
         sound_manager.play_bgm("RBY 107 Battle! (Trainer).ogg")
 
     def exit(self) -> None:
-        pass
+        self.battle.reset()
+        self.displayed = False
 
     def update(self, dt: float) -> None:
-        if self.battle.overall_state == "battle" and self.battle.player_turn and self.battle.battle_state == "player_choose":
+        if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
             self.attack_button.update(dt)
             self.defend_button.update(dt)
             self.run_button.update(dt)
             self.potion_button.update(dt)
 
-        if self.battle.battle_state == "player_act" or self.battle.battle_state == "enemy_act":
-            self.battle.update()
-
         if input_manager.key_pressed(K_ESCAPE):
             scene_manager.change_scene("game")
 
-        # Input in intermediate scene, skip with player's input
-        if input_manager.key_pressed(K_SPACE):
-            if self.battle.overall_state == "battle_setup":
-                if not self.enemy_setup:
-                    self.enemy_setup = True
-                elif not self.ally_setup:
-                    self.ally_setup = True
-                else:
-                    self.battle.overall_state= "battle"
-
-            elif self.battle.overall_state == "battle":
-                if self.battle.battle_state == "player_act":
-                    self.battle.battle_state = "battle_dialogue"
-
-                elif self.battle.battle_state == "battle_dialogue":
-                    self.battle.battle_state = "enemy_choose"
-                elif self.battle.battle_state == "enemy_choose":
-                    self.battle.battle_state = "enemy_act"
-                elif self.battle.battle_state == "enemy_act":
-                    self.battle.battle_state = "battle_dialogue"
-                elif self.battle.battle_state == "battle_dialogue":
-                    if self.battle.is_player_alive():
-                        self.battle.player_turn = True
-                        self.battle.battle_state = "player_choose"
-
-            elif self.battle.overall_state == "end":
-                pass
-
-        # Input in actual battle scene
+        self.battle.update()
 
 
     def action_display(self, screen):
-        if self.battle.overall_state == "battle" and self.battle.player_turn and self.battle.battle_state == "player_choose":
+        if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
             self.attack_button.draw(screen)
             self.defend_button.draw(screen)
             self.run_button.draw(screen)
@@ -127,9 +97,15 @@ class BattleScene(Scene):
 
 
     def battle_setup(self, screen):
-        if self.enemy_setup:
+        if isinstance(self.battle.state, BattleSetup):
+            if self.battle.state.enemy_setup or self.displayed:
+                screen.blit(self.enemy_monster_img, self.enemy_monster_rect)
+            if self.battle.state.ally_setup:
+                screen.blit(self.ally_monster_img, self.ally_monster_rect)
+                self.displayed = True
+
+        if self.displayed:
             screen.blit(self.enemy_monster_img, self.enemy_monster_rect)
-        if self.ally_setup:
             screen.blit(self.ally_monster_img, self.ally_monster_rect)
 
     def monster_info(self, monster):
@@ -145,6 +121,7 @@ class BattleScene(Scene):
 
         return info
 
+
     def dialouge_display(self, screen):
         screen.blit(self.dialogue_box, self.dialogue_rect)
         dialogue_text = self.font.render(self.dialogue_system(), True, (255, 255, 255))
@@ -152,31 +129,15 @@ class BattleScene(Scene):
 
 
     def dialogue_system(self):
-        if self.battle.overall_state == "battle_setup":
-            if not self.enemy_setup and not self.ally_setup:
-                dialogue = "Enemy trainer challenges you to a monster battle"
-                return dialogue
-            elif self.enemy_setup and not self.ally_setup:
-                dialogue = f"Enemy trainer selects {self.battle.enemy.name}"
-                return dialogue
-            else:
-                dialogue = f"Ally trainer selects {self.battle.player.name}"
-                return dialogue
+        return self.battle.get_dialogue()
 
-
-        elif self.battle.overall_state == "battle":
-            return self.battle.get_dialogue()
-
-        elif self.battle.overall_state == "end":
-            pass
-
-        return None
 
     def draw(self, screen: pg.Surface) -> None:
         self.background.draw(screen)
+        self.battle_setup(screen)
         self.dialouge_display(screen)
         self.action_display(screen)
-        self.battle_setup(screen)
+
 
     def reset(self):
         pass

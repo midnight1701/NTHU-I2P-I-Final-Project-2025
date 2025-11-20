@@ -20,7 +20,7 @@ class GameScene(Scene):
         # Game Manager
         manager = GameManager.load("saves/game0.json")
         if manager is None:
-            manager = GameManager.load("game0.json")
+            manager = GameManager.load("saves/game0.json")
             Logger.error("Failed to load game manager")
             exit(1)
         self.game_manager = manager
@@ -42,6 +42,9 @@ class GameScene(Scene):
                                  1140, 20, 50, 50,
                                  lambda: scene_manager.change_scene("bag")
                                  )
+
+    def load_option(self, load):
+        self.game_manager = load
 
     @override
     def enter(self) -> None:

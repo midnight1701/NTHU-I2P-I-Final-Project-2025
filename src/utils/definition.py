@@ -92,3 +92,13 @@ class MonsterBattle:
         self.level = level
         self.atk = atk
         self.defense = defense
+
+class BattleState:
+    def enter (self):
+        ...
+
+    def exit(self):
+        ...
+
+    def update(self):
+        ...
