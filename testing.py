@@ -1,10 +1,4 @@
-a = 0
+lst = [(9, 30), (23, 26), (31, 16), (49, 7), (56, 22), (42, 31)]
 
-def change():
-    global a
-    a = a + 1
-    return "test"
-
-text = change()
-print(text)
-print(a)
+if (9, 30) in lst:
+    print(True)

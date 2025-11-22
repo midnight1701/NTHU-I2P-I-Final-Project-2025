@@ -75,6 +75,9 @@ class PlayerTurn(BattleState):
 
 
     def dialogue(self):
+        if self.action is None:
+            return "What will ally trainer do?"
+
         if self.action is not None and not self.dialogue_check:
             match self.action:
                 case "attack":
@@ -174,6 +177,7 @@ class BattleEnd(BattleState):
             return "Ally trainer falls to the enemy"
 
         return None
+
 ####################################################################
 
 # noinspection PyMethodMayBeStatic
@@ -239,6 +243,7 @@ class BattleSystem:
 
     def potion(self, current):
         return f"{current.name} prepares for a deadly blow"
+    
 
     def reset(self):
         pass

@@ -16,16 +16,16 @@ class BattleScene(Scene):
         super().__init__()
         # Background/ Display font
         self.background = BackgroundSprite("backgrounds/background1.png")
-        self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
+        self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=22)
 
         # Dialogue setup
         self.dialogue_rect = pg.Rect(0, 0, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT * 0.2)
-        self.dialogue_rect.bottomleft = (320, 720)
+        self.dialogue_rect.bottomleft = (192, 720)
         self.dialogue_box = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01g.png"),
-                                               (GameSettings.SCREEN_WIDTH * 0.5, GameSettings.SCREEN_HEIGHT * 0.6))
+                                               (GameSettings.SCREEN_WIDTH * 0.7, GameSettings.SCREEN_HEIGHT * 0.2))
         self.dialogue_box.set_alpha(255)
         self.text_rect = pg.Rect(0, 0, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT * 0.2)
-        self.text_rect.topleft = (325, 720 - GameSettings.SCREEN_HEIGHT * 0.2 + 10)
+        self.text_rect.topleft = (212, 720 - GameSettings.SCREEN_HEIGHT * 0.2 + 10)
 
 
         # Enemy monster battle setup
@@ -50,20 +50,22 @@ class BattleScene(Scene):
 
         # Display monster info
 
+
         # Button in battle scene
-        self.attack_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0],
-                                    self.dialogue_rect.topleft[1], 100, 50,
+        self.offset = 200
+        self.attack_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 50,
+                                    self.dialogue_rect.topleft[1] + 50, 180, 70,
                                     lambda: self.battle.state.change_action("attack"))
-        self.defend_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 130,
-                                    self.dialogue_rect.topleft[1], 100, 50,
+        self.defend_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 50 + self.offset,
+                                    self.dialogue_rect.topleft[1] + 50, 180, 70,
                                     lambda: self.battle.state.change_action("defend"))
         self.run_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
-                                    self.dialogue_rect.topleft[0] + 260,
-                                    self.dialogue_rect.topleft[1], 100, 50,
+                                    self.dialogue_rect.topleft[0] + self.offset * 2 + 50,
+                                    self.dialogue_rect.topleft[1] + 50, 180, 70,
                                     lambda: self.battle.state.change_action("potion"))
         self.potion_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
-                                    self.dialogue_rect.topleft[0] + 390,
-                                    self.dialogue_rect.topleft[1], 100, 50,
+                                    self.dialogue_rect.topleft[0] + self.offset * 3 + 50,
+                                    self.dialogue_rect.topleft[1] + 50, 180, 70,
                                     lambda: self.battle.state.change_action("run"))
 
 
@@ -72,8 +74,8 @@ class BattleScene(Scene):
         sound_manager.play_bgm("RBY 107 Battle! (Trainer).ogg")
 
     def exit(self) -> None:
-        self.battle.reset()
-        self.displayed = False
+        self.reset()
+
 
     def update(self, dt: float) -> None:
         if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
@@ -140,7 +142,8 @@ class BattleScene(Scene):
 
 
     def reset(self):
-        pass
+        self.displayed = False
+        self.battle = BattleSystem(self.ally_info, self.enemy_info)
 
 
 

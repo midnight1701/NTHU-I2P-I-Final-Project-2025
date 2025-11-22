@@ -81,6 +81,7 @@ class GameScene(Scene):
                 self.game_manager.player.position.y,
                 self.game_manager.current_map.path_name
             )
+
         
     @override
     def draw(self, screen: pg.Surface):        

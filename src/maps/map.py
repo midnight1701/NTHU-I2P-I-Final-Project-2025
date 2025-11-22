@@ -41,11 +41,6 @@ class Map:
                 pg.draw.rect(screen, (255, 0, 0), camera.transform_rect(rect), 1)
         
     def check_collision(self, rect: pg.Rect) -> bool:
-        '''
-        [TODO HACKATHON 4]
-        Return True if collide if rect param collide with self._collision_map
-        Hint: use API colliderect and iterate each rectangle to check
-        '''
         return any(rect.colliderect(r) for r in self._collision_map)
         
     def check_teleport(self, pos: Position) -> Teleport | None:
@@ -75,18 +70,20 @@ class Map:
     
     def _create_collision_map(self) -> list[pg.Rect]:
         rects = []
+        bush_pos = [(9, 30), (43, 17), (31, 16), (49, 7), (56, 22), (42, 31)]
         for layer in self.tmxdata.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer) and ("collision" in layer.name.lower() or "house" in layer.name.lower()):
                 for x, y, gid in layer:
                     if gid != 0:
-                        '''
-                        [TODO HACKATHON 4]
-                        rects.append(pg.Rect(...))
-                        Append the collision rectangle to the rects[] array
-                        Remember scale the rectangle with the TILE_SIZE from settings
-                        '''
                         rects.append(pg.Rect(x * GameSettings.TILE_SIZE, y * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE,
                                              GameSettings.TILE_SIZE))
+
+            elif isinstance(layer, pytmx.TiledTileLayer) and ("bush" in layer.name.lower()):
+                for x, y, gid in layer:
+                    if gid != 0 and (x, y) in bush_pos:
+                        rects.append(pg.Rect(x * GameSettings.TILE_SIZE, y * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE,
+                                    GameSettings.TILE_SIZE))
+
         return rects
 
     @classmethod

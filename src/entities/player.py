@@ -18,6 +18,7 @@ class Player(Entity):
     def __init__(self, x: float, y: float, game_manager: GameManager) -> None:
         super().__init__(x, y, game_manager)
 
+
     @override
     def update(self, dt: float) -> None:
         dis = Position(0, 0)
