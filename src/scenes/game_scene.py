@@ -1,5 +1,7 @@
 import pygame as pg
 from src.scenes.scene import Scene
+from src.scenes.bag_overlay import BagOverlay
+from src.scenes.setting_overlay import SettingOverlay
 from src.core import GameManager, OnlineManager
 from src.utils import Logger, PositionCamera, GameSettings, Position
 from src.interface.components import Button
@@ -35,27 +37,37 @@ class GameScene(Scene):
         self.setting_button = Button(
             "UI/button_setting.png", "UI/button_setting_hover.png",
             1200, 20, 50, 50,
-            lambda: scene_manager.change_scene("setting")
+            lambda: self.setting_open_func()
         )
 
         self.bag_button = Button("UI/button_backpack.png", "UI/button_backpack_hover.png",
                                  1140, 20, 50, 50,
-                                 lambda: scene_manager.change_scene("bag")
+                                 lambda: self.bag_open_func()
                                  )
+
+
+        self.setting_overlay = SettingOverlay()
+        self.setting_open = False
+
+        self.bag_overlay = BagOverlay()
+        self.bag_open = False
 
     def load_option(self, load):
         self.game_manager = load
 
+    def setting_open_func(self):
+        self.setting_open = True
+
+    def bag_open_func(self):
+        self.bag_open = True
+
     @override
     def enter(self) -> None:
-        if not scene_manager.current_game:
-            sound_manager.play_bgm("RBY 103 Pallet Town.ogg")
-            scene_manager.current_game = True
+        sound_manager.play_bgm("RBY 103 Pallet Town.ogg")
+
 
     @override
     def exit(self) -> None:
-        if scene_manager._next_scene == "battle":
-            scene_manager.current_game = False
         if self.online_manager:
             self.online_manager.exit()
         
@@ -74,6 +86,20 @@ class GameScene(Scene):
         self.game_manager.bag.update(dt)
         self.setting_button.update(dt)
         self.bag_button.update(dt)
+
+
+        if self.bag_open:
+            self.bag_overlay.update(dt)
+            if self.bag_overlay.close:
+                self.bag_open = False
+                self.bag_overlay.close = False
+
+        if self.setting_open:
+            self.setting_overlay.update(dt)
+            if self.setting_overlay.close:
+                self.setting_open = False
+                self.setting_overlay.close = False
+
 
         if self.game_manager.player is not None and self.online_manager is not None:
             _ = self.online_manager.update(
@@ -97,6 +123,19 @@ class GameScene(Scene):
 
         self.bag_button.draw(screen)
         self.setting_button.draw(screen)
+
+        if self.bag_open:
+            self.bag_overlay.draw(screen)
+            self.game_manager.player.blocked = True
+        elif not self.bag_open and not self.setting_open:
+            self.game_manager.player.blocked = False
+
+        if self.setting_open:
+            self.setting_overlay.draw(screen)
+            self.game_manager.player.blocked = True
+        elif not self.setting_open and not self.bag_open:
+            self.game_manager.player.blocked = False
+
         
         if self.online_manager and self.game_manager.player:
             list_online = self.online_manager.get_list_players()

@@ -82,6 +82,9 @@ class GameManager:
                 return True
         
         return False
+
+    def check_bush_collision(self, rect: pg.Rect):
+        pass
         
     def save(self, path: str) -> None:
         try:

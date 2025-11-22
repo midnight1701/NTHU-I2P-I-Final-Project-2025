@@ -3,6 +3,7 @@ import pytmx
 
 from src.utils import load_tmx, Position, GameSettings, PositionCamera, Teleport
 
+# noinspection PyMethodMayBeStatic
 class Map:
     # Map Properties
     path_name: str
@@ -19,6 +20,7 @@ class Map:
         self.tmxdata = load_tmx(path)
         self.spawn = spawn
         self.teleporters = tp
+        self.monster_bush = self.bush_generation()
 
         pixel_w = self.tmxdata.width * GameSettings.TILE_SIZE
         pixel_h = self.tmxdata.height * GameSettings.TILE_SIZE
@@ -28,6 +30,7 @@ class Map:
         self._render_all_layers(self._surface)
         # Prebake the collision map
         self._collision_map = self._create_collision_map()
+        self.detected = False
 
     def update(self, dt: float):
         return
@@ -39,9 +42,17 @@ class Map:
         if GameSettings.DRAW_HITBOXES:
             for rect in self._collision_map:
                 pg.draw.rect(screen, (255, 0, 0), camera.transform_rect(rect), 1)
+
+            for rect in self.monster_bush:
+                pg.draw.rect(screen, (255, 0, 0), camera.transform_rect(rect), 1)
+
         
     def check_collision(self, rect: pg.Rect) -> bool:
         return any(rect.colliderect(r) for r in self._collision_map)
+
+    def check_if_bush_collision(self, rect: pg.Rect):
+        return any(rect.colliderect(r) for r in self.monster_bush)
+
         
     def check_teleport(self, pos: Position) -> Teleport | None:
         for t in self.teleporters:
@@ -50,13 +61,22 @@ class Map:
                 return t
         return None
 
+
+    def bush_generation(self):
+        bush_rect = []
+        bush_pos = [(9, 30), (43, 17), (31, 16), (49, 7), (56, 22), (42, 31)]
+        for b in bush_pos:
+            bush_rect.append(pg.Rect(b[0] * GameSettings.TILE_SIZE, b[1] * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
+
+        return bush_rect
+
     def _render_all_layers(self, target: pg.Surface) -> None:
         for layer in self.tmxdata.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
                 self._render_tile_layer(target, layer)
             # elif isinstance(layer, pytmx.TiledImageLayer) and layer.image:
             #     target.blit(layer.image, (layer.x or 0, layer.y or 0))
- 
+
     def _render_tile_layer(self, target: pg.Surface, layer: pytmx.TiledTileLayer) -> None:
         for x, y, gid in layer:
             if gid == 0:
@@ -70,19 +90,12 @@ class Map:
     
     def _create_collision_map(self) -> list[pg.Rect]:
         rects = []
-        bush_pos = [(9, 30), (43, 17), (31, 16), (49, 7), (56, 22), (42, 31)]
         for layer in self.tmxdata.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer) and ("collision" in layer.name.lower() or "house" in layer.name.lower()):
                 for x, y, gid in layer:
                     if gid != 0:
                         rects.append(pg.Rect(x * GameSettings.TILE_SIZE, y * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE,
                                              GameSettings.TILE_SIZE))
-
-            elif isinstance(layer, pytmx.TiledTileLayer) and ("bush" in layer.name.lower()):
-                for x, y, gid in layer:
-                    if gid != 0 and (x, y) in bush_pos:
-                        rects.append(pg.Rect(x * GameSettings.TILE_SIZE, y * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE,
-                                    GameSettings.TILE_SIZE))
 
         return rects
 

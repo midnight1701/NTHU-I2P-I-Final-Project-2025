@@ -26,13 +26,14 @@ class Bag:
         self.index = 0
         self.curr_surface = pg.display.get_surface()
 
+
     def update(self, dt: float):
         if input_manager.key_pressed(pg.K_UP):
-            self.index = self.index - 1 if self.index - 1 >= 0 else 0
+            self.index = self.index - 1
         elif input_manager.key_pressed(pg.K_DOWN):
-            self.index = self.index + 1 if self.index + 1 <= len(self._monsters_data) - 1 else len(self._monsters_data) - 1
+            self.index = self.index + 1
+        self.index = self.index % len(self._monsters_data)
         self.draw(self.curr_surface)
-
 
     def draw(self, screen: pg.Surface):
         box_offset = 0 if self.index < 6 else -(self.index - 6 + 1) * self.item_rect_height

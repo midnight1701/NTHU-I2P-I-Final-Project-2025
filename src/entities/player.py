@@ -17,45 +17,49 @@ class Player(Entity):
 
     def __init__(self, x: float, y: float, game_manager: GameManager) -> None:
         super().__init__(x, y, game_manager)
+        self.blocked = False
 
 
     @override
     def update(self, dt: float) -> None:
         dis = Position(0, 0)
 
-        if input_manager.key_down(pg.K_LEFT) or input_manager.key_down(pg.K_a):
-            dis.x -= dt
-            self.animation.switch("left")
-            self.direction = Direction.LEFT
-        if input_manager.key_down(pg.K_RIGHT) or input_manager.key_down(pg.K_d):
-            dis.x += dt
-            self.animation.switch("right")
-            self.direction = Direction.RIGHT
-        if input_manager.key_down(pg.K_UP) or input_manager.key_down(pg.K_w):
-            dis.y -= dt
-            self.animation.switch("up")
-            self.direction = Direction.UP
-        if input_manager.key_down(pg.K_DOWN) or input_manager.key_down(pg.K_s):
-            dis.y += dt
-            self.animation.switch("down")
-            self.direction = Direction.DOWN
+        if not self.blocked:
+            if input_manager.key_down(pg.K_LEFT) or input_manager.key_down(pg.K_a):
+                dis.x -= dt
+                self.animation.switch("left")
+                self.direction = Direction.LEFT
+            if input_manager.key_down(pg.K_RIGHT) or input_manager.key_down(pg.K_d):
+                dis.x += dt
+                self.animation.switch("right")
+                self.direction = Direction.RIGHT
+            if input_manager.key_down(pg.K_UP) or input_manager.key_down(pg.K_w):
+                dis.y -= dt
+                self.animation.switch("up")
+                self.direction = Direction.UP
+            if input_manager.key_down(pg.K_DOWN) or input_manager.key_down(pg.K_s):
+                dis.y += dt
+                self.animation.switch("down")
+                self.direction = Direction.DOWN
 
-        normalized = dis.distance_to(Position(0, 0))
-        if normalized != 0:
-            dis = Position(dis.x / normalized , dis.y / normalized)
+            normalized = dis.distance_to(Position(0, 0))
+            if normalized != 0:
+                dis = Position(dis.x / normalized, dis.y / normalized)
 
-        if self.game_manager.check_collision(pg.Rect(self.position.x + dis.x * self.speed * dt, self.position.y + dis.y * self.speed * dt,
-                                                     GameSettings.TILE_SIZE, GameSettings.TILE_SIZE)):
-            pass
-        else:
-            self.position = Position(self.position.x + dis.x * self.speed * dt, self.position.y + dis.y * self.speed * dt)
+            if self.game_manager.check_collision(
+                    pg.Rect(self.position.x + dis.x * self.speed * dt, self.position.y + dis.y * self.speed * dt,
+                            GameSettings.TILE_SIZE, GameSettings.TILE_SIZE)):
+                pass
+            else:
+                self.position = Position(self.position.x + dis.x * self.speed * dt,
+                                         self.position.y + dis.y * self.speed * dt)
 
+            # Check teleportation
+            tp = self.game_manager.current_map.check_teleport(self.position)
+            if tp:
+                dest = tp.destination
+                self.game_manager.switch_map(dest)
 
-        # Check teleportation
-        tp = self.game_manager.current_map.check_teleport(self.position)
-        if tp:
-            dest = tp.destination
-            self.game_manager.switch_map(dest)
 
         super().update(dt)
 

@@ -9,33 +9,19 @@ from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager
 from typing import override
 
-class BagScene(Scene):
+class BagOverlay(Overlay):
     def __init__(self):
         super().__init__()
         self.background = pg.Rect(0, 0, 720, 540)
         self.background.center = (GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT // 2)
-        self.overlay = Overlay()
-        self.fade = pg.Surface((GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT), pg.SRCALPHA)
-        self.fade.fill((0, 0, 0, 50))
         self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
+        self.exit_button.hitbox.x = self.background.topright[0] + 10
+        self.exit_button.hitbox.y = self.background.topright[1]
 
-    @override
-    def enter(self) -> None:
-        scene_manager.bag_enter_check = True
-
-    @override
-    def exit(self) -> None:
-        self.fade_check = False
-        scene_manager.bag_enter_check = False
-
-    @override
-    def update(self, dt: float) -> None:
-        if input_manager.key_pressed(pg.K_ESCAPE):
-            scene_manager.change_scene("game")
-        scene_manager._scenes["game"].game_manager.bag.update(dt)
+    def update(self, dt):
+        super().update(dt)
 
 
-    @override
-    def draw(self, screen: pg.Surface) -> None:
+    def draw(self, screen):
+        super().draw(screen)
         scene_manager._scenes["game"].game_manager.bag.draw(screen)
-        self.overlay.draw(screen)
