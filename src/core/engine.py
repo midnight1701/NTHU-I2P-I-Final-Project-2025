@@ -30,7 +30,6 @@ class Engine:
         scene_manager.register_scene("menu", MenuScene())
         scene_manager.register_scene("game", GameScene())
         scene_manager.register_scene("setting", SettingScene())
-        scene_manager.register_scene("bag", BagScene())
         scene_manager.register_scene("battle", BattleScene())
         '''
         [TODO HACKATHON 5]

@@ -50,6 +50,7 @@ class Map:
     def check_collision(self, rect: pg.Rect) -> bool:
         return any(rect.colliderect(r) for r in self._collision_map)
 
+
     def check_if_bush_collision(self, rect: pg.Rect):
         return any(rect.colliderect(r) for r in self.monster_bush)
 

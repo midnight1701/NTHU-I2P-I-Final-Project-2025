@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 from pygame import K_ESCAPE, K_SPACE
 from src.scenes.battle_system import BattleSetup, BattleEnd, EnemyTurn, PlayerTurn
@@ -17,6 +19,7 @@ class BattleScene(Scene):
         # Background/ Display font
         self.background = BackgroundSprite("backgrounds/background1.png")
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=22)
+        self.box_font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=25)
 
         # Dialogue setup
         self.dialogue_rect = pg.Rect(0, 0, GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT * 0.2)
@@ -30,25 +33,31 @@ class BattleScene(Scene):
 
         # Enemy monster battle setup
         self.enemy_pos = (800, 318)
-        self.enemy_monster = [{"name": "Charizard", "hp": 150, "max_hp": 200, "atk": 20, "def": 5, "level": 36, "sprite_path": "menu_sprites/menusprite2.png" }]
+        self.enemy_monster = [random.choice(scene_manager._scenes["game"].game_manager.bag._game_monsters)]
         self.enemy_monster_rect = pg.Rect(self.enemy_pos[0], self.enemy_pos[1], 196 * 2, 98 * 2)
         self.enemy_monster_rect.center = (964, 360)
         self.enemy_info = self.monster_info(self.enemy_monster)
-        self.enemy_monster_img = pg.transform.scale(resource_manager.get_image(self.enemy_info[2]), (250, 250))
+        self.enemy_monster_img = pg.transform.scale(resource_manager.get_image(self.enemy_info[len(self.enemy_info) - 1]), (250, 250))
 
         # Ally monster battle setup
         self.ally_monster_rect = pg.Rect(0, 0, 196 * 2, 98 * 2)
         self.ally_monster_rect.center = (430, 360)
-        self.ally_monster = [{ "name": "Viper", "hp": 120, "max_hp": 160, "atk": 20, "def": 5, "level": 10, "sprite_path": "menu_sprites/menusprite11.png"}]
+        self.ally_monster = [random.choice(scene_manager._scenes["game"].game_manager.bag._monsters_data)]
         self.ally_info = self.monster_info(self.ally_monster)
-        self.ally_monster_img = pg.transform.flip(pg.transform.scale(resource_manager.get_image(self.ally_info[2]), (250, 250)), flip_x=True, flip_y=False)
+        self.ally_monster_img = pg.transform.flip(pg.transform.scale(resource_manager.get_image(self.ally_info[len(self.ally_info) - 1]), (250, 250)), flip_x=True, flip_y=False)
 
         # Battle state...
-        self.battle = BattleSystem(self.ally_info, self.enemy_info)
+        self.battle = BattleSystem(self.ally_info, self.enemy_info, True) if scene_manager.monster_catch else BattleSystem(self.ally_info, self.enemy_info, False)
         self.displayed = False
 
 
         # Display monster info
+        self.ally_info_rect = pg.Rect(self.background.rect.topleft[0] + 10, self.background.rect.topleft[1] + 10, 300, 90)
+        self.enemy_info_rect = pg.Rect(self.background.rect.topright[0] - 300 - 10, self.background.rect.topright[1] + 10, 300, 90)
+
+        template = resource_manager.get_image("UI/UI_Flat_Banner04a.png")
+        self.ally_template = pg.transform.scale(template, (300, 90))
+        self.enemy_template = pg.transform.scale(template, (300, 90))
 
 
         # Button in battle scene
@@ -62,19 +71,35 @@ class BattleScene(Scene):
         self.run_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.dialogue_rect.topleft[0] + self.offset * 2 + 50,
                                     self.dialogue_rect.topleft[1] + 50, 180, 70,
-                                    lambda: self.battle.state.change_action("potion"))
+                                    lambda: self.battle.state.change_action("run"))
         self.potion_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.dialogue_rect.topleft[0] + self.offset * 3 + 50,
                                     self.dialogue_rect.topleft[1] + 50, 180, 70,
-                                    lambda: self.battle.state.change_action("run"))
+                                    lambda: self.battle.state.change_action("potion"))
 
+        self.attack_rect = pg.Rect(self.dialogue_rect.topleft[0] + 100, self.dialogue_rect.topleft[1] + 65, 180, 70)
+        self.defend_rect = pg.Rect(self.dialogue_rect.topleft[0] + 100 + self.offset, self.dialogue_rect.topleft[1] + 65, 180, 70)
+        self.potion_rect = pg.Rect(self.dialogue_rect.topleft[0] + self.offset * 3 + 105, self.dialogue_rect.topleft[1] + 65, 180, 70)
+        self.run_rect = pg.Rect(self.dialogue_rect.topleft[0] + self.offset * 2 + 120, self.dialogue_rect.topleft[1] + 65, 180, 70)
 
 
     def enter(self) -> None:
         sound_manager.play_bgm("RBY 107 Battle! (Trainer).ogg")
+        self.displayed = False
+        self.enemy_monster = [random.choice(scene_manager._scenes["game"].game_manager.bag._game_monsters)]
+        self.ally_monster = [random.choice(scene_manager._scenes["game"].game_manager.bag._monsters_data)]
+        self.enemy_info = self.monster_info(self.enemy_monster)
+        self.ally_info = self.monster_info(self.ally_monster)
+        self.enemy_monster_img = pg.transform.scale(
+            resource_manager.get_image(self.enemy_info[len(self.enemy_info) - 1]), (250, 250))
+        self.ally_monster_img = pg.transform.flip(
+            pg.transform.scale(resource_manager.get_image(self.ally_info[len(self.ally_info) - 1]), (250, 250)),
+            flip_x=True, flip_y=False)
+        self.battle = BattleSystem(self.ally_info, self.enemy_info, True) if scene_manager.monster_catch else BattleSystem(self.ally_info, self.enemy_info, False)
+
 
     def exit(self) -> None:
-        self.reset()
+        scene_manager.monster_catch = False
 
 
     def update(self, dt: float) -> None:
@@ -83,6 +108,13 @@ class BattleScene(Scene):
             self.defend_button.update(dt)
             self.run_button.update(dt)
             self.potion_button.update(dt)
+
+        if isinstance(self.battle.state, BattleEnd) and self.battle.state.status == "ally_wins" and scene_manager.monster_catch:
+            for m in self.enemy_monster:
+                print(m)
+                if m not in scene_manager._scenes["game"].game_manager.bag._monsters_data:
+                    scene_manager._scenes["game"].game_manager.bag._monsters_data.append(m)
+
 
         if input_manager.key_pressed(K_ESCAPE):
             scene_manager.change_scene("game")
@@ -93,22 +125,44 @@ class BattleScene(Scene):
     def action_display(self, screen):
         if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
             self.attack_button.draw(screen)
+            attack_text = self.font.render("Attack", True, (0, 0, 0))
+
             self.defend_button.draw(screen)
-            self.run_button.draw(screen)
+            defend_text = self.font.render("Defend", True, (0, 0, 0))
+
             self.potion_button.draw(screen)
+            potion_text = self.font.render("Potion", True, (0, 0, 0))
+
+            self.run_button.draw(screen)
+            run_text = self.font.render("Run", True, (0, 0, 0))
+
+            screen.blit(run_text, self.run_rect)
+            screen.blit(potion_text, self.potion_rect)
+            screen.blit(defend_text, self.defend_rect)
+            screen.blit(attack_text, self.attack_rect)
 
 
     def battle_setup(self, screen):
         if isinstance(self.battle.state, BattleSetup):
-            if self.battle.state.enemy_setup or self.displayed:
+            if self.battle.state.enemy_setup:
                 screen.blit(self.enemy_monster_img, self.enemy_monster_rect)
+                screen.blit(self.enemy_template, self.enemy_info_rect)
+
+
             if self.battle.state.ally_setup:
                 screen.blit(self.ally_monster_img, self.ally_monster_rect)
+                screen.blit(self.ally_template, self.ally_info_rect)
                 self.displayed = True
+
 
         if self.displayed:
             screen.blit(self.enemy_monster_img, self.enemy_monster_rect)
+            screen.blit(self.enemy_template, self.enemy_info_rect)
+
+
             screen.blit(self.ally_monster_img, self.ally_monster_rect)
+            screen.blit(self.ally_template, self.ally_info_rect)
+
 
     def monster_info(self, monster):
         info = []
@@ -118,7 +172,11 @@ class BattleScene(Scene):
             m_level, m_img_path = i["level"], i["sprite_path"]
             m_atk, m_def = i["atk"], i["def"]
             info.append(m_name)
-            info.append((m_hp, m_max_hp, m_level, m_atk, m_def))
+            info.append(m_hp)
+            info.append(m_max_hp)
+            info.append(m_level)
+            info.append(m_atk)
+            info.append(m_def)
             info.append(m_img_path)
 
         return info
@@ -141,9 +199,7 @@ class BattleScene(Scene):
         self.action_display(screen)
 
 
-    def reset(self):
-        self.displayed = False
-        self.battle = BattleSystem(self.ally_info, self.enemy_info)
+
 
 
 

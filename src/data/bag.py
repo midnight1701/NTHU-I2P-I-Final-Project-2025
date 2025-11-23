@@ -1,6 +1,7 @@
 import pygame as pg
 import json
 from src.core.services import resource_manager, input_manager
+from src.utils.definition import MonsterBattle
 from src.utils import GameSettings
 from src.utils.definition import Monster, Item
 
@@ -9,19 +10,19 @@ class Bag:
     _monsters_data: list[Monster]
     _items_data: list[Item]
 
-    def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None):
+    def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None, game_monster_data: list[Monster] | None = None):
         self._monsters_data = monsters_data if monsters_data else []
         self._items_data = items_data if items_data else []
+        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
+        self._game_monsters = game_monster_data if game_monster_data else []
+
+
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
-
-
         self.background = pg.Rect(0, 0, 720, 540)
         self.background.center = (GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT // 2)
         self.item_rect_top = self.background.topleft
         self.item_rect_width = self.background.width * 0.3
         self.item_rect_height = self.background.height / 6
-
-        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
 
         self.index = 0
         self.curr_surface = pg.display.get_surface()
@@ -34,6 +35,8 @@ class Bag:
             self.index = self.index + 1
         self.index = self.index % len(self._monsters_data)
         self.draw(self.curr_surface)
+
+        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
 
     def draw(self, screen: pg.Surface):
         box_offset = 0 if self.index < 6 else -(self.index - 6 + 1) * self.item_rect_height
@@ -102,13 +105,14 @@ class Bag:
 
     def to_dict(self) -> dict[str, object]:
         return {
-            "monsters": list(self._monsters_data),
+            "initial_monsters": list(self._monsters_data),
             "items": list(self._items_data)
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> "Bag":
-        monsters = data.get("monsters") or []
+        monsters = data.get("initial_monsters") or []
+        game_monsters = data.get("monsters") or []
         items = data.get("items") or []
-        bag = cls(monsters, items)
+        bag = cls(monsters, items, game_monsters)
         return bag

@@ -106,7 +106,7 @@ class EnemyTurn(BattleState):
         self.atk, self.defend, self.run, self.potion = atk, defend, run, potion
 
     def get_action(self):
-        action = ["attack", "defend", "run", "potion"]
+        action = ["attack"]
         return random.choice(action)
 
 
@@ -182,11 +182,12 @@ class BattleEnd(BattleState):
 
 # noinspection PyMethodMayBeStatic
 class BattleSystem:
-    def __init__(self, player_info, enemy_info):
-        self.player = MonsterBattle(player_info[0], player_info[1][0], player_info[1][1], player_info[1][2], player_info[1][3], player_info[1][4])
-        self.enemy = MonsterBattle(enemy_info[0], enemy_info[1][0], enemy_info[1][1], enemy_info[1][2], enemy_info[1][3], enemy_info[1][4])
+    def __init__(self, player_info, enemy_info, monster_catch):
+        self.player = MonsterBattle(*(player_info[:len(player_info) - 1]))
+        self.enemy = MonsterBattle(*(enemy_info[:len(enemy_info) - 1]))
         self.player_turn = True
         self.state = BattleSetup(self.player, self.enemy)
+        self.monster_catch = monster_catch
 
 
     def update(self):
@@ -196,6 +197,7 @@ class BattleSystem:
         if not isinstance(self.state, BattleEnd):
             if self.state.state_complete:
                 self.change_state()
+
 
     def change_state(self):
         if isinstance(self.state, BattleSetup):
@@ -243,9 +245,6 @@ class BattleSystem:
 
     def potion(self, current):
         return f"{current.name} prepares for a deadly blow"
-    
 
-    def reset(self):
-        pass
 
 

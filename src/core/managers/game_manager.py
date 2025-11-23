@@ -84,7 +84,10 @@ class GameManager:
         return False
 
     def check_bush_collision(self, rect: pg.Rect):
-        pass
+        if self.maps[self.current_map_key].check_if_bush_collision(rect):
+            return True
+
+        return False
         
     def save(self, path: str) -> None:
         try:

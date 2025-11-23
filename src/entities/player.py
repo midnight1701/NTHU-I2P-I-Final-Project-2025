@@ -1,9 +1,10 @@
 from __future__ import annotations
 import pygame as pg
 from jedi.debug import speed
+from pygame import K_SPACE
 
 from .entity import Entity
-from src.core.services import input_manager
+from src.core.services import input_manager, scene_manager
 from src.utils import Position, PositionCamera, GameSettings, Logger, Direction
 from src.core import GameManager
 import math
@@ -18,6 +19,7 @@ class Player(Entity):
     def __init__(self, x: float, y: float, game_manager: GameManager) -> None:
         super().__init__(x, y, game_manager)
         self.blocked = False
+        self.bush_collide = False
 
 
     @override
@@ -60,8 +62,19 @@ class Player(Entity):
                 dest = tp.destination
                 self.game_manager.switch_map(dest)
 
+            self.check_if_bush_collide()
+            if self.bush_collide and input_manager.key_pressed(K_SPACE):
+                scene_manager.change_scene("battle")
+                scene_manager.monster_catch = True
 
         super().update(dt)
+
+    def check_if_bush_collide(self):
+        check = self.game_manager.check_bush_collision(pg.Rect(self.position.x, self.position.y, 64, 64))
+        if check:
+            self.bush_collide = True
+        else:
+            self.bush_collide = False
 
     @override
     def draw(self, screen: pg.Surface, camera: PositionCamera) -> None:
