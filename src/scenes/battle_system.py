@@ -51,7 +51,7 @@ class PlayerTurn(BattleState):
 
     def update(self):
         if input_manager.key_pressed(K_SPACE):
-            if not self.dialogue_check:
+            if not self.dialogue_check and self.action is not None:
                 self.dialogue_check = True
                 self.perform_action()
             elif self.dialogue_check:
