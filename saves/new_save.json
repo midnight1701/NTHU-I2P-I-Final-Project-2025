@@ -65,14 +65,14 @@
   ],
   "current_map": "map.tmx",
   "player": {
-    "x": 9.669999999999987,
+    "x": 9.609999999999987,
     "y": 30.0
   },
   "bag": {
     "initial_monsters": [
       {
         "name": "Pikachu",
-        "hp": 100,
+        "hp": 80,
         "max_hp": 100,
         "atk": 20,
         "def": 5,
@@ -80,13 +80,13 @@
         "sprite_path": "menu_sprites/menusprite1.png"
       },
       {
-        "name": "Viper",
+        "name": "Charizard",
         "hp": 50,
-        "max_hp": 160,
+        "max_hp": 200,
         "atk": 20,
         "def": 5,
-        "level": 10,
-        "sprite_path": "menu_sprites/menusprite11.png"
+        "level": 36,
+        "sprite_path": "menu_sprites/menusprite2.png"
       }
     ],
     "items": [
