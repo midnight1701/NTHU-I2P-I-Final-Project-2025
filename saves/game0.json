@@ -40,7 +40,7 @@
 
   "bag": {
     "initial_monsters": [
-      { "name": "Pikachu", "hp": 100,  "max_hp": 100, "atk": 20, "def": 5, "level": 1, "sprite_path": "menu_sprites/menusprite1.png" }
+      { "name": "Pikachu", "hp": 80,  "max_hp": 100, "atk": 20, "def": 5, "level": 1, "sprite_path": "menu_sprites/menusprite1.png" }
     ],
 
     "monsters": [
