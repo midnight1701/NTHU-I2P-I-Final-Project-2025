@@ -19,6 +19,9 @@ class SoundManager:
     def update(self):
         self.current_bgm.set_volume(self.volume)
 
+    def change_volume(self, volume):
+        self.volume = volume
+
     def pause_all(self):
         pg.mixer.pause()
 

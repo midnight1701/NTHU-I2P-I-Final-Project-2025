@@ -13,9 +13,8 @@ class Bag:
     def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None, game_monster_data: list[Monster] | None = None):
         self._monsters_data = monsters_data if monsters_data else []
         self._items_data = items_data if items_data else []
-        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._game_monsters = game_monster_data if game_monster_data else []
-
+        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
 
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
         self.background = pg.Rect(0, 0, 720, 540)
@@ -43,11 +42,11 @@ class Bag:
         main_rect = pg.Rect(self.item_rect_top[0], self.item_rect_top[1], self.item_rect_width, self.background.height)
         pg.draw.rect(self.curr_surface, "grey", main_rect, border_bottom_left_radius=12, border_top_left_radius=12)
 
-        for index, m in enumerate(self._monsters_data):
+        for index, monster in enumerate(self._monsters_data):
             bg_color = "grey" if self.index != index else "white"
 
-            monster_name = self.font.render(m["name"], True, (0, 0, 0))
-            monster_img_path = m["sprite_path"]
+            monster_name = self.font.render(monster["name"], True, (0, 0, 0))
+            monster_img_path = monster["sprite_path"]
             top = self.item_rect_top[1] + index * self.item_rect_height + box_offset
 
             monster_rect = pg.Rect(self.item_rect_top[0], top, self.item_rect_width, self.item_rect_height)
@@ -116,3 +115,13 @@ class Bag:
         items = data.get("items") or []
         bag = cls(monsters, items, game_monsters)
         return bag
+
+
+    def create_monster_dict(self, monster_list):
+        monster_dict = {}
+        for m in monster_list:
+            if m["name"] not in monster_dict:
+                monster_dict[m["name"]] = m
+
+        return monster_dict
+

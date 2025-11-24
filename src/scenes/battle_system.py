@@ -183,8 +183,8 @@ class BattleEnd(BattleState):
 # noinspection PyMethodMayBeStatic
 class BattleSystem:
     def __init__(self, player_info, enemy_info, monster_catch):
-        self.player = MonsterBattle(*(player_info[:len(player_info) - 1]))
-        self.enemy = MonsterBattle(*(enemy_info[:len(enemy_info) - 1]))
+        self.player = MonsterBattle(player_info["name"], player_info["hp"], player_info["max_hp"], player_info["level"], player_info["atk"], player_info["def"])
+        self.enemy = MonsterBattle(enemy_info["name"], enemy_info["hp"], enemy_info["max_hp"], enemy_info["level"], enemy_info["atk"], enemy_info["def"])
         self.player_turn = True
         self.state = BattleSetup(self.player, self.enemy)
         self.monster_catch = monster_catch
@@ -192,7 +192,6 @@ class BattleSystem:
 
     def update(self):
         self.state.update()
-        print(f"Ally health: {self.player.hp} | Enemy health: {self.enemy.hp}")
 
         if not isinstance(self.state, BattleEnd):
             if self.state.state_complete:

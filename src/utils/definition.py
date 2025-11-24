@@ -93,6 +93,7 @@ class MonsterBattle:
         self.atk = atk
         self.defense = defense
 
+
 class BattleState:
     def enter (self):
         ...

@@ -49,6 +49,7 @@ class MenuScene(Scene):
     def update(self, dt: float) -> None:
         self.play_button.update(dt)
         self.setting_button.update(dt)
+        sound_manager.update()
 
     @override
     def draw(self, screen: pg.Surface) -> None:

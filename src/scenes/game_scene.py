@@ -73,6 +73,7 @@ class GameScene(Scene):
         
     @override
     def update(self, dt: float):
+        sound_manager.update()
         # Check if there is assigned next scene
         self.game_manager.try_switch_map()
         

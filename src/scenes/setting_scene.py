@@ -80,9 +80,8 @@ class SettingScene(Scene):
             self.close_button.update(dt)
 
         if sound_manager.current_bgm:
-            sound_manager.volume = (float(float(self._slider.volume()) / 100))
-
-        sound_manager.update()
+            sound_manager.change_volume((float(float(self._slider.volume()) / 100)))
+            sound_manager.update()
 
 
     @override
