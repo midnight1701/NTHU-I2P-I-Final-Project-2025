@@ -38,32 +38,35 @@
     "y": 30
   },
 
+
   "bag": {
     "initial_monsters": [
-      { "name": "Pikachu", "hp": 80,  "max_hp": 100, "atk": 20, "def": 5, "level": 1, "sprite_path": "menu_sprites/menusprite1.png", "animation_path":"assets/images/sprites/sprite1_idle.png"},
-       { "name": "Charizard", "hp": 50, "max_hp": 200, "atk": 20, "def": 5, "level": 36, "sprite_path": "menu_sprites/menusprite2.png",  "animation_path":"assets/images/sprites/sprite2_idle.png"},
-      { "name": "Blastoise", "hp": 50, "max_hp": 180, "atk": 20, "def": 5, "level": 32, "sprite_path": "menu_sprites/menusprite3.png", "animation_path":"assets/images/sprites/sprite3_idle.png"},
-      { "name": "Venusaur",  "hp": 50,  "max_hp": 160, "atk": 20, "def": 5, "level": 30, "sprite_path": "menu_sprites/menusprite4.png", "animation_path":"assets/images/sprites/sprite4_idle.png"},
-      { "name": "Gengar",    "hp": 50, "max_hp": 140, "atk": 20, "def": 5, "level": 28, "sprite_path": "menu_sprites/menusprite5.png", "animation_path":"assets/images/sprites/sprite5_idle.png"},
-      { "name": "Dragonite", "hp": 50, "max_hp": 220, "atk": 20, "def": 5, "level": 40, "sprite_path": "menu_sprites/menusprite6.png", "animation_path":"assets/images/sprites/sprite6_idle.png"},
-      { "name": "Viper",     "hp": 50, "max_hp": 160, "atk": 20, "def": 5, "level": 10, "sprite_path": "menu_sprites/menusprite11.png","animation_path":"assets/images/sprites/sprite11_idle.png"}
+      { "name": "Pikachu", "hp": 120,  "max_hp": 120, "atk": 100, "def": 20, "speed": 40, "accuracy": 60,"level": 1,
+        "element": "grass"}
+
     ],
 
     "monsters": [
-      { "name": "Pikachu",   "hp": 100,  "max_hp": 100, "atk": 20, "def": 5, "level": 1, "sprite_path": "menu_sprites/menusprite1.png", "animation_path":"assets/images/sprites/sprite1_idle.png" },
-      { "name": "Charizard", "hp": 50, "max_hp": 200, "atk": 20, "def": 5, "level": 36, "sprite_path": "menu_sprites/menusprite2.png",  "animation_path":"assets/images/sprites/sprite2_idle.png"},
-      { "name": "Blastoise", "hp": 50, "max_hp": 180, "atk": 20, "def": 5, "level": 32, "sprite_path": "menu_sprites/menusprite3.png", "animation_path":"assets/images/sprites/sprite3_idle.png"},
-      { "name": "Venusaur",  "hp": 50,  "max_hp": 160, "atk": 20, "def": 5, "level": 30, "sprite_path": "menu_sprites/menusprite4.png", "animation_path":"assets/images/sprites/sprite4_idle.png"},
-      { "name": "Gengar",    "hp": 50, "max_hp": 140, "atk": 20, "def": 5, "level": 28, "sprite_path": "menu_sprites/menusprite5.png", "animation_path":"assets/images/sprites/sprite5_idle.png"},
-      { "name": "Dragonite", "hp": 50, "max_hp": 220, "atk": 20, "def": 5, "level": 40, "sprite_path": "menu_sprites/menusprite6.png", "animation_path":"assets/images/sprites/sprite6_idle.png"},
-      { "name": "Viper",     "hp": 50, "max_hp": 160, "atk": 20, "def": 5, "level": 10, "sprite_path": "menu_sprites/menusprite11.png","animation_path":"assets/images/sprites/sprite11_idle.png"}
-
+      { "name": "Pikachu", "hp": 120,  "max_hp": 120, "atk": 20, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "grass"},
+      { "name": "Charizard", "hp": 150, "max_hp": 150, "atk": 10, "def": 35, "speed": 40, "accuracy": 60, "level": 1,
+        "element": "grass"},
+      { "name": "Blastoise", "hp": 200, "max_hp": 200, "atk": 10, "def": 40, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "grass"},
+      { "name": "Venusaur",  "hp": 120,  "max_hp": 120, "atk": 25, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "earth"},
+      { "name": "Gengar",    "hp": 100, "max_hp": 100, "atk": 30, "def": 15, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "wind"},
+      { "name": "Dragonite", "hp": 150, "max_hp": 150, "atk": 30, "def": 10, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "ice"},
+      { "name": "Viper",     "hp": 100, "max_hp": 100, "atk": 25, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "poison"}
     ],
 
     "items": [
-      { "name": "Potion",      "count": 5,  "sprite_path": "ingame_ui/potion.png" },
-      { "name": "Coins",       "count": 3,  "sprite_path": "ingame_ui/coin.png" },
-      { "name": "Pokeball",    "count": 1, "sprite_path": "ingame_ui/ball.png" }
+      { "name": "Potion",      "count": 5},
+      { "name": "Coins",       "count": 3},
+      { "name": "Pokeball",    "count": 1}
     ]
   }
 }

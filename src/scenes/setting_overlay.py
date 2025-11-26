@@ -1,15 +1,15 @@
 import pygame as pg
 import time
+import math
 
 from src.core import GameManager
+from src.scenes.setting_scene import SettingScene
 from src.utils.silder import Slider
 from src.interface.components.checkbox import Checkbox
 from src.utils import GameSettings
 from src.sprites.background import SettingSprite
-from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager
-from typing import override
 from src.scenes.overlay import Overlay
 
 class SettingOverlay(Overlay):
@@ -37,9 +37,11 @@ class SettingOverlay(Overlay):
         self._slider = Slider(348, 285, 581, 32, 50.0, 0, 100,
                               "assets/images/UI/UI_Flat_FrameSlot03a.png")
 
+
         self._checkbox = Checkbox("UI/UI_Flat_ToggleOff01a.png",
                                   "UI/UI_Flat_ToggleOn01a.png",
-                                  480, 330, 64, 32)
+                                  480, 330, 64, 32,
+                                  )
 
         self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
         self.exit_button.hitbox.x -= 3
@@ -51,10 +53,8 @@ class SettingOverlay(Overlay):
         self._checkbox.update()
         self.save_button.update(dt)
         self.load_button.update(dt)
-
-        if sound_manager.current_bgm:
-            sound_manager.change_volume((float(float(self._slider.volume()) / 100)))
-            sound_manager.update()
+        GameSettings.volume_change((float(self._slider.volume() / 100)))
+        sound_manager.update()
         super().update(dt)
 
     def change_scene(self):
@@ -72,5 +72,5 @@ class SettingOverlay(Overlay):
         self.save_button.draw(screen)
         self.load_button.draw(screen)
 
-        text = self.font.render(f"Volume: {self._slider.volume()}", True, (255, 255, 255))
+        text = self.font.render(f"Volume: {int(round(self._slider.volume(), 1))}", True, (255, 255, 255))
         screen.blit(text, (348, 260))

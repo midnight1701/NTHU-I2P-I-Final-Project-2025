@@ -1,11 +1,11 @@
 import pygame as pg
-import json
 from src.core.services import resource_manager, input_manager
-from src.utils.definition import MonsterBattle
 from src.utils import GameSettings
-from src.utils.definition import Monster, Item
+from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX
+from src.scenes.battle_scene import get_animation_image, AnimatedMonster
 
 
+# noinspection PyMethodMayBeStatic
 class Bag:
     _monsters_data: list[Monster]
     _items_data: list[Item]
@@ -14,17 +14,26 @@ class Bag:
         self._monsters_data = monsters_data if monsters_data else []
         self._items_data = items_data if items_data else []
         self._game_monsters = game_monster_data if game_monster_data else []
+
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
+        self.info = ["hp", "atk", "def", "speed", "accuracy"]
+        self.limit = 6
+        self.clock = pg.time.Clock()
+        self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
+        self.frame_index = 0
 
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
         self.background = pg.Rect(0, 0, 720, 540)
         self.background.center = (GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT // 2)
         self.item_rect_top = self.background.topleft
         self.item_rect_width = self.background.width * 0.3
-        self.item_rect_height = self.background.height / 6
+        self.item_rect_height = self.background.height / self.limit
+
+        self.main_rect = pg.Rect(self.item_rect_top[0], self.item_rect_top[1], self.item_rect_width, self.background.height)
 
         self.index = 0
         self.curr_surface = pg.display.get_surface()
+        self.animated = False
 
 
     def update(self, dt: float):
@@ -32,79 +41,107 @@ class Bag:
             self.index = self.index - 1
         elif input_manager.key_pressed(pg.K_DOWN):
             self.index = self.index + 1
-        self.index = self.index % len(self._monsters_data)
-        self.draw(self.curr_surface)
 
-        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
+        self.index = self.index % len(self._monsters_data)
+
 
     def draw(self, screen: pg.Surface):
-        box_offset = 0 if self.index < 6 else -(self.index - 6 + 1) * self.item_rect_height
-        main_rect = pg.Rect(self.item_rect_top[0], self.item_rect_top[1], self.item_rect_width, self.background.height)
-        pg.draw.rect(self.curr_surface, "grey", main_rect, border_bottom_left_radius=12, border_top_left_radius=12)
+        self.draw_monster(screen)
+        self.draw_monster_info_bg(screen)
 
+
+    def draw_monster(self, screen):
+        pg.draw.rect(screen, (44, 44, 44), self.main_rect, border_top_left_radius=12, border_bottom_left_radius=12)
+        box_offset = 0 if self.index < self.limit else -(self.index - self.limit + 1) * self.item_rect_height
         for index, monster in enumerate(self._monsters_data):
-            bg_color = "grey" if self.index != index else "white"
-
-            monster_name = self.font.render(monster["name"], True, (0, 0, 0))
-            monster_img_path = monster["sprite_path"]
+            text_color = "yellow" if self.index == index else "white"
+            bg_color = (44, 44, 44) if self.index != index else (169, 169, 169)
             top = self.item_rect_top[1] + index * self.item_rect_height + box_offset
-
             monster_rect = pg.Rect(self.item_rect_top[0], top, self.item_rect_width, self.item_rect_height)
+            icon_rect = pg.Rect(self.item_rect_top[0] + 10, top + 10, self.item_rect_width, self.item_rect_height)
+            monster_img = self.get_monster_img(MONSTER_PATH[monster["name"]]["sprite_path"])
 
+            monster_name = self.font.render(monster["name"], True, text_color)
             text_rect = monster_name.get_rect()
-            text_rect.midleft = monster_rect.midleft
-            text_rect.x = text_rect.x + 90
+            text_rect.midleft = (monster_rect.midleft[0] + 90, monster_rect.midleft[1])
 
-            monster_icon = resource_manager.get_image(monster_img_path)
-            monster_icon = pg.transform.scale(monster_icon, (55, 55))
-            icon_rect = monster_icon.get_rect()
-            icon_rect.midleft = monster_rect.midleft
-            icon_rect.x = icon_rect.x + 20
-            icon_rect.y = icon_rect.y - 8
-
+            info_bg = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height)
 
             if monster_rect.colliderect(self.background):
-                 if monster_rect.collidepoint(self.background.topleft):
-                     pg.draw.rect(screen, bg_color, monster_rect, 0, 0, 12)
-                 elif monster_rect.collidepoint(self.background.bottomleft[0] + 1, self.background.bottomleft[1] + -1):
-                     pg.draw.rect(screen, bg_color, monster_rect, border_bottom_left_radius=12)
-                 else:
-                     pg.draw.rect(screen, bg_color, monster_rect)
-                 screen.blit(monster_icon, icon_rect)
-                 screen.blit(monster_name, text_rect)
+                if monster_rect.collidepoint(self.background.topleft):
+                    pg.draw.rect(screen, bg_color, monster_rect, 0, 0, 12)
+                elif monster_rect.collidepoint(self.background.bottomleft[0] + 1, self.background.bottomleft[1] + -1):
+                    pg.draw.rect(screen, bg_color, monster_rect, border_bottom_left_radius=12)
+                else:
+                    pg.draw.rect(screen, bg_color, monster_rect)
+                screen.blit(monster_img, icon_rect)
+                screen.blit(monster_name, text_rect)
 
-        info_rect = pg.Rect(self.item_rect_top[0] + self.item_rect_width, self.item_rect_top[1],
-                            self.background.width - self.item_rect_width, self.background.height * 0.5)
+            pg.draw.rect(screen, (44, 44, 44), info_bg)
 
-        info_text_rect = pg.Rect(self.item_rect_top[0] + self.item_rect_width + 30, self.item_rect_top[1] + 30,
-                                 self.background.width - self.item_rect_width, self.background.height / 12)
-        info_text_rect_alt = pg.Rect(self.item_rect_top[0] + self.item_rect_width + 30, self.item_rect_top[1] + 60,
-                                     self.background.width - self.item_rect_width, self.background.height / 12)
+        for i in range(1, min(len(self._monsters_data), self.limit)):
+            pg.draw.line(screen, (169, 169, 169), (self.item_rect_top[0], self.item_rect_top[1] + i * self.item_rect_height), (self.main_rect.topright[0], self.main_rect.topright[1] + i * self.item_rect_height))
 
-        pg.draw.rect(self.curr_surface, (255, 156, 0), info_rect, border_top_right_radius=12)
-        screen.blit(self.font.render(f"Level: {self._monsters_dict[self.index]["level"]}", True, (0, 0, 0)), info_text_rect)
-        screen.blit(self.font.render(f"HP: {self._monsters_dict[self.index]["hp"]}/{self._monsters_dict[self.index]["max_hp"]}", True, (0, 0, 0)), info_text_rect_alt)
 
-        item_rect = pg.Rect(self.background.bottomleft[0] + self.item_rect_width,
-                            self.background.bottomleft[1] - self.item_rect_height * 3,
-                            self.background.width - self.item_rect_width, self.background.height * 0.5)
-        pg.draw.rect(self.curr_surface, (0, 128, 225), item_rect, border_bottom_right_radius=12)
+    def draw_monster_info_bg(self, screen):
+        monster = self._monsters_dict[self.index]
+        sprite = get_animation_image(MONSTER_PATH[monster["name"]]["animation_path"])
+        self.frame_index += GameSettings.ANIMATION_SPEED * self.dt
+        img = sprite[int(self.frame_index % len(sprite))]
+        img = pg.transform.scale(img, (200, 200))
 
-        for index, i in enumerate(self._items_data):
-            item_name, item_qty = i["name"], i["count"]
-            item_img_path = i["sprite_path"]
+        border = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], 2, self.background.height)
+        animated_bg = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height * 0.4)
+        animated = pg.Rect(0, 0, 200, 200)
+        animated.center = animated_bg.center
 
-            item_img = pg.transform.scale(resource_manager.get_image(item_img_path), (55, 55))
-            item_text_x, item_text_y = item_rect.topleft[0] + 30, item_rect.topleft[1] + 20
-            item_actual_rect = pg.Rect(item_text_x, item_text_y + index * 80, 55, 55)
-            item_text_rect = pg.Rect(item_text_x + 80, item_text_y + 24 + index * 80, 100, 55)
-            screen.blit(item_img, item_actual_rect)
-            screen.blit(self.font.render(f"{item_name} x{item_qty}", True, (0, 0, 0)), item_text_rect)
+        info_bg = pg.Rect(animated_bg.bottomleft[0], animated_bg.bottomleft[1], self.background.width * 0.35, self.background.height * 0.6)
+        monster_info = self.get_monster_info(monster)
+        top = (info_bg.topleft[0] + 25, info_bg.topleft[1] + 20)
+
+        pg.draw.rect(screen, COLOR[monster["element"]], animated_bg)
+        pg.draw.rect(screen, (169, 169, 169), border)
+        screen.blit(img, animated)
+
+
+        for index, (char, val) in enumerate(monster_info.items()):
+            text = self.font.render(DISPLAY_INFO[char], True, (255, 255, 255))
+            char_img = resource_manager.get_image(INFO_IMG[char])
+            char_img = pg.transform.scale(char_img, (20, 20))
+            char_rect = pg.Rect(top[0], top[1] + index * 55, text.get_width(), text.get_height())
+            img_rect = pg.Rect(char_rect.topright[0] + 13, char_rect.topright[1], 20, 20)
+            img_rect.centery = char_rect.centery + 2
+
+            val = self.font.render(f"{val}/{monster["max_hp"]}", True, (255, 255, 0)) if char == "hp" else self.font.render(f"{val}/{CHAR_MAX[char]}", True, (255, 255, 0))
+            val_rect = pg.Rect(char_rect.bottomleft[0], char_rect.bottomleft[1], val.get_width(), val.get_height())
+
+            screen.blit(text, char_rect)
+            screen.blit(char_img, img_rect)
+            screen.blit(val, val_rect)
+
+
+    def draw_item(self):
+        pass
+
+    def get_monster_img(self, path):
+        img = resource_manager.get_image(path)
+        img = pg.transform.scale(img, (55, 55))
+
+        return img
+
+    def get_monster_info(self, monster):
+        info = {}
+        for i in monster:
+            if i not in info and i in self.info:
+                info[i] = monster[i]
+
+        return info
 
 
     def to_dict(self) -> dict[str, object]:
         return {
             "initial_monsters": list(self._monsters_data),
+            "monsters": list(self._game_monsters),
             "items": list(self._items_data)
         }
 
@@ -117,11 +154,4 @@ class Bag:
         return bag
 
 
-    def create_monster_dict(self, monster_list):
-        monster_dict = {}
-        for m in monster_list:
-            if m["name"] not in monster_dict:
-                monster_dict[m["name"]] = m
-
-        return monster_dict
 

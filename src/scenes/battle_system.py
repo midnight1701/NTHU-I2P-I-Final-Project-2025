@@ -2,7 +2,7 @@ import pygame as pg
 from pygame import K_SPACE
 
 from src.core.services import scene_manager, sound_manager, input_manager
-from src.utils.definition import MonsterBattle, BattleState
+from src.utils.support import MonsterBattle, BattleState
 from src.core.services import input_manager
 import random
 

@@ -8,6 +8,7 @@ from src.scenes.battle_system import BattleSetup, BattleEnd, EnemyTurn, PlayerTu
 from src.scenes.battle_system import BattleSystem
 from src.sprites import BackgroundSprite
 from src.utils import GameSettings
+from src.utils.support import MONSTER_PATH
 from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager, resource_manager
@@ -25,18 +26,16 @@ def get_animation_image(path, ally=False):
     return animation_sprite
 
 
-
 class AnimatedMonster:
     def __init__(self, sprite):
         self.sprite_lst = sprite
         self.frame_index = 0
 
-    def draw(self, screen, dt, rect):
+    def draw(self, screen, dt, rect, size):
         self.frame_index += GameSettings.ANIMATION_SPEED * dt
         img = self.sprite_lst[int(self.frame_index % len(self.sprite_lst))]
-        img = pg.transform.scale(img, (300, 300))
+        img = pg.transform.scale(img, (size, size))
         screen.blit(img, rect)
-
 
 
 # noinspection PyMethodMayBeStatic
@@ -65,14 +64,14 @@ class BattleScene(Scene):
         self.enemy_monster_rect = pg.Rect(self.enemy_pos[0], self.enemy_pos[1], 196 * 2, 98 * 2)
         self.enemy_monster_rect.center = (964, 360)
         self.enemy_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._game_monsters)
-        self.enemy_monster_ani = AnimatedMonster(get_animation_image(self.enemy_monster["animation_path"]))
+        self.enemy_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.enemy_monster["name"]]["animation_path"]))
 
 
         # Ally monster battle setup
         self.ally_monster_rect = pg.Rect(0, 0, 196 * 2, 98 * 2)
         self.ally_monster_rect.center = (430, 360)
         self.ally_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._monsters_dict)
-        self.ally_monster_ani = AnimatedMonster(get_animation_image(self.ally_monster["animation_path"], True))
+        self.ally_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.ally_monster["name"]]["animation_path"], True))
 
 
         # Battle state...
@@ -87,7 +86,7 @@ class BattleScene(Scene):
         self.enemy_info_rect = pg.Rect(self.background.rect.topright[0] - 300 - 10, self.background.rect.topright[1] + 10, 300, 90)
 
         # Display ally monster info
-        self.ally_info_img = resource_manager.get_image(self.ally_monster["sprite_path"])
+        self.ally_info_img = resource_manager.get_image(MONSTER_PATH[self.ally_monster["name"]]["sprite_path"])
         self.ally_info_img = pg.transform.scale(self.ally_info_img, (75, 75))
         self.ally_info_img_rect = pg.Rect(self.ally_info_rect.topleft[0] + 12, self.ally_info_rect.topleft[1] - 3, 75, 75)
         self.ally_name = self.alt_font.render(self.battle.player.name, True, (0, 0, 0))
@@ -102,7 +101,7 @@ class BattleScene(Scene):
 
 
         # Display enemy monster info
-        self.enemy_info_img = resource_manager.get_image(self.enemy_monster["sprite_path"])
+        self.enemy_info_img = resource_manager.get_image(MONSTER_PATH[self.enemy_monster["name"]]["sprite_path"])
         self.enemy_info_img = pg.transform.scale(self.enemy_info_img, (75, 75))
         self.enemy_info_img_rect = pg.Rect(self.enemy_info_rect.topleft[0] + 12, self.enemy_info_rect[1] - 3, 75, 75)
         self.enemy_name = self.alt_font.render(self.battle.enemy.name, True, (0, 0, 0))
@@ -143,17 +142,17 @@ class BattleScene(Scene):
         self.ally_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._monsters_data)
         self.battle = BattleSystem(self.ally_monster, self.enemy_monster,True) if scene_manager.monster_catch else BattleSystem(self.ally_monster,self.enemy_monster, False)
 
-        self.enemy_monster_ani = AnimatedMonster(get_animation_image(self.enemy_monster["animation_path"]))
-        self.ally_monster_ani = AnimatedMonster(get_animation_image(self.ally_monster["animation_path"], True))
+        self.enemy_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.enemy_monster["name"]]["animation_path"]))
+        self.ally_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.ally_monster["name"]]["animation_path"], True))
 
-        self.ally_info_img = resource_manager.get_image(self.ally_monster["sprite_path"])
+        self.ally_info_img = resource_manager.get_image(MONSTER_PATH[self.ally_monster["name"]]["sprite_path"])
         self.ally_info_img = pg.transform.scale(self.ally_info_img, (75, 75))
         self.ally_name = self.alt_font.render(self.battle.player.name, True, (0, 0, 0))
         self.ally_level = self.alt_font.render(f"Lv {self.battle.player.level}", True, (0, 0, 0))
         self.green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.player.hp / self.battle.player.max_hp)), 15))
         self.hp_text = self.alt_font.render(f"{self.battle.player.hp}/{self.battle.player.max_hp}", True, (0, 0, 0))
 
-        self.enemy_info_img = resource_manager.get_image(self.enemy_monster["sprite_path"])
+        self.enemy_info_img = resource_manager.get_image(MONSTER_PATH[self.enemy_monster["name"]]["sprite_path"])
         self.enemy_info_img = pg.transform.scale(self.enemy_info_img, (75, 75))
         self.enemy_name = self.alt_font.render(self.battle.enemy.name, True, (0, 0, 0))
         self.enemy_level = self.alt_font.render(f"Lv {self.battle.enemy.level}", True, (0, 0, 0))
@@ -219,7 +218,7 @@ class BattleScene(Scene):
     def battle_setup(self, screen):
         if isinstance(self.battle.state, BattleSetup):
             if self.battle.state.enemy_setup:
-                self.enemy_monster_ani.draw(screen, dt=self.dt, rect=self.enemy_monster_rect)
+                self.enemy_monster_ani.draw(screen, dt=self.dt, rect=self.enemy_monster_rect, size=300)
                 screen.blit(self.enemy_template, self.enemy_info_rect)
                 screen.blit(self.enemy_info_img, self.enemy_info_img_rect)
                 screen.blit(self.enemy_name, self.enemy_name_rect)
@@ -230,7 +229,7 @@ class BattleScene(Scene):
 
 
             if self.battle.state.ally_setup:
-                self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect)
+                self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect, 300)
                 screen.blit(self.ally_template, self.ally_info_rect)
                 screen.blit(self.ally_info_img, self.ally_info_img_rect)
                 screen.blit(self.ally_name, self.ally_name_rect)
@@ -243,7 +242,7 @@ class BattleScene(Scene):
 
 
         if self.displayed:
-            self.enemy_monster_ani.draw(screen, dt=self.dt, rect=self.enemy_monster_rect)
+            self.enemy_monster_ani.draw(screen, dt=self.dt, rect=self.enemy_monster_rect, size=300)
             screen.blit(self.enemy_template, self.enemy_info_rect)
             screen.blit(self.enemy_info_img, self.enemy_info_img_rect)
             screen.blit(self.enemy_name, self.enemy_name_rect)
@@ -252,7 +251,7 @@ class BattleScene(Scene):
             screen.blit(self.enemy_green_hp, self.enemy_hp_rect)
             screen.blit(self.enemy_hp_text, self.enemy_hp_text_rect)
 
-            self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect)
+            self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect, 300)
             screen.blit(self.ally_template, self.ally_info_rect)
             screen.blit(self.ally_info_img, self.ally_info_img_rect)
             screen.blit(self.ally_info_img, self.ally_info_img_rect)

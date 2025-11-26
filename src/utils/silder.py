@@ -3,6 +3,8 @@ import math
 from src.core.managers import input_manager
 from src.core.managers import game_manager
 from src.core import engine
+from src.utils import GameSettings
+
 
 class Slider:
     def __init__(self, x, y, width, height, intial_val: float, min_val: int, max_val: int, img_path: str):
@@ -15,6 +17,7 @@ class Slider:
         self.img = pg.image.load(img_path).convert()
         self.rect = self.img.get_rect()
         self.rect.x, self.rect.y = x + (width // 2) - self.rect.width // 2, y
+        self.volume_range = self.right - self.left - 32
 
     def check_if_slider_update(self, mouse_1, mouse_2, mouse_button):
         if self._container.collidepoint(mouse_1, mouse_2) and mouse_button:
@@ -31,15 +34,17 @@ class Slider:
             else:
                 self.rect.centerx = self.left + 16 if mouse_pos[0] < self.left + 16 else self.right - 16
 
+    def synchronize(self):
+        self.rect.centerx = GameSettings.AUDIO_VOLUME * self.volume_range + 16 + self.left
+
     def draw(self, surface):
         pg.draw.rect(surface, "grey", self._container)
         surface.blit(self.img, self.rect)
 
     def volume(self):
-        volume_range = self.right - self.left - 32
         actual_range = self.rect.centerx - self.left - 16
-        volume = (actual_range / volume_range) * (self._max_value - self._min_value) + self._min_value
-        return math.ceil(volume)
+        volume = (actual_range / self.volume_range) * (self._max_value - self._min_value) + self._min_value
+        return volume
 
 
 

@@ -96,6 +96,7 @@ class GameScene(Scene):
                 self.bag_overlay.close = False
 
         if self.setting_open:
+            self.setting_overlay._slider.synchronize()
             self.setting_overlay.update(dt)
             if self.setting_overlay.close:
                 self.setting_open = False

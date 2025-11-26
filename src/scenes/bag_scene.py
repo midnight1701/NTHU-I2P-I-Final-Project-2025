@@ -19,13 +19,13 @@ class BagScene(Scene):
         self.fade.fill((0, 0, 0, 50))
         self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
 
+
     @override
     def enter(self) -> None:
         scene_manager.bag_enter_check = True
 
     @override
     def exit(self) -> None:
-        self.fade_check = False
         scene_manager.bag_enter_check = False
 
     @override

@@ -3,7 +3,7 @@ import pygame as pg
 
 from src.sprites import Sprite
 from src.core.services import input_manager, sound_manager
-from src.utils import Logger
+from src.utils import Logger, GameSettings
 from typing import Callable, override
 from src.interface.components.component import UIComponent
 
@@ -17,6 +17,7 @@ class Checkbox:
         self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
 
         self.switched = False
+        self.original_vol = None
 
     def update(self):
         mouse_pos = input_manager.mouse_pos
@@ -25,10 +26,13 @@ class Checkbox:
                 self.switched = not self.switched
                 if self.switched:
                     self.img = self.img_clicked
-                    sound_manager.volume = 0
+                    self.original_vol = GameSettings.AUDIO_VOLUME
+                    GameSettings.volume_change(0)
+                    sound_manager.update()
                 else:
                     self.img = self.img_default
-                    sound_manager.volume = 0.5
+                    GameSettings.volume_change(self.original_vol)
+                    sound_manager.update()
 
     def draw(self, surface):
         _ = surface.blit(self.img.image, self.hitbox)

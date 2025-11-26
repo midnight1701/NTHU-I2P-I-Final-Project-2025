@@ -65,45 +65,114 @@
   ],
   "current_map": "map.tmx",
   "player": {
-    "x": 9.609999999999987,
-    "y": 30.0
+    "x": 23.94838192284826,
+    "y": 26.22447175744574
   },
   "bag": {
     "initial_monsters": [
       {
         "name": "Pikachu",
-        "hp": 80,
-        "max_hp": 100,
-        "atk": 20,
-        "def": 5,
+        "hp": 120,
+        "max_hp": 120,
+        "atk": 100,
+        "def": 20,
+        "speed": 40,
+        "accuracy": 60,
         "level": 1,
-        "sprite_path": "menu_sprites/menusprite1.png"
+        "element": "grass"
+      }
+    ],
+    "monsters": [
+      {
+        "name": "Pikachu",
+        "hp": 120,
+        "max_hp": 120,
+        "atk": 20,
+        "def": 20,
+        "speed": 75,
+        "accuracy": 50,
+        "level": 1,
+        "element": "grass"
       },
       {
         "name": "Charizard",
-        "hp": 50,
+        "hp": 150,
+        "max_hp": 150,
+        "atk": 10,
+        "def": 35,
+        "speed": 40,
+        "accuracy": 60,
+        "level": 1,
+        "element": "grass"
+      },
+      {
+        "name": "Blastoise",
+        "hp": 200,
         "max_hp": 200,
-        "atk": 20,
-        "def": 5,
-        "level": 36,
-        "sprite_path": "menu_sprites/menusprite2.png"
+        "atk": 10,
+        "def": 40,
+        "speed": 75,
+        "accuracy": 50,
+        "level": 1,
+        "element": "grass"
+      },
+      {
+        "name": "Venusaur",
+        "hp": 120,
+        "max_hp": 120,
+        "atk": 25,
+        "def": 20,
+        "speed": 75,
+        "accuracy": 50,
+        "level": 1,
+        "element": "earth"
+      },
+      {
+        "name": "Gengar",
+        "hp": 100,
+        "max_hp": 100,
+        "atk": 30,
+        "def": 15,
+        "speed": 75,
+        "accuracy": 50,
+        "level": 1,
+        "element": "wind"
+      },
+      {
+        "name": "Dragonite",
+        "hp": 150,
+        "max_hp": 150,
+        "atk": 30,
+        "def": 10,
+        "speed": 75,
+        "accuracy": 50,
+        "level": 1,
+        "element": "ice"
+      },
+      {
+        "name": "Viper",
+        "hp": 100,
+        "max_hp": 100,
+        "atk": 25,
+        "def": 20,
+        "speed": 75,
+        "accuracy": 50,
+        "level": 1,
+        "element": "poison"
       }
     ],
     "items": [
       {
         "name": "Potion",
-        "count": 5,
-        "sprite_path": "ingame_ui/potion.png"
+        "count": 5
       },
       {
         "name": "Coins",
-        "count": 3,
-        "sprite_path": "ingame_ui/coin.png"
+        "count": 3
       },
       {
         "name": "Pokeball",
-        "count": 1,
-        "sprite_path": "ingame_ui/ball.png"
+        "count": 1
       }
     ]
   }
