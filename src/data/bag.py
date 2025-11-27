@@ -2,7 +2,7 @@ import pygame as pg
 from src.core.services import resource_manager, input_manager
 from src.utils import GameSettings
 from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX
-from src.scenes.battle_scene import get_animation_image, AnimatedMonster
+from src.scenes.battle_scene import get_animation_image
 
 
 # noinspection PyMethodMayBeStatic
@@ -33,7 +33,7 @@ class Bag:
 
         self.index = 0
         self.curr_surface = pg.display.get_surface()
-        self.animated = False
+
 
 
     def update(self, dt: float):
@@ -43,6 +43,7 @@ class Bag:
             self.index = self.index + 1
 
         self.index = self.index % len(self._monsters_data)
+        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
 
 
     def draw(self, screen: pg.Surface):

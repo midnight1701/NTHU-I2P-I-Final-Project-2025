@@ -8,7 +8,8 @@
         { "x": 31, "y": 31, "classification": "stationary", "facing": "UP", "max_tiles": 2 }
       ],
       "teleport": [
-        { "x": 24, "y": 23, "destination": "gym.tmx" }
+        { "x": 24, "y": 23, "destination": "gym.tmx" },
+        { "x": 52, "y": 26, "destination": "shop.tmx"}
       ],
       "player": {
         "x": 16,
@@ -29,7 +30,25 @@
         "x": 12,
         "y": 12
       }
+    },
+
+    {
+      "path": "shop.tmx",
+      "teleport": [
+         { "x": 8, "y": 9, "destination": "map.tmx" },
+         { "x": 9, "y": 9, "destination": "map.tmx" },
+         { "x": 10, "y": 9, "destination": "map.tmx" },
+         { "x": 11, "y": 9, "destination": "map.tmx" }
+
+      ],
+      "roaming_mobs": [],
+      "enemy_trainers": [],
+      "player": {
+          "x": 9,
+          "y": 8
+      }
     }
+
   ],
 
   "current_map": "map.tmx",

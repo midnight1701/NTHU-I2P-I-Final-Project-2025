@@ -6,7 +6,6 @@ from .services import scene_manager, input_manager, sound_manager
 from src.scenes.menu_scene import MenuScene
 from src.scenes.game_scene import GameScene
 from src.scenes.setting_scene import SettingScene
-from src.scenes.bag_scene import BagScene
 from src.scenes.battle_scene import BattleScene
 
 

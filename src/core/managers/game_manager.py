@@ -40,6 +40,7 @@ class GameManager:
         self.bag = bag if bag is not None else Bag([], [])
         
         # Check If you should change scene
+        self.shop = False
         self.should_change_scene = False
         self.next_map = ""
         
@@ -62,6 +63,8 @@ class GameManager:
         
         self.next_map = target
         self.should_change_scene = True
+        if self.next_map == "shop.tmx":
+            self.shop = True
             
     def try_switch_map(self) -> None:
         if self.should_change_scene:
@@ -70,7 +73,8 @@ class GameManager:
             self.should_change_scene = False
             if self.player:
                 if self.current_map_key == "map.tmx":
-                    self.player.position = Position(24 * 64, 24 * 64)
+                    self.player.position = Position(52 * 64, 27 * 64) if self.shop else Position(24 * 64, 24 * 64)
+                    self.shop = False
                 else:
                     self.player.position = self.maps[self.current_map_key].spawn
             

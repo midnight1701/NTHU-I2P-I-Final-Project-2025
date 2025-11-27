@@ -5,3 +5,4 @@ resource_manager = ResourceManager()
 scene_manager = SceneManager()
 sound_manager = SoundManager()
 
+game_manager = None

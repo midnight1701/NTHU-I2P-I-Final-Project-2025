@@ -11,7 +11,7 @@ import math
 from typing import override
 
 class Player(Entity):
-    speed: float = 3.0 * GameSettings.TILE_SIZE
+    speed: float = 6.0 * GameSettings.TILE_SIZE
     game_manager: GameManager
     map_x: float
     map_y: float

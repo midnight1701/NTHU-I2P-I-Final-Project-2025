@@ -5,7 +5,8 @@ from src.scenes.setting_overlay import SettingOverlay
 from src.core import GameManager, OnlineManager
 from src.utils import Logger, PositionCamera, GameSettings, Position
 from src.interface.components import Button
-from src.core.services import sound_manager, scene_manager
+from src.core.services import sound_manager
+import src.core.services as services
 from src.sprites import Sprite
 from typing import override
 
@@ -26,6 +27,8 @@ class GameScene(Scene):
             Logger.error("Failed to load game manager")
             exit(1)
         self.game_manager = manager
+        services.game_manager = self.game_manager
+
         
         # Online Manager
         if GameSettings.IS_ONLINE:

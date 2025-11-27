@@ -12,6 +12,7 @@ from src.utils.support import MONSTER_PATH
 from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager, resource_manager
+import src.core.services as services
 
 def get_animation_image(path, ally=False):
     animation_sprite = []
@@ -63,14 +64,14 @@ class BattleScene(Scene):
         self.enemy_pos = (800, 318)
         self.enemy_monster_rect = pg.Rect(self.enemy_pos[0], self.enemy_pos[1], 196 * 2, 98 * 2)
         self.enemy_monster_rect.center = (964, 360)
-        self.enemy_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._game_monsters)
+        self.enemy_monster = random.choice(services.game_manager.bag._game_monsters)
         self.enemy_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.enemy_monster["name"]]["animation_path"]))
 
 
         # Ally monster battle setup
         self.ally_monster_rect = pg.Rect(0, 0, 196 * 2, 98 * 2)
         self.ally_monster_rect.center = (430, 360)
-        self.ally_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._monsters_dict)
+        self.ally_monster = random.choice(services.game_manager.bag._monsters_data)
         self.ally_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.ally_monster["name"]]["animation_path"], True))
 
 
@@ -138,8 +139,8 @@ class BattleScene(Scene):
 
 
     def reset(self):
-        self.enemy_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._game_monsters)
-        self.ally_monster = random.choice(scene_manager._scenes["game"].game_manager.bag._monsters_data)
+        self.enemy_monster = random.choice(services.game_manager.bag._game_monsters)
+        self.ally_monster = random.choice(services.game_manager.bag._monsters_data)
         self.battle = BattleSystem(self.ally_monster, self.enemy_monster,True) if scene_manager.monster_catch else BattleSystem(self.ally_monster,self.enemy_monster, False)
 
         self.enemy_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.enemy_monster["name"]]["animation_path"]))
@@ -164,9 +165,20 @@ class BattleScene(Scene):
         sound_manager.play_bgm("RBY 107 Battle! (Trainer).ogg")
         self.reset()
 
+
     def exit(self) -> None:
         scene_manager.monster_catch = False
         self.displayed = False
+
+
+    def monster_selection_display(self):
+        name = []
+        for monster in self.ally_monster:
+            name.append(monster["name"])
+
+
+
+
 
     def update(self, dt: float) -> None:
         # Update health bar in battle
@@ -186,8 +198,8 @@ class BattleScene(Scene):
             self.potion_button.update(dt)
 
         if isinstance(self.battle.state, BattleEnd) and self.battle.state.status == "ally_wins" and scene_manager.monster_catch:
-            if self.enemy_monster not in scene_manager._scenes["game"].game_manager.bag._monsters_data:
-                scene_manager._scenes["game"].game_manager.bag._monsters_data.append(self.enemy_monster)
+            if self.enemy_monster not in services.game_manager.bag._monsters_data:
+                services.game_manager.bag._monsters_data.append(self.enemy_monster)
 
         if input_manager.key_pressed(K_ESCAPE):
             scene_manager.change_scene("game")

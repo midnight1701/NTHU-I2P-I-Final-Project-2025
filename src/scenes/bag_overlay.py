@@ -18,6 +18,9 @@ class BagOverlay(Overlay):
         self.exit_button.hitbox.x = self.background.topright[0] + 10
         self.exit_button.hitbox.y = self.background.topright[1]
 
+        self.item_display = False
+
+
     def update(self, dt):
         super().update(dt)
 

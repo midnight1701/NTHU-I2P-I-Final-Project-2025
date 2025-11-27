@@ -11,7 +11,7 @@ class BattleSetup(BattleState):
     def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
-        self.enemy_setup, self.ally_setup = False, False
+        self.enemy_setup, self.ally_setup, self.ally_selection = False, False, False
         self.state_complete = False
 
 
@@ -178,7 +178,7 @@ class BattleEnd(BattleState):
 
         return None
 
-####################################################################
+
 
 # noinspection PyMethodMayBeStatic
 class BattleSystem:
