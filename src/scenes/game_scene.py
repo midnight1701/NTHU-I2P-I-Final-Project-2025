@@ -1,11 +1,14 @@
 import pygame as pg
+from pygame import K_SPACE
+
 from src.scenes.scene import Scene
 from src.scenes.bag_overlay import BagOverlay
 from src.scenes.setting_overlay import SettingOverlay
+from src.scenes.shop_overlay import ShopOverlay
 from src.core import GameManager, OnlineManager
 from src.utils import Logger, PositionCamera, GameSettings, Position
 from src.interface.components import Button
-from src.core.services import sound_manager
+from src.core.services import sound_manager, input_manager, scene_manager
 import src.core.services as services
 from src.sprites import Sprite
 from typing import override
@@ -55,6 +58,10 @@ class GameScene(Scene):
         self.bag_overlay = BagOverlay()
         self.bag_open = False
 
+        self.shop_overlay = ShopOverlay()
+        self.shop_open = False
+
+
     def load_option(self, load):
         self.game_manager = load
 
@@ -63,6 +70,10 @@ class GameScene(Scene):
 
     def bag_open_func(self):
         self.bag_open = True
+
+    def shop_open_func(self):
+        self.shop_open = True
+
 
     @override
     def enter(self) -> None:
@@ -85,12 +96,12 @@ class GameScene(Scene):
             self.game_manager.player.update(dt)
         for enemy in self.game_manager.current_enemy_trainers:
             enemy.update(dt)
+
             
         # Update others
         self.game_manager.bag.update(dt)
         self.setting_button.update(dt)
         self.bag_button.update(dt)
-
 
         if self.bag_open:
             self.bag_overlay.update(dt)
@@ -104,6 +115,12 @@ class GameScene(Scene):
             if self.setting_overlay.close:
                 self.setting_open = False
                 self.setting_overlay.close = False
+
+        if self.shop_open:
+            self.shop_overlay.update(dt)
+            if self.shop_overlay.close:
+                self.shop_open = False
+                self.shop_overlay.close = False
 
 
         if self.game_manager.player is not None and self.online_manager is not None:
@@ -132,13 +149,16 @@ class GameScene(Scene):
         if self.bag_open:
             self.bag_overlay.draw(screen)
             self.game_manager.player.blocked = True
-        elif not self.bag_open and not self.setting_open:
-            self.game_manager.player.blocked = False
-
-        if self.setting_open:
+        elif self.setting_open:
             self.setting_overlay.draw(screen)
             self.game_manager.player.blocked = True
-        elif not self.setting_open and not self.bag_open:
+        elif self.shop_open:
+            self.shop_overlay.draw(screen)
+            self.game_manager.player.blocked = True
+        else:
+            self.bag_open = False
+            self.setting_open = False
+            self.shop_open = False
             self.game_manager.player.blocked = False
 
         

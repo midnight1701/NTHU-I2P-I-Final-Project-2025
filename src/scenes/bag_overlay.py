@@ -1,13 +1,11 @@
 import pygame as pg
-from src.scenes.overlay import Overlay
+from pygame import K_SPACE
 
-from src.interface.components.checkbox import Checkbox
+from src.scenes.overlay import Overlay
 from src.utils import GameSettings
-from src.sprites.background import BagSprite
-from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager
-from typing import override
+from src.core import services
 
 class BagOverlay(Overlay):
     def __init__(self):
@@ -17,12 +15,13 @@ class BagOverlay(Overlay):
         self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
         self.exit_button.hitbox.x = self.background.topright[0] + 10
         self.exit_button.hitbox.y = self.background.topright[1]
-
-        self.item_display = False
+        self.switch_button = Button
 
 
     def update(self, dt):
         super().update(dt)
+        if input_manager.key_pressed(pg.K_z):
+            services.game_manager.bag.switch_bag()
 
 
     def draw(self, screen):

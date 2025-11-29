@@ -90,14 +90,14 @@ class BattleScene(Scene):
         self.ally_info_img = resource_manager.get_image(MONSTER_PATH[self.ally_monster["name"]]["sprite_path"])
         self.ally_info_img = pg.transform.scale(self.ally_info_img, (75, 75))
         self.ally_info_img_rect = pg.Rect(self.ally_info_rect.topleft[0] + 12, self.ally_info_rect.topleft[1] - 3, 75, 75)
-        self.ally_name = self.alt_font.render(self.battle.player.name, True, (0, 0, 0))
+        self.ally_name = self.alt_font.render(self.battle.player["name"], True, (0, 0, 0))
         self.ally_name_rect = pg.Rect(self.ally_info_img_rect.topright[0] + 10, self.ally_info_img_rect.topright[1] + 22, 95, 25)
-        self.ally_level = self.alt_font.render(f"Lv {self.battle.player.level}", True, (0, 0, 0))
+        self.ally_level = self.alt_font.render(f"Lv {self.battle.player["level"]}", True, (0, 0, 0))
         self.ally_level_rect = pg.Rect(self.ally_name_rect.topright[0] + 30, self.ally_name_rect.topright[1], 59, 25)
         self.hp_rect = pg.Rect(self.ally_name_rect.bottomleft[0], self.ally_name_rect.bottomright[1] + 8, 110, 15)
         self.red_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01c.png"), (110, 15))
-        self.green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"),((110 * (self.battle.player.hp / self.battle.player.max_hp)), 15))
-        self.hp_text = self.alt_font.render(f"{self.battle.player.hp}/{self.battle.player.max_hp}", True,(0, 0, 0))
+        self.green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.player["hp"] / self.battle.player["max_hp"])), 15))
+        self.hp_text = self.alt_font.render(f"{self.battle.player["hp"]}/{self.battle.player["max_hp"]}", True,(0, 0, 0))
         self.hp_text_rect = pg.Rect(self.ally_level_rect.bottomleft[0], self.hp_rect.topright[1], 91, 25)
 
 
@@ -105,13 +105,13 @@ class BattleScene(Scene):
         self.enemy_info_img = resource_manager.get_image(MONSTER_PATH[self.enemy_monster["name"]]["sprite_path"])
         self.enemy_info_img = pg.transform.scale(self.enemy_info_img, (75, 75))
         self.enemy_info_img_rect = pg.Rect(self.enemy_info_rect.topleft[0] + 12, self.enemy_info_rect[1] - 3, 75, 75)
-        self.enemy_name = self.alt_font.render(self.battle.enemy.name, True, (0, 0, 0))
+        self.enemy_name = self.alt_font.render(self.battle.enemy["name"], True, (0, 0, 0))
         self.enemy_name_rect = pg.Rect(self.enemy_info_img_rect.topright[0] + 10, self.enemy_info_img_rect.topright[1] + 22, 95, 25)
-        self.enemy_level = self.alt_font.render(f"Lv {self.battle.enemy.level}", True, (0, 0, 0))
+        self.enemy_level = self.alt_font.render(f"Lv {self.battle.enemy["level"]}", True, (0, 0, 0))
         self.enemy_level_rect = pg.Rect(self.enemy_name_rect.topright[0] + 30, self.enemy_name_rect.topright[1], 59, 25)
         self.enemy_hp_rect = pg.Rect(self.enemy_name_rect.bottomleft[0], self.enemy_name_rect.bottomright[1] + 8 , 110, 15)
-        self.enemy_hp_text = self.alt_font.render(f"{self.battle.enemy.hp}/{self.battle.enemy.max_hp}", True,(0, 0, 0))
-        self.enemy_green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"),((110 *(self.battle.enemy.hp / self.battle.enemy.max_hp)), 15))
+        self.enemy_hp_text = self.alt_font.render(f"{self.battle.enemy["hp"]}/{self.battle.enemy["max_hp"]}", True,(0, 0, 0))
+        self.enemy_green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.enemy["hp"] / self.battle.enemy["max_hp"])), 15))
         self.enemy_hp_text_rect = pg.Rect(self.enemy_level_rect.bottomleft[0], self.enemy_hp_rect.topright[1], 91, 25)
 
 
@@ -148,17 +148,17 @@ class BattleScene(Scene):
 
         self.ally_info_img = resource_manager.get_image(MONSTER_PATH[self.ally_monster["name"]]["sprite_path"])
         self.ally_info_img = pg.transform.scale(self.ally_info_img, (75, 75))
-        self.ally_name = self.alt_font.render(self.battle.player.name, True, (0, 0, 0))
-        self.ally_level = self.alt_font.render(f"Lv {self.battle.player.level}", True, (0, 0, 0))
-        self.green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.player.hp / self.battle.player.max_hp)), 15))
-        self.hp_text = self.alt_font.render(f"{self.battle.player.hp}/{self.battle.player.max_hp}", True, (0, 0, 0))
+        self.ally_name = self.alt_font.render(self.battle.player["name"], True, (0, 0, 0))
+        self.ally_level = self.alt_font.render(f"Lv {self.battle.player["level"]}", True, (0, 0, 0))
+        self.green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.player["hp"] / self.battle.player["max_hp"])), 15))
+        self.hp_text = self.alt_font.render(f"{self.battle.player["hp"]}/{self.battle.player["max_hp"]}", True, (0, 0, 0))
 
         self.enemy_info_img = resource_manager.get_image(MONSTER_PATH[self.enemy_monster["name"]]["sprite_path"])
         self.enemy_info_img = pg.transform.scale(self.enemy_info_img, (75, 75))
-        self.enemy_name = self.alt_font.render(self.battle.enemy.name, True, (0, 0, 0))
-        self.enemy_level = self.alt_font.render(f"Lv {self.battle.enemy.level}", True, (0, 0, 0))
-        self.enemy_hp_text = self.alt_font.render(f"{self.battle.enemy.hp}/{self.battle.enemy.max_hp}", True, (0, 0, 0))
-        self.enemy_green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.enemy.hp / self.battle.enemy.max_hp)), 15))
+        self.enemy_name = self.alt_font.render(self.battle.enemy["name"], True, (0, 0, 0))
+        self.enemy_level = self.alt_font.render(f"Lv {self.battle.enemy["level"]}", True, (0, 0, 0))
+        self.enemy_hp_text = self.alt_font.render(f"{self.battle.enemy["hp"]}/{self.battle.enemy["max_hp"]}", True,(0, 0, 0))
+        self.enemy_green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"), ((110 * (self.battle.enemy["hp"] / self.battle.enemy["max_hp"])), 15))
 
 
     def enter(self) -> None:
@@ -170,7 +170,7 @@ class BattleScene(Scene):
         scene_manager.monster_catch = False
         self.displayed = False
 
-
+    # TODO
     def monster_selection_display(self):
         name = []
         for monster in self.ally_monster:
@@ -178,18 +178,16 @@ class BattleScene(Scene):
 
 
 
-
-
     def update(self, dt: float) -> None:
         # Update health bar in battle
         self.green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"),
-                                           ((110 * (self.battle.player.hp / self.battle.player.max_hp)), 15))
-        self.hp_text = self.alt_font.render(f"{self.battle.player.hp}/{self.battle.player.max_hp}", True,
+                                           ((110 * (self.battle.player["hp"] / self.battle.player["max_hp"])), 15))
+        self.hp_text = self.alt_font.render(f"{self.battle.player["hp"]}/{self.battle.player["max_hp"]}", True,
                                             (0, 0, 0))
-        self.enemy_hp_text = self.alt_font.render(f"{self.battle.enemy.hp}/{self.battle.enemy.max_hp}", True,
+        self.enemy_hp_text = self.alt_font.render(f"{self.battle.enemy["hp"]}/{self.battle.enemy["max_hp"]}", True,
                                                   (0, 0, 0))
         self.enemy_green_hp = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_BarFill01a.png"),
-                                                 ((110 * (self.battle.enemy.hp / self.battle.enemy.max_hp)), 15))
+                                                 ((110 * (self.battle.enemy["hp"] / self.battle.enemy["max_hp"])), 15))
 
         if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
             self.attack_button.update(dt)

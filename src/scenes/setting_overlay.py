@@ -9,7 +9,7 @@ from src.interface.components.checkbox import Checkbox
 from src.utils import GameSettings
 from src.sprites.background import SettingSprite
 from src.interface.components import Button
-from src.core.services import scene_manager, sound_manager, input_manager
+from src.core.services import scene_manager, sound_manager
 from src.scenes.overlay import Overlay
 
 class SettingOverlay(Overlay):

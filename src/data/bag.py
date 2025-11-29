@@ -1,7 +1,7 @@
 import pygame as pg
 from src.core.services import resource_manager, input_manager
 from src.utils import GameSettings
-from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX
+from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX, ITEM_PATH
 from src.scenes.battle_scene import get_animation_image
 
 
@@ -16,6 +16,7 @@ class Bag:
         self._game_monsters = game_monster_data if game_monster_data else []
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
+        self._items_dict = {i: k for i, k in enumerate(self._items_data)}
         self.info = ["hp", "atk", "def", "speed", "accuracy"]
         self.limit = 6
         self.clock = pg.time.Clock()
@@ -32,23 +33,31 @@ class Bag:
         self.main_rect = pg.Rect(self.item_rect_top[0], self.item_rect_top[1], self.item_rect_width, self.background.height)
 
         self.index = 0
+        self.switch = False
         self.curr_surface = pg.display.get_surface()
 
 
+    def switch_bag(self):
+        self.switch = not self.switch
+        self.index = 0
 
     def update(self, dt: float):
         if input_manager.key_pressed(pg.K_UP):
             self.index = self.index - 1
         elif input_manager.key_pressed(pg.K_DOWN):
             self.index = self.index + 1
-
-        self.index = self.index % len(self._monsters_data)
+        self.index = (self.index % len(self._monsters_data)) if not self.switch else (self.index % len(self._items_data))
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
+        self._items_dict = {i: k for i, k in enumerate(self._items_dict)}
+
 
 
     def draw(self, screen: pg.Surface):
-        self.draw_monster(screen)
-        self.draw_monster_info_bg(screen)
+        if not self.switch:
+            self.draw_monster(screen)
+            self.draw_monster_info_bg(screen)
+        elif self.switch:
+            self.draw_item(screen)
 
 
     def draw_monster(self, screen):
@@ -60,7 +69,7 @@ class Bag:
             top = self.item_rect_top[1] + index * self.item_rect_height + box_offset
             monster_rect = pg.Rect(self.item_rect_top[0], top, self.item_rect_width, self.item_rect_height)
             icon_rect = pg.Rect(self.item_rect_top[0] + 10, top + 10, self.item_rect_width, self.item_rect_height)
-            monster_img = self.get_monster_img(MONSTER_PATH[monster["name"]]["sprite_path"])
+            monster_img = self.get_img(MONSTER_PATH[monster["name"]]["sprite_path"])
 
             monster_name = self.font.render(monster["name"], True, text_color)
             text_rect = monster_name.get_rect()
@@ -121,10 +130,44 @@ class Bag:
             screen.blit(val, val_rect)
 
 
-    def draw_item(self):
+    def draw_item(self, screen):
+        pg.draw.rect(screen, (44, 44, 44), self.main_rect, border_top_left_radius=12, border_bottom_left_radius=12)
+        box_offset = 0 if self.index < self.limit else -(self.index - self.limit + 1) * self.item_rect_height
+        for index, item in enumerate(self._items_data):
+            text_color = "yellow" if self.index == index else "white"
+            bg_color = (44, 44, 44) if self.index != index else (169, 169, 169)
+            top = self.item_rect_top[1] + index * self.item_rect_height + box_offset
+            item_rect = pg.Rect(self.item_rect_top[0], top, self.item_rect_width, self.item_rect_height)
+            icon_rect = pg.Rect(self.item_rect_top[0] + 20, top + 30, self.item_rect_width, self.item_rect_height)
+            img = resource_manager.get_image(ITEM_PATH[item['name']])
+            img = pg.transform.scale(img, (40, 40))
+
+            item_name = self.font.render(item["name"], True, text_color)
+            text_rect = item_name.get_rect()
+            text_rect.midleft = (item_rect.midleft[0] + 90, item_rect.midleft[1])
+
+            info_bg = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height)
+
+            if item_rect.colliderect(self.background):
+                if item_rect.collidepoint(self.background.topleft):
+                    pg.draw.rect(screen, bg_color, item_rect, 0, 0, 12)
+                elif item_rect.collidepoint(self.background.bottomleft[0] + 1, self.background.bottomleft[1] + -1):
+                    pg.draw.rect(screen, bg_color, item_rect, border_bottom_left_radius=12)
+                else:
+                    pg.draw.rect(screen, bg_color, item_rect)
+                screen.blit(img, icon_rect)
+                screen.blit(item_name, text_rect)
+
+
+            for i in range(1, min(len(self._items_data), self.limit)):
+                pg.draw.line(screen, (169, 169, 169), (self.item_rect_top[0], self.item_rect_top[1] + i * self.item_rect_height),
+                             (self.main_rect.topright[0], self.main_rect.topright[1] + i * self.item_rect_height))
+
+
+    def draw_item_info(self, screen):
         pass
 
-    def get_monster_img(self, path):
+    def get_img(self, path):
         img = resource_manager.get_image(path)
         img = pg.transform.scale(img, (55, 55))
 

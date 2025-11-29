@@ -19,7 +19,9 @@ class BattleSetup(BattleState):
         if input_manager.key_pressed(K_SPACE):
             if not self.ally_setup and not self.enemy_setup:
                 self.enemy_setup = True
-            elif not self.ally_setup and self.enemy_setup:
+            elif not self.ally_setup and not self.ally_selection:
+                self.ally_selection = True
+            elif not self.ally_setup:
                 self.ally_setup = True
             else:
                 self.state_complete = True
@@ -30,11 +32,13 @@ class BattleSetup(BattleState):
             dialogue = "Enemy trainer challenges you to a monster battle"
             return dialogue
         elif self.enemy_setup and not self.ally_setup:
-            dialogue = f"Enemy trainer selects {self.enemy.name}"
+            dialogue = f"Enemy trainer selects {self.enemy["name"]}"
             return dialogue
-        else:
-            dialogue = f"Ally trainer selects {self.player.name}"
+        elif self.ally_selection and self.ally_setup:
+            dialogue = f"Ally trainer selects {self.player["name"]}"
             return dialogue
+
+        return None
 
 
 # noinspection PyMethodMayBeStatic
@@ -81,13 +85,13 @@ class PlayerTurn(BattleState):
         if self.action is not None and not self.dialogue_check:
             match self.action:
                 case "attack":
-                    return f"{self.player.name} decides to go on the offensive"
+                    return f"{self.player["name"]} decides to go on the offensive"
                 case "defend":
-                    return f"{self.player.name} decides to go on the defensive"
+                    return f"{self.player["name"]} decides to go on the defensive"
                 case "run":
-                    return f"{self.player.name} senses a dark premonition"
+                    return f"{self.player["name"]} senses a dark premonition"
                 case "potion":
-                    return f"{self.player.name} obtains a hidden power within"
+                    return f"{self.player["name"]} obtains a hidden power within"
 
         elif self.action and self.dialogue_check:
             return self.action_text
@@ -139,13 +143,13 @@ class EnemyTurn(BattleState):
         elif self.action is not None and not self.dialogue_check:
             match self.action:
                 case "attack":
-                    return f"{self.enemy.name} decides to go on the offensive"
+                    return f"{self.enemy["name"]} decides to go on the offensive"
                 case "defend":
-                    return f"{self.enemy.name} decides to go on the defensive"
+                    return f"{self.enemy["name"]} decides to go on the defensive"
                 case "run":
-                    return f"{self.enemy.name} senses a dark premonition"
+                    return f"{self.enemy["name"]} senses a dark premonition"
                 case "potion":
-                    return f"{self.enemy.name} obtains a hidden power within"
+                    return f"{self.enemy["name"]} obtains a hidden power within"
         elif self.action and self.dialogue_check:
             return self.action_text
 
@@ -183,8 +187,8 @@ class BattleEnd(BattleState):
 # noinspection PyMethodMayBeStatic
 class BattleSystem:
     def __init__(self, player_info, enemy_info, monster_catch):
-        self.player = MonsterBattle(player_info["name"], player_info["hp"], player_info["max_hp"], player_info["level"], player_info["atk"], player_info["def"])
-        self.enemy = MonsterBattle(enemy_info["name"], enemy_info["hp"], enemy_info["max_hp"], enemy_info["level"], enemy_info["atk"], enemy_info["def"])
+        self.player = player_info
+        self.enemy = enemy_info
         self.player_turn = True
         self.state = BattleSetup(self.player, self.enemy)
         self.monster_catch = monster_catch
@@ -214,11 +218,11 @@ class BattleSystem:
 
 
     def is_player_alive(self):
-        return self.player.hp > 0
+        return self.player["hp"] > 0
 
 
     def is_enemy_alive(self):
-        return self.enemy.hp > 0
+        return self.enemy["hp"] > 0
 
 
     def get_dialogue(self):
@@ -226,12 +230,12 @@ class BattleSystem:
 
 
     def attack(self, attacker, defender):
-        actual_atk = attacker.atk - defender.defense if attacker.atk - defender.defense > 0 else 0
-        defender.hp = defender.hp - actual_atk
-        if defender.hp < 0:
-            defender.hp = 0
+        actual_atk = attacker["atk"] - defender["def"] if attacker["atk"] - defender["def"] > 0 else 0
+        defender["hp"] = defender["hp"] - actual_atk
+        if defender["hp"] < 0:
+            defender["hp"] = 0
 
-        return f"{attacker.name} attacks and deals {actual_atk} damage to {defender.name}"
+        return f"{attacker["name"]} attacks and deals {actual_atk} damage to {defender["name"]}"
 
 
     def run(self, side):
@@ -239,11 +243,11 @@ class BattleSystem:
 
 
     def defend(self, current):
-        return f"{current.name} defend with all its might"
+        return f"{current["name"]} defend with all its might"
 
 
     def potion(self, current):
-        return f"{current.name} prepares for a deadly blow"
+        return f"{current["name"]} prepares for a deadly blow"
 
 
 

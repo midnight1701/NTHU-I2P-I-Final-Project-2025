@@ -136,6 +136,12 @@ ITEM_PATH = {
     "Pokeball": "ingame_ui/ball.png"
 }
 
+ITEM_LIST = [
+    {"name": "Pokeball", "price": 50},
+    {"name": "Potion", "price": 30}
+]
+
+
 DISPLAY_INFO = {
     "hp": "Health",
     "atk": "Attack",
