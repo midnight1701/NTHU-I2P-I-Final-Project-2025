@@ -9,16 +9,22 @@ from src.core.services import scene_manager, sound_manager, input_manager, resou
 from src.core import services
 from src.scenes.overlay import Overlay
 
+
+
+#noinspection PyMethodMayBeStatic
 class ShopOverlay(Overlay):
     def __init__(self):
         super().__init__()
 
         # Shop data
+        self.money = services.game_manager.bag._items_data[0]["count"]
         self.shop_data = ITEM_LIST
         self.shop_data_alt = {v: i for v, i in enumerate(self.shop_data)}
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
         self.limit = 5
         self.index = 0
+        self.clock = pg.time.Clock()
+        self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
 
         # Shop background
         self.rect = pg.Rect(0, 0, GameSettings.SCREEN_WIDTH * 0.55, GameSettings.SCREEN_HEIGHT * 0.6)
@@ -33,8 +39,20 @@ class ShopOverlay(Overlay):
         self.item_rect_width, self.item_rect_height = self.main_rect.width, self.main_rect.height / self.limit
 
         # Item description + Buy & Sell
-        self.ui_top = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.rect.width * 0.6, self.rect.height * 0.3)
-        self.ui_bottom = pg.Rect(self.ui_top.bottomleft[0], self.ui_top.bottomleft[1], self.rect.width * 0.6, self.rect.height * 0.7)
+        self.ui_top_bg = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_Frame03a.png"), (self.rect.width * 0.6, self.rect.height * 0.35))
+        self.ui_top = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.rect.width * 0.6, self.rect.height * 0.35)
+
+        self.ui_bottom_bg = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_Frame02a.png"), (self.rect.width * 0.6, self.rect.height * 0.65))
+        self.ui_bottom = pg.Rect(self.ui_top.bottomleft[0], self.ui_top.bottomleft[1], self.rect.width * 0.6, self.rect.height * 0.65)
+
+        self.button_topright = (self.ui_top.topright[0] - 110, self.ui_top.topright[1] + 14)
+        self.buy_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
+                                 self.button_topright[0], self.button_topright[1], 80, 40,
+                                 lambda: self.buy(self.shop_data_alt[self.index]))
+
+        self.sell_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
+                                 self.button_topright[0], self.button_topright[1] + 55 , 80, 40,
+                                 lambda: self.sell(self.shop_data_alt[self.index]))
 
 
 
@@ -70,15 +88,24 @@ class ShopOverlay(Overlay):
 
     def draw_item_ui(self, screen):
         item = self.shop_data_alt[self.index]
-        pg.draw.rect(screen, (255, 255, 0), self.ui_top)
 
+        # UI - top part
+        screen.blit(self.ui_top_bg, self.ui_top)
+        self.buy_button.draw(screen)
+        self.sell_button.draw(screen)
 
-
-        pg.draw.rect(screen, (255, 0, 0), self.ui_bottom)
+        # UI - bottom part
+        screen.blit(self.ui_bottom_bg, self.ui_bottom)
 
 
     def update(self, dt):
         super().update(dt)
+        self.money = services.game_manager.bag._items_data[0]["count"]
+        print(self.money)
+        print(services.game_manager.bag._items_data)
+
+        self.buy_button.update(dt)
+        self.sell_button.update(dt)
         if input_manager.key_pressed(pg.K_UP):
             self.index = self.index - 1
         elif input_manager.key_pressed(pg.K_DOWN):
@@ -86,9 +113,23 @@ class ShopOverlay(Overlay):
         self.index = self.index % len(self.shop_data)
 
 
-    def buy(self):
-        pass
+    def buy(self, item):
+        item_name, item_price = item["name"], item["price"]
+        for i in services.game_manager.bag._items_data:
+            if i["name"] == item_name:
+                money = self.money - item_price
+                if money >= 0:
+                    i["count"] += 1
+                    services.game_manager.bag._items_data[0]["count"] = money
 
-    def sell(self):
-        pass
+
+    def sell(self, item):
+        item_name, item_price = item["name"], item["price"]
+        for i in services.game_manager.bag._items_data:
+            if i["name"] == item_name and i["count"] > 0:
+                i["count"] -= 1
+                services.game_manager.bag._items_data[0]["count"] += int(item_price * 0.75)
+
+
+
 

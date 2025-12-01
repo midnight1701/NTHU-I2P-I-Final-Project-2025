@@ -82,9 +82,9 @@
     ],
 
     "items": [
-      { "name": "Potion",      "count": 0},
-      { "name": "Coins",       "count": 1000},
-      { "name": "Pokeball",    "count": 0}
+      { "name": "Coins",       "count": 0},
+      { "name": "Potion",      "count": 5},
+      { "name": "Pokeball",    "count": 5}
     ]
   }
 }
