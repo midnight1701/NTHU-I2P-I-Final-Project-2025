@@ -7,11 +7,16 @@
           "x": 24,
           "y": 23,
           "destination": "gym.tmx"
+        },
+        {
+          "x": 52,
+          "y": 26,
+          "destination": "shop.tmx"
         }
       ],
       "player": {
-        "x": 16,
-        "y": 30
+        "x": 52,
+        "y": 27
       },
       "enemy_trainers": [
         {
@@ -58,15 +63,56 @@
       ],
       "player": {
         "x": 12,
-        "y": 12
+        "y": 13
       },
-      "enemy_trainers": []
+      "enemy_trainers": [
+        {
+          "x": 12.0,
+          "y": 9.0,
+          "classification": "stationary",
+          "facing": "DOWN",
+          "max_tiles": 2
+        }
+      ]
+    },
+    {
+      "path": "shop.tmx",
+      "teleport": [
+        {
+          "x": 9,
+          "y": 12,
+          "destination": "map.tmx"
+        },
+        {
+          "x": 10,
+          "y": 12,
+          "destination": "map.tmx"
+        },
+        {
+          "x": 11,
+          "y": 12,
+          "destination": "map.tmx"
+        }
+      ],
+      "player": {
+        "x": 10,
+        "y": 11
+      },
+      "enemy_trainers": [
+        {
+          "x": 10.0,
+          "y": 4.0,
+          "classification": "stationary",
+          "facing": "DOWN",
+          "max_tiles": 4
+        }
+      ]
     }
   ],
-  "current_map": "map.tmx",
+  "current_map": "shop.tmx",
   "player": {
-    "x": 23.94838192284826,
-    "y": 26.22447175744574
+    "x": 9.569529003975635,
+    "y": 8.567971429300247
   },
   "bag": {
     "initial_monsters": [
@@ -87,7 +133,7 @@
         "name": "Pikachu",
         "hp": 120,
         "max_hp": 120,
-        "atk": 20,
+        "atk": 100,
         "def": 20,
         "speed": 75,
         "accuracy": 50,
@@ -98,7 +144,7 @@
         "name": "Charizard",
         "hp": 150,
         "max_hp": 150,
-        "atk": 10,
+        "atk": 100,
         "def": 35,
         "speed": 40,
         "accuracy": 60,
@@ -109,7 +155,7 @@
         "name": "Blastoise",
         "hp": 200,
         "max_hp": 200,
-        "atk": 10,
+        "atk": 80,
         "def": 40,
         "speed": 75,
         "accuracy": 50,
@@ -120,7 +166,7 @@
         "name": "Venusaur",
         "hp": 120,
         "max_hp": 120,
-        "atk": 25,
+        "atk": 80,
         "def": 20,
         "speed": 75,
         "accuracy": 50,
@@ -131,7 +177,7 @@
         "name": "Gengar",
         "hp": 100,
         "max_hp": 100,
-        "atk": 30,
+        "atk": 80,
         "def": 15,
         "speed": 75,
         "accuracy": 50,
@@ -142,7 +188,7 @@
         "name": "Dragonite",
         "hp": 150,
         "max_hp": 150,
-        "atk": 30,
+        "atk": 80,
         "def": 10,
         "speed": 75,
         "accuracy": 50,
@@ -153,7 +199,7 @@
         "name": "Viper",
         "hp": 100,
         "max_hp": 100,
-        "atk": 25,
+        "atk": 80,
         "def": 20,
         "speed": 75,
         "accuracy": 50,
@@ -163,16 +209,16 @@
     ],
     "items": [
       {
-        "name": "Potion",
-        "count": 5
+        "name": "Coins",
+        "count": 22
       },
       {
-        "name": "Coins",
-        "count": 3
+        "name": "Potion",
+        "count": 4
       },
       {
         "name": "Pokeball",
-        "count": 1
+        "count": 5
       }
     ]
   }

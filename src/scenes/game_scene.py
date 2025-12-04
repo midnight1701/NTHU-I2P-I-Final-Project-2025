@@ -108,6 +108,7 @@ class GameScene(Scene):
             if self.bag_overlay.close:
                 self.bag_open = False
                 self.bag_overlay.close = False
+                services.game_manager.bag.index = 0
 
         if self.setting_open:
             self.setting_overlay._slider.synchronize()
@@ -121,6 +122,7 @@ class GameScene(Scene):
             if self.shop_overlay.close:
                 self.shop_open = False
                 self.shop_overlay.close = False
+                self.shop_overlay.reset()
 
 
         if self.game_manager.player is not None and self.online_manager is not None:

@@ -131,16 +131,35 @@ INFO_IMG = {
 }
 
 ITEM_PATH = {
-    "Potion": "ingame_ui/potion.png",
+    "HP Potion": "ingame_ui/red-potion.png",
+    "ATK Potion": "ingame_ui/blue-potion2.png",
+    "DEF Potion": "ingame_ui/purple-potion2.png",
     "Coins": "ingame_ui/coin.png",
     "Pokeball": "ingame_ui/ball.png"
 }
 
 ITEM_LIST = [
     {"name": "Pokeball", "price": 50},
-    {"name": "Potion", "price": 30}
+    {"name": "HP Potion", "price": 45},
+    {"name": "ATK Potion", "price": 35},
+    {"name": "DEF Potion", "price": 40}
+
 ]
 
+ITEM_DESCRIPTION = {
+    "Coins": "An in-game currency (maybe the only in-game currency), giving player the ability to obtain consumables. This item can be "
+             "\nobtained via battles with wandering trainers, region leaders and wild monsters",
+    "HP Potion": "An incredibly powerful item, giving trainers the ability to heal their monsters during battle. This consumable item can be obtained"
+                 " via shop or occasionally, through battles with wandering trainers & region leaders",
+    "ATK Potion": "A consumable item with unlimited (not really) potential, increasing the attack damage of monsters, thus allowing them to deal the most deadly blow"
+                  " in the most unexpected moment (if used at the right moment). Can be obtained via shop and, occasionally, battles with other trainers",
+    "DEF Potion": "A defensive-type item, bestowed on monsters unyielding protection even against the deadliest attack (not really) by increasing their defense, thereby"
+                  " decreasing the amount of damage taken",
+    "Pokeball": "The only item in the game that allows trainers to catch wild monsters. Can be obtained through shop; however, "
+                "the number of pokeballs that can be purchased is limited, so use them wisely."
+
+
+}
 
 DISPLAY_INFO = {
     "hp": "Health",

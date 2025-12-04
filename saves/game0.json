@@ -12,8 +12,8 @@
         { "x": 52, "y": 26, "destination": "shop.tmx"}
       ],
       "player": {
-        "x": 52,
-        "y": 27
+        "x": 16,
+        "y": 30
       }
     },
 
@@ -52,15 +52,27 @@
 
   "current_map": "map.tmx",
   "player": {
-    "x": 52,
-    "y": 27
+    "x": 16,
+    "y": 30
   },
 
 
   "bag": {
     "initial_monsters": [
-      { "name": "Pikachu", "hp": 120,  "max_hp": 120, "atk": 100, "def": 20, "speed": 40, "accuracy": 60,"level": 1,
-        "element": "grass"}
+      { "name": "Pikachu", "hp": 500,  "max_hp": 500, "atk": 100, "def": 20, "speed": 40, "accuracy": 60,"level": 1,
+        "element": "grass"},
+      { "name": "Charizard", "hp": 150, "max_hp": 150, "atk": 100, "def": 35, "speed": 40, "accuracy": 60, "level": 1,
+        "element": "grass"},
+      { "name": "Blastoise", "hp": 200, "max_hp": 200, "atk": 80, "def": 40, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "grass"},
+      { "name": "Venusaur",  "hp": 120,  "max_hp": 120, "atk": 80, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "earth"},
+      { "name": "Gengar",    "hp": 100, "max_hp": 100, "atk": 80, "def": 15, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "wind"},
+      { "name": "Dragonite", "hp": 150, "max_hp": 150, "atk": 80, "def": 10, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "ice"},
+      { "name": "Viper",     "hp": 100, "max_hp": 100, "atk": 80, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+        "element": "poison"}
 
     ],
 
@@ -82,9 +94,12 @@
     ],
 
     "items": [
-      { "name": "Coins",       "count": 0},
-      { "name": "Potion",      "count": 5},
-      { "name": "Pokeball",    "count": 5}
+      { "name": "Coins",       "count": 100},
+      { "name": "Pokeball",    "count": 2},
+      { "name": "HP Potion",   "count": 4},
+      { "name": "ATK Potion",  "count": 0},
+      { "name": "DEF Potion",  "count": 3}
+
     ]
   }
 }

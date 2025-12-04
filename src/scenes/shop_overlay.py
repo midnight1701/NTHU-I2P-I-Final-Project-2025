@@ -1,6 +1,6 @@
 import pygame as pg
 
-from src.utils.support import ITEM_PATH, ITEM_LIST
+from src.utils.support import ITEM_PATH, ITEM_LIST, ITEM_DESCRIPTION
 from src.core import GameManager
 from src.utils import GameSettings
 from src.sprites.background import SettingSprite
@@ -21,6 +21,7 @@ class ShopOverlay(Overlay):
         self.shop_data = ITEM_LIST
         self.shop_data_alt = {v: i for v, i in enumerate(self.shop_data)}
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
+        self.info_font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=17)
         self.limit = 5
         self.index = 0
         self.clock = pg.time.Clock()
@@ -45,7 +46,7 @@ class ShopOverlay(Overlay):
         self.ui_bottom_bg = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_Frame02a.png"), (self.rect.width * 0.6, self.rect.height * 0.65))
         self.ui_bottom = pg.Rect(self.ui_top.bottomleft[0], self.ui_top.bottomleft[1], self.rect.width * 0.6, self.rect.height * 0.65)
 
-        self.button_topright = (self.ui_top.topright[0] - 110, self.ui_top.topright[1] + 14)
+        self.button_topright = (self.ui_top.topleft[0] + 120, self.ui_top.topleft[1] + 27)
         self.buy_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                  self.button_topright[0], self.button_topright[1], 80, 40,
                                  lambda: self.buy(self.shop_data_alt[self.index]))
@@ -70,8 +71,8 @@ class ShopOverlay(Overlay):
             top = self.item_rect_top[1] + index * self.item_rect_height + box_offset
             item_rect = pg.Rect(self.item_rect_top[0], top, self.item_rect_width, self.item_rect_height)
             item_img = resource_manager.get_image(ITEM_PATH[item["name"]])
-            item_img = pg.transform.scale(item_img, (self.item_rect_height * 0.35, self.item_rect_height * 0.35))
-            item_img_rect = pg.Rect(self.item_rect_top[0] + 14, top + 27, item_img.get_width(), item_img.get_height())
+            item_img = pg.transform.scale(item_img, (30, 30)) if "Potion" not in item["name"] else pg.transform.scale(item_img, (25, 35))
+            item_img_rect = pg.Rect(self.item_rect_top[0] + 14, top + 27, item_img.get_width(), item_img.get_height()) if "Potion" not in item["name"] else pg.Rect(self.item_rect_top[0] + 17, top + 24, item_img.get_width(), item_img.get_height())
 
             item_name = self.font.render(item["name"], True, text_color)
             name_rect = item_name.get_rect()
@@ -90,20 +91,28 @@ class ShopOverlay(Overlay):
         item = self.shop_data_alt[self.index]
 
         # UI - top part
+        item_img = resource_manager.get_image(ITEM_PATH[item["name"]])
+        item_img = pg.transform.scale(item_img, (45, 45)) if "Potion" not in item["name"] else pg.transform.scale(item_img, (31.25, 50))
+        item_rect = pg.Rect(self.ui_top.topleft[0] + 50, self.ui_top.topleft[1] + 50, 40, 40) if "Potion" not in item["name"] else pg.Rect(self.ui_top.topleft[0] + 55, self.ui_top.topleft[1] + 44, 31.25, 50)
+
         screen.blit(self.ui_top_bg, self.ui_top)
+        screen.blit(item_img, item_rect)
         self.buy_button.draw(screen)
         self.sell_button.draw(screen)
 
         # UI - bottom part
         screen.blit(self.ui_bottom_bg, self.ui_bottom)
+        description = ITEM_DESCRIPTION[item["name"]]
+
+        descript_rect = pg.Rect(self.ui_bottom.topleft[0] + 16, self.ui_bottom.topleft[1] + 16, self.ui_bottom.width - 32, self.info_font.get_height())
+        descript_text = self.font.render(description, True, (0, 0, 0), wraplength=descript_rect.width)
+        screen.blit(descript_text, descript_rect)
+
 
 
     def update(self, dt):
         super().update(dt)
         self.money = services.game_manager.bag._items_data[0]["count"]
-        print(self.money)
-        print(services.game_manager.bag._items_data)
-
         self.buy_button.update(dt)
         self.sell_button.update(dt)
         if input_manager.key_pressed(pg.K_UP):
@@ -111,6 +120,9 @@ class ShopOverlay(Overlay):
         elif input_manager.key_pressed(pg.K_DOWN):
             self.index = self.index + 1
         self.index = self.index % len(self.shop_data)
+
+    def reset(self):
+        self.index = 0
 
 
     def buy(self, item):

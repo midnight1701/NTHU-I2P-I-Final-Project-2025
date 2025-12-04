@@ -94,7 +94,7 @@ class Map:
         for layer in self.tmxdata.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer) and ("collision" in layer.name.lower() or "house" in layer.name.lower()):
                 for x, y, gid in layer:
-                    if gid != 0 and x != 45 and y != 14:
+                    if gid != 0:
                         rects.append(pg.Rect(x * GameSettings.TILE_SIZE, y * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE,
                                              GameSettings.TILE_SIZE))
 

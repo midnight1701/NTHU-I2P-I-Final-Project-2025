@@ -1,7 +1,9 @@
 import pygame as pg
+
 from src.core.services import resource_manager, input_manager
+from src.core import services
 from src.utils import GameSettings
-from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX, ITEM_PATH
+from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX, ITEM_PATH, ITEM_DESCRIPTION
 from src.scenes.battle_scene import get_animation_image
 
 
@@ -41,15 +43,16 @@ class Bag:
         self.switch = not self.switch
         self.index = 0
 
-    def update(self, dt: float):
-        if input_manager.key_pressed(pg.K_UP):
-            self.index = self.index - 1
-        elif input_manager.key_pressed(pg.K_DOWN):
-            self.index = self.index + 1
-        self.index = (self.index % len(self._monsters_data)) if not self.switch else (self.index % len(self._items_data))
-        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
-        self._items_dict = {i: k for i, k in enumerate(self._items_dict)}
 
+    def update(self, dt: float):
+        if services.game_manager.player.blocked:
+            if input_manager.key_pressed(pg.K_UP):
+                self.index = self.index - 1
+            elif input_manager.key_pressed(pg.K_DOWN):
+                self.index = self.index + 1
+            self.index = (self.index % len(self._monsters_data)) if not self.switch else (self.index % len(self._items_data))
+        self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
+        self._items_dict = {i: k for i, k in enumerate(self._items_data)}
 
 
     def draw(self, screen: pg.Surface):
@@ -58,6 +61,7 @@ class Bag:
             self.draw_monster_info_bg(screen)
         elif self.switch:
             self.draw_item(screen)
+            self.draw_item_info(screen)
 
 
     def draw_monster(self, screen):
@@ -138,15 +142,14 @@ class Bag:
             bg_color = (44, 44, 44) if self.index != index else (169, 169, 169)
             top = self.item_rect_top[1] + index * self.item_rect_height + box_offset
             item_rect = pg.Rect(self.item_rect_top[0], top, self.item_rect_width, self.item_rect_height)
-            icon_rect = pg.Rect(self.item_rect_top[0] + 20, top + 30, self.item_rect_width, self.item_rect_height)
+            icon_rect = pg.Rect(self.item_rect_top[0] + 20, top + 25, self.item_rect_width, self.item_rect_height) if "Potion" not in item["name"] else pg.Rect(self.item_rect_top[0] + 26, top + 25, self.item_rect_width, self.item_rect_height)
+
             img = resource_manager.get_image(ITEM_PATH[item['name']])
-            img = pg.transform.scale(img, (40, 40))
+            img = pg.transform.scale(img, (40, 40)) if "Potion" not in item["name"] else pg.transform.scale(img, (25, 40))
 
             item_name = self.font.render(item["name"], True, text_color)
             text_rect = item_name.get_rect()
             text_rect.midleft = (item_rect.midleft[0] + 90, item_rect.midleft[1])
-
-            info_bg = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height)
 
             if item_rect.colliderect(self.background):
                 if item_rect.collidepoint(self.background.topleft):
@@ -165,7 +168,27 @@ class Bag:
 
 
     def draw_item_info(self, screen):
-        pass
+        item = self._items_dict[self.index]
+        info_bg_top = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height * 0.35)
+        bg_img_top = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_Frame03a.png"), (info_bg_top.width, info_bg_top.height))
+        info_bg_bottom = pg.Rect(info_bg_top.bottomleft[0], info_bg_top.bottomleft[1], info_bg_top.width, self.background.height * 0.65)
+        bg_img_bottom = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_Frame02a.png"), (info_bg_bottom.width, info_bg_bottom.height))
+
+        quantity = item["count"]
+        quantity_text = self.font.render(f"Quantity: {quantity}", True, (0, 0, 0))
+        quantity_rect = pg.Rect(info_bg_top.bottomleft[0] + 17, info_bg_top.bottomleft[1] - quantity_text.get_height() - 6, quantity_text.get_width(), quantity_text.get_height())
+
+        description = ITEM_DESCRIPTION[item["name"]]
+
+        descript_rect = pg.Rect(info_bg_bottom.topleft[0] + 16, info_bg_bottom.topleft[1] + 16, info_bg_bottom.width - 32, quantity_text.get_height())
+        descript_text = self.font.render(description, True, (0, 0, 0), wraplength=descript_rect.width)
+
+        screen.blit(bg_img_top, info_bg_top)
+        screen.blit(bg_img_bottom, info_bg_bottom)
+        screen.blit(quantity_text, quantity_rect)
+        screen.blit(descript_text, descript_rect)
+
+
 
     def get_img(self, path):
         img = resource_manager.get_image(path)
