@@ -32,12 +32,13 @@ class GameScene(Scene):
         self.game_manager = manager
         services.game_manager = self.game_manager
 
-        
         # Online Manager
         if GameSettings.IS_ONLINE:
             self.online_manager = OnlineManager()
         else:
             self.online_manager = None
+
+
         self.sprite_online = Sprite("ingame_ui/options1.png", (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
 
         self.setting_button = Button(
@@ -132,6 +133,7 @@ class GameScene(Scene):
                 self.game_manager.current_map.path_name
             )
 
+
         
     @override
     def draw(self, screen: pg.Surface):        
@@ -172,3 +174,4 @@ class GameScene(Scene):
                     pos = cam.transform_position_as_position(Position(player["x"], player["y"]))
                     self.sprite_online.update_pos(pos)
                     self.sprite_online.draw(screen)
+

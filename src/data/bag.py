@@ -19,7 +19,7 @@ class Bag:
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
-        self.info = ["hp", "atk", "def", "speed", "accuracy"]
+        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_hp", "max_def"]
         self.limit = 6
         self.clock = pg.time.Clock()
         self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
@@ -119,6 +119,8 @@ class Bag:
 
 
         for index, (char, val) in enumerate(monster_info.items()):
+            if char == "max_hp" or char == "max_def":
+                continue
             text = self.font.render(DISPLAY_INFO[char], True, (255, 255, 255))
             char_img = resource_manager.get_image(INFO_IMG[char])
             char_img = pg.transform.scale(char_img, (20, 20))
@@ -126,7 +128,8 @@ class Bag:
             img_rect = pg.Rect(char_rect.topright[0] + 13, char_rect.topright[1], 20, 20)
             img_rect.centery = char_rect.centery + 2
 
-            val = self.font.render(f"{val}/{monster["max_hp"]}", True, (255, 255, 0)) if char == "hp" else self.font.render(f"{val}/{CHAR_MAX[char]}", True, (255, 255, 0))
+            string = "max_" + char
+            val = self.font.render(f"{val}/{monster_info[string]}", True, (255, 255, 0)) if char in ["hp", "def"] else self.font.render(f"{val}", True, (255, 255, 0))
             val_rect = pg.Rect(char_rect.bottomleft[0], char_rect.bottomleft[1], val.get_width(), val.get_height())
 
             screen.blit(text, char_rect)
@@ -162,9 +165,9 @@ class Bag:
                 screen.blit(item_name, text_rect)
 
 
-            for i in range(1, min(len(self._items_data), self.limit)):
-                pg.draw.line(screen, (169, 169, 169), (self.item_rect_top[0], self.item_rect_top[1] + i * self.item_rect_height),
-                             (self.main_rect.topright[0], self.main_rect.topright[1] + i * self.item_rect_height))
+        for i in range(1, min(len(self._items_data), self.limit)):
+            pg.draw.line(screen, (169, 169, 169), (self.item_rect_top[0], self.item_rect_top[1] + i * self.item_rect_height),
+                            (self.main_rect.topright[0], self.main_rect.topright[1] + i * self.item_rect_height))
 
 
     def draw_item_info(self, screen):
@@ -199,7 +202,7 @@ class Bag:
     def get_monster_info(self, monster):
         info = {}
         for i in monster:
-            if i not in info and i in self.info:
+            if i not in info and i in self.info_bag:
                 info[i] = monster[i]
 
         return info

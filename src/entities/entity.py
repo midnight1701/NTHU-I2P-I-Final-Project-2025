@@ -4,6 +4,8 @@ from typing import override
 from src.sprites import Animation
 from src.utils import Position, PositionCamera, Direction, GameSettings
 from src.core import GameManager
+import random
+from src.utils.support import RANDOM_CHAR_PATH
 
 
 class Entity:
@@ -15,7 +17,7 @@ class Entity:
     def __init__(self, x: float, y: float, game_manager: GameManager) -> None:
         # Sprite is only for debug, need to change into animations
         self.animation = Animation(
-            "character/ow1.png", ["down", "left", "right", "up"], 4,
+            random.choice(RANDOM_CHAR_PATH), ["down", "left", "right", "up"], 4,
             (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE)
         )
         

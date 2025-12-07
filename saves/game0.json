@@ -3,9 +3,7 @@
     {
       "path": "map.tmx",
       "enemy_trainers": [
-        { "x": 24, "y": 29, "classification": "stationary", "facing": "DOWN", "max_tiles": 2, "shop": "False"},
-        { "x": 54, "y": 16, "classification": "stationary", "facing": "UP", "max_tiles": 2, "shop": "False" },
-        { "x": 31, "y": 31, "classification": "stationary", "facing": "UP", "max_tiles": 2, "shop": "False" }
+        { "x": 24, "y": 29, "classification": "stationary", "facing": "DOWN", "max_tiles": 2, "shop": "False"}
       ],
       "teleport": [
         { "x": 24, "y": 23, "destination": "gym.tmx" },
@@ -25,11 +23,8 @@
         { "x": 13, "y": 14, "destination": "map.tmx" }
       ],
       "roaming_mobs": [],
-      "enemy_trainers": [  { "x": 12, "y": 9, "classification": "stationary", "facing": "DOWN", "max_tiles": 2, "shop": "False"}],
-      "player": {
-        "x": 12,
-        "y": 13
-      }
+      "enemy_trainers": [{ "x": 12, "y": 9, "classification": "stationary", "facing": "DOWN", "max_tiles": 2, "shop": "False"}],
+      "player": {"x": 12, "y": 13}
     },
 
     {
@@ -59,37 +54,28 @@
 
   "bag": {
     "initial_monsters": [
-      { "name": "Pikachu", "hp": 500,  "max_hp": 500, "atk": 100, "def": 20, "speed": 40, "accuracy": 60,"level": 1,
+       { "name": "Pikachu", "hp": 120, "atk": 20, "def": 20, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120,
         "element": "grass"},
-      { "name": "Charizard", "hp": 150, "max_hp": 150, "atk": 100, "def": 35, "speed": 40, "accuracy": 60, "level": 1,
-        "element": "grass"},
-      { "name": "Blastoise", "hp": 200, "max_hp": 200, "atk": 80, "def": 40, "speed": 75, "accuracy": 50, "level": 1,
-        "element": "grass"},
-      { "name": "Venusaur",  "hp": 120,  "max_hp": 120, "atk": 80, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Venusaur",  "hp": 120, "atk": 25, "def": 20, "speed": 45, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120,
         "element": "earth"},
-      { "name": "Gengar",    "hp": 100, "max_hp": 100, "atk": 80, "def": 15, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Gengar",    "hp": 100, "atk": 30, "def": 15, "speed": 55, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 15, "max_hp": 100,
         "element": "wind"},
-      { "name": "Dragonite", "hp": 150, "max_hp": 150, "atk": 80, "def": 10, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Dragonite", "hp": 150, "atk": 20, "def": 10, "speed": 30, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 10, "max_hp": 150,
         "element": "ice"},
-      { "name": "Viper",     "hp": 100, "max_hp": 100, "atk": 80, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Viper",     "hp": 100, "atk": 35, "def": 10, "speed": 25, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 10, "max_hp": 100,
         "element": "poison"}
-
     ],
 
     "monsters": [
-      { "name": "Pikachu", "hp": 120,  "max_hp": 120, "atk": 100, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Pikachu", "hp": 120, "atk": 100, "def": 20, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120,
         "element": "grass"},
-      { "name": "Charizard", "hp": 150, "max_hp": 150, "atk": 100, "def": 35, "speed": 40, "accuracy": 60, "level": 1,
-        "element": "grass"},
-      { "name": "Blastoise", "hp": 200, "max_hp": 200, "atk": 80, "def": 40, "speed": 75, "accuracy": 50, "level": 1,
-        "element": "grass"},
-      { "name": "Venusaur",  "hp": 120,  "max_hp": 120, "atk": 80, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Venusaur",  "hp": 120, "atk": 80, "def": 20, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120,
         "element": "earth"},
-      { "name": "Gengar",    "hp": 100, "max_hp": 100, "atk": 80, "def": 15, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Gengar",    "hp": 100, "atk": 80, "def": 15, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 15, "max_hp": 100,
         "element": "wind"},
-      { "name": "Dragonite", "hp": 150, "max_hp": 150, "atk": 80, "def": 10, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Dragonite", "hp": 150, "atk": 80, "def": 10, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 10, "max_hp": 150,
         "element": "ice"},
-      { "name": "Viper",     "hp": 100, "max_hp": 100, "atk": 80, "def": 20, "speed": 75, "accuracy": 50, "level": 1,
+      { "name": "Viper",     "hp": 100, "atk": 80, "def": 20, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 100,
         "element": "poison"}
     ],
 

@@ -176,3 +176,20 @@ CHAR_MAX = {
     "speed": 100,
     "accuracy": 100
 }
+
+INFO_BAR_COLOR = {
+    "hp": "UI/UI_Flat_BarFill01a.png",
+    "def": "UI/UI_Flat_BarFill01f.png",
+}
+
+ADVERSARIES = {
+    "grass": ["poison", "earth"],
+    "earth": ["poison", "fire"],
+    "wind": ["grass", "fire"],
+    "ice": ["poison", "earth", "grass"],
+    "poison": []
+}
+
+
+RANDOM_CHAR_PATH = ["character/ow1.png", "character/ow2.png", "character/ow3.png", "character/ow5.png", "character/ow6.png", "character/ow7.png", "character/ow8.png",
+                    "character/ow9.png"]
