@@ -18,7 +18,11 @@ class SceneManager:
         self.current_menu = False
         self.current_game = False
         self.monster_catch = False
-        
+
+    def monster_catch_func(self):
+        self.monster_catch = True
+
+
     def register_scene(self, name: str, scene: Scene) -> None:
         self._scenes[name] = scene
         

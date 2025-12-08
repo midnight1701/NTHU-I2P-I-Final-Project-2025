@@ -19,7 +19,7 @@ class Bag:
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
-        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_hp", "max_def"]
+        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_hp", "max_def", "max_atk"]
         self.limit = 6
         self.clock = pg.time.Clock()
         self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
@@ -51,6 +51,7 @@ class Bag:
             elif input_manager.key_pressed(pg.K_DOWN):
                 self.index = self.index + 1
             self.index = (self.index % len(self._monsters_data)) if not self.switch else (self.index % len(self._items_data))
+
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
 
@@ -119,7 +120,7 @@ class Bag:
 
 
         for index, (char, val) in enumerate(monster_info.items()):
-            if char == "max_hp" or char == "max_def":
+            if char in ["max_hp", "max_def", "max_atk"]:
                 continue
             text = self.font.render(DISPLAY_INFO[char], True, (255, 255, 255))
             char_img = resource_manager.get_image(INFO_IMG[char])
@@ -129,7 +130,7 @@ class Bag:
             img_rect.centery = char_rect.centery + 2
 
             string = "max_" + char
-            val = self.font.render(f"{val}/{monster_info[string]}", True, (255, 255, 0)) if char in ["hp", "def"] else self.font.render(f"{val}", True, (255, 255, 0))
+            val = self.font.render(f"{val}/{monster_info[string]}", True, (255, 255, 0)) if char in ["hp", "def", "atk"] else self.font.render(f"{val}", True, (255, 255, 0))
             val_rect = pg.Rect(char_rect.bottomleft[0], char_rect.bottomleft[1], val.get_width(), val.get_height())
 
             screen.blit(text, char_rect)
@@ -152,7 +153,7 @@ class Bag:
 
             item_name = self.font.render(item["name"], True, text_color)
             text_rect = item_name.get_rect()
-            text_rect.midleft = (item_rect.midleft[0] + 90, item_rect.midleft[1])
+            text_rect.midleft = (item_rect.midleft[0] + 90 - 6, item_rect.midleft[1])
 
             if item_rect.colliderect(self.background):
                 if item_rect.collidepoint(self.background.topleft):

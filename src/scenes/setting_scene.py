@@ -43,14 +43,14 @@ class SettingScene(Scene):
             lambda: scene_manager.change_scene("menu")
         )
 
-        self._slider = Slider(348, 285, 581, 32, 50.0, 0, 100,
+        self._slider = Slider(348, 285, 581, 32, math.ceil(round(GameSettings.AUDIO_VOLUME, 1)) * 100, 0, 100,
                               "assets/images/UI/UI_Flat_FrameSlot03a.png")
 
 
         self._checkbox = Checkbox("UI/UI_Flat_ToggleOff01a.png",
                                   "UI/UI_Flat_ToggleOn01a.png",
                                   480, 330, 64,32,
-                                  )
+                                  lambda: sound_manager.change_mute())
 
 
         self.fade = pg.Surface((GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT), pg.SRCALPHA)
@@ -62,7 +62,7 @@ class SettingScene(Scene):
     def enter(self) -> None:
         self._slider.synchronize()
         scene_manager.setting_enter_check = True
-        pass
+
 
     @override
     def exit(self) -> None:
@@ -84,6 +84,7 @@ class SettingScene(Scene):
             self.close_button.update(dt)
 
         GameSettings.volume_change((float(self._slider.volume()) / 100))
+
         sound_manager.update()
 
 
@@ -95,7 +96,7 @@ class SettingScene(Scene):
         self._checkbox.draw(screen)
         self.load_button.draw(screen)
 
-        text = self.font.render(f"Volume: {int(round(self._slider.volume(), 1))}", True, (255, 255, 255))
+        text = self.font.render(f"Volume: {math.ceil(round(self._slider.volume(), 1))}", True, (255, 255, 255))
 
         screen.blit(text, (348, 260))
 

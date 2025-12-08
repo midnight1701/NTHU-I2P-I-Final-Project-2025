@@ -36,16 +36,17 @@ class SettingOverlay(Overlay):
 
         self._slider = Slider(348, 285, 581, 32, 50.0, 0, 100,
                               "assets/images/UI/UI_Flat_FrameSlot03a.png")
-
+        self._slider.synchronize()
 
         self._checkbox = Checkbox("UI/UI_Flat_ToggleOff01a.png",
                                   "UI/UI_Flat_ToggleOn01a.png",
                                   480, 330, 64, 32,
-                                  )
+                                   lambda: sound_manager.change_mute())
 
         self.font = pg.font.Font("assets/fonts/Minecraft.ttf", size=25)
         self.exit_button.hitbox.x -= 3
         self.exit_button.hitbox.y -= 19
+        self.synchronized = False
 
     def update(self, dt):
         self.back_button.update(dt)
@@ -53,9 +54,12 @@ class SettingOverlay(Overlay):
         self._checkbox.update()
         self.save_button.update(dt)
         self.load_button.update(dt)
-        GameSettings.volume_change((float(self._slider.volume() / 100)))
+
+        GameSettings.volume_change((float(self._slider.volume()) / 100))
+
         sound_manager.update()
         super().update(dt)
+
 
     def change_scene(self):
         scene_manager.change_scene("menu")
@@ -72,5 +76,5 @@ class SettingOverlay(Overlay):
         self.save_button.draw(screen)
         self.load_button.draw(screen)
 
-        text = self.font.render(f"Volume: {int(round(self._slider.volume(), 1))}", True, (255, 255, 255))
+        text = self.font.render(f"Volume: {math.ceil(round(self._slider.volume(), 1))}", True, (255, 255, 255))
         screen.blit(text, (348, 260))

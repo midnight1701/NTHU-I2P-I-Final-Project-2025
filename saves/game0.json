@@ -54,16 +54,8 @@
 
   "bag": {
     "initial_monsters": [
-       { "name": "Pikachu", "hp": 120, "atk": 20, "def": 20, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120,
-        "element": "grass"},
-      { "name": "Venusaur",  "hp": 120, "atk": 25, "def": 20, "speed": 45, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120,
-        "element": "earth"},
-      { "name": "Gengar",    "hp": 100, "atk": 30, "def": 15, "speed": 55, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 15, "max_hp": 100,
-        "element": "wind"},
-      { "name": "Dragonite", "hp": 150, "atk": 20, "def": 10, "speed": 30, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 10, "max_hp": 150,
-        "element": "ice"},
-      { "name": "Viper",     "hp": 100, "atk": 35, "def": 10, "speed": 25, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 10, "max_hp": 100,
-        "element": "poison"}
+       { "name": "Pikachu", "hp": 50, "atk": 20, "def": 0, "speed": 50, "accuracy": 70, "level": 1, "mana": 50, "max_mana": 100, "max_def": 20, "max_hp": 120, "max_atk":  20,
+        "element": "grass"}
     ],
 
     "monsters": [
@@ -83,8 +75,9 @@
       { "name": "Coins",       "count": 100},
       { "name": "Pokeball",    "count": 2},
       { "name": "HP Potion",   "count": 4},
-      { "name": "ATK Potion",  "count": 0},
-      { "name": "DEF Potion",  "count": 3}
+      { "name": "ATK Potion",  "count": 1},
+      { "name": "DEF Potion",  "count": 3},
+      { "name": "Mana Potion", "count": 2}
 
     ]
   }

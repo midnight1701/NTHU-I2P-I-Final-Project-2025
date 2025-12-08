@@ -22,6 +22,8 @@ def get_animation_image(path, ally=False):
 
     return animation_sprite
 
+
+
 class AttackDisplay:
     def __init__(self):
         self.choice = ["Light", "Normal", "Heavy", "Ultimate"]
@@ -98,7 +100,7 @@ class Attack:
 
     def perform_attack(self):
         attacked = random.choices([True, False], weights=[self.attacker["accuracy"], 100 - self.attacker["accuracy"]], k=1)
-        required_mana = {"Light": 10, "Normal": 15, "Heavy": 20, "Ultimate": 100}
+        required_mana = {"Light": 10, "Normal": 15, "Heavy": 20, "Ultimate": 80}
 
         if attacked == [True] and self.attacker["mana"] >= required_mana[self.attack_type]:
             self.attacker["mana"] -= required_mana[self.attack_type]
@@ -148,6 +150,104 @@ class Attack:
                 return f"{self.attacker["name"]} unleashes full power to obliterate its enemy"
 
         return None
+
+
+class Potion:
+    def __init__(self, item_lst, monster):
+        self.potion_type = None
+        self.display_potion_type = False
+        self.potion_display = PotionDisplay()
+        self.item_lst = item_lst
+        self.potion_display_draw = True
+        self.end = False
+        self.potion_usage = False
+
+        self.final_text = ""
+        self.monster_alt = monster
+
+    def draw(self, screen):
+        self.potion_display.draw(screen)
+
+    def update(self):
+        if self.potion_type is None:
+            self.potion_display.update()
+        if input_manager.key_pressed(K_SPACE):
+            if self.potion_type is None:
+                self.potion_type = self.potion_display.choice[self.potion_display.index]
+                self.display_potion_type = True
+            elif self.potion_display_draw:
+                self.potion_display_draw = False
+                self.potion_usage = True
+                self.final_text = self.perform_action()
+            else:
+                self.end = True
+
+
+    def dialogue(self):
+        match self.potion_type:
+            case "HP Potion":
+                return f"{self.monster_alt["name"]} receives healing to compensate for its damage"
+            case "DEF Potion":
+                return f"{self.monster_alt["name"]} strengthens its defense in preparation for upcoming perils"
+            case "ATK Potion":
+                return f"{self.monster_alt["name"]} upgrades its attack to obliterate the enemy ahead"
+            case "Mana Potion":
+                return f"{self.monster_alt["name"]} senses magical energy flowing within"
+
+        return None
+
+    def perform_action(self):
+        if self.potion_type == "HP Potion":
+            for item in self.item_lst:
+                if item["name"] == "HP Potion" and item["count"] > 0:
+                    item["count"] -= 1
+                    self.monster_alt["hp"] += int((self.monster_alt["max_hp"] - self.monster_alt["hp"]) * 0.5)
+                    if self.monster_alt["hp"] > self.monster_alt["max_hp"]:
+                        self.monster_alt["hp"] = self.monster_alt["max_hp"]
+
+                    return f"{self.monster_alt["name"]}'s HP is restored"
+
+
+            return f"Potion unavailable. Should have paid attention to inventory management"
+
+
+        elif self.potion_type == "DEF Potion":
+            for item in self.item_lst:
+                if item["name"] == "DEF Potion" and item["count"] > 0:
+                    item["count"] -= 1
+                    self.monster_alt["def"] = self.monster_alt["max_def"]
+                    return f"{self.monster_alt["name"]}'s defense is restored to its original state"
+
+            return f"Potion unavailable. Should have paid attention to inventory management"
+
+        elif self.potion_type == "Mana Potion":
+            for item in self.item_lst:
+                if item["name"] == "Mana Potion" and item["count"] > 0:
+                    item["count"] -= 1
+                    self.monster_alt["mana"] = self.monster_alt["max_mana"]
+                    return f"{self.monster_alt["name"]}'s energy is restored to its original state"
+
+            return f"Potion unavailable. Attack is no longer an option"
+
+        elif self.potion_type == "ATK Potion":
+            for item in self.item_lst:
+                if item["name"] == "ATK Potion" and item["count"] > 0:
+                    item["count"] -= 1
+                    self.monster_alt["atk"] += self.monster_alt["atk"] * 0.3
+                    return f"{self.monster_alt["name"]}'s attack now inflict {int(self.monster_alt["atk"])} base damage upon enemy"
+
+            return f"Potion unavailable. Use your original strength without relying on some strange potions"
+
+
+        return None
+
+
+class PotionDisplay(AttackDisplay):
+    def __init__(self):
+        super().__init__()
+        self.choice = ["HP Potion", "DEF Potion", "ATK Potion", "Mana Potion"]
+
+
 
 # noinspection PyMethodMayBeStatic
 
@@ -267,38 +367,37 @@ class BattleSetup(BattleState):
 
 
         if input_manager.key_pressed(K_SPACE):
-            if not self.ally_selection:
-                self.ally_selection = True
-            elif not self.ally_selected:
-                self.selected_monster = self.player_dict[self.index]
-                self.ally_selected = True
-            elif not self.ally_setup:
-                self.ally_setup = True
-            elif not self.enemy_selection:
+            if not self.enemy_selection:
                 self.enemy_selection = True
             elif not self.enemy_selected:
                 self.enemy_selected = True
                 self.selected_enemy = random.choice(self.enemy_monster)
             elif not self.enemy_setup:
                 self.enemy_setup = True
+            elif not self.ally_selection:
+                self.ally_selection = True
+            elif not self.ally_selected:
+                self.selected_monster = self.player_dict[self.index]
+                self.ally_selected = True
+            elif not self.ally_setup:
+                self.ally_setup = True
             else:
                 self.state_complete = True
 
 
-
     def dialogue(self):
-        if not self.selected_monster and not self.ally_selection:
+        if not self.enemy_selection:
             return f"Ally trainer has encountered something unexpected"
+        elif self.enemy_selection and not self.enemy_selected:
+            return f"Enemy trainer is selecting a monster for battle"
+        elif self.enemy_selected and not self.ally_selection:
+            return f"{self.selected_enemy["name"]} arrives with blazing determination"
         elif not self.ally_selected and self.ally_selection:
             return f"Please select a monster for battle"
         elif self.ally_selected and self.selected_monster is not None and not self.ally_setup:
             return f"Ally trainer has selected {self.selected_monster["name"]} for battle"
-        elif self.ally_setup and not self.enemy_selection:
+        elif self.ally_setup:
             return f"{self.selected_monster["name"]} enters the battleground with unyielding conviction"
-        elif self.enemy_selection and not self.enemy_selected:
-            return f"Enemy trainer is devising a novel battle strategy"
-        elif self.enemy_selected:
-            return f"{self.selected_enemy["name"]} arrives with blazing determination"
 
 
         return None
@@ -319,7 +418,7 @@ class BattleSetup(BattleState):
 
 # noinspection PyMethodMayBeStatic
 class PlayerTurn(BattleState):
-    def __init__(self, player, enemy, defend, run, potion, residue_text=None):
+    def __init__(self, player, enemy, run, residue_text=None):
         # Flags
         self.state_complete = False
         self.dialogue_check = False
@@ -331,13 +430,17 @@ class PlayerTurn(BattleState):
         self.action_text = None
         self.residue_text = residue_text
 
+        self.potion_unavailable = False
+
         # Action
-        self.atk, self.defend, self.run, self.potion = Attack(self.player, self.enemy), defend, run, potion
+        self.atk, self.run, self.potion = Attack(self.player, self.enemy), run, Potion(services.game_manager.bag._items_data, monster=self.player)
 
 
     def draw(self, screen):
         if self.action == "attack" and self.atk.attack_display_draw:
             self.atk.draw(screen)
+        elif self.action == "potion" and self.potion.potion_display_draw:
+            self.potion.draw(screen)
 
 
     def update(self):
@@ -349,12 +452,22 @@ class PlayerTurn(BattleState):
             self.atk.update()
             if self.atk.end:
                 self.state_complete = True
+                self.potion_unavailable = False
+                self.player["atk"] = self.player["max_atk"]
+
+        elif self.action == "potion":
+            self.potion.update()
+            if self.potion.end:
+                self.action = None
+                self.potion_unavailable = True
 
         elif self.action == "run":
             if input_manager.key_pressed(K_SPACE):
                 self.action_text = self.run("ally", self.player)
                 if not self.dialogue_check:
                     self.dialogue_check = True
+                    self.potion_unavailable = False
+
 
     def change_action(self, action):
         self.action = action
@@ -376,15 +489,23 @@ class PlayerTurn(BattleState):
                         return dialogue
                     elif self.atk.attacked:
                         return self.atk.final_text
-                case "defend":
-                    return f"{self.player["name"]} decides to go on the defensive"
+
+
                 case "run":
                     if not self.dialogue_check:
                         return f"{self.player["name"]} senses a dark premonition"
                     elif self.dialogue_check:
                         return self.action_text
+
                 case "potion":
-                    return f"{self.player["name"]} obtains a hidden power within"
+                    if not self.potion.potion_type:
+                        return f"{self.player["name"]} obtains a hidden power within, select a potion to bring this power to light"
+                    elif self.potion.display_potion_type and not self.potion.potion_usage:
+                        dialogue = self.potion.dialogue()
+                        return dialogue
+                    elif self.potion.potion_usage:
+                        return self.potion.final_text
+
 
         return None
 
@@ -404,20 +525,20 @@ class EnemyTurn(BattleState):
 
 
     def get_action(self):
-        action = ["defend", "run"]
-        return random.choice(action)
+        action = ["attack", "run", "mana", "def"]
+        return random.choices(action, weights=[25, 25, 25, 25], k=1)
 
 
     def perform_action(self):
         match self.action:
             case "attack":
                 self.action_text = self.atk(self.enemy, self.player)
-            case "defend":
-                self.action_text = self.defend(self.enemy)
+            case "mana":
+                pass
             case "run":
                 self.action_text = self.run("enemy", self.enemy)
-            case "potion":
-                self.action_text = self.potion(self.enemy)
+            case "def":
+                pass
 
 
     def update(self):
@@ -437,7 +558,7 @@ class EnemyTurn(BattleState):
         if self.residue_text is not None:
             return self.residue_text
         elif not self.action:
-            return "Enemy trainer is devising a battle strategy"
+            return "Enemy trainer is devising a novel battle strategy"
         elif self.action is not None and not self.dialogue_check:
             match self.action:
                 case "attack":
@@ -502,8 +623,9 @@ class BattleSystem:
                 self.change_state()
         else:
             if scene_manager.monster_catch:
-                if self.state.status == "ally_wins" and self.curr_ally_monster not in services.game_manager.bag._monsters_data:
-                    services.game_manager.bag._monsters_data.append(self.curr_ally_monster)
+                scene_manager.monster_catch_func()
+                if self.state.status == "ally_wins" and self.curr_enemy_monster not in services.game_manager.bag._monsters_data:
+                    services.game_manager.bag._monsters_data.append(self.curr_enemy_monster)
 
 
     def reset(self):
@@ -527,16 +649,16 @@ class BattleSystem:
 
     def change_state(self):
         if isinstance(self.state, BattleSetup):
-            self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.defend, self.run, self.potion)
+            self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.run)
         elif isinstance(self.state, PlayerTurn):
             if self.is_enemy_alive():
-                self.state = EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.defend, self.run, self.potion)
+                self.state = EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.run,)
             else:
                 self.state = BattleEnd(status="ally_wins", side="ally")
 
         elif isinstance(self.state, EnemyTurn):
             if self.is_player_alive():
-                self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.defend, self.run, self.potion)
+                self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.run)
             else:
                 self.state = BattleEnd(status="enemy_wins", enemy="enemy")
 
@@ -566,16 +688,15 @@ class BattleSystem:
             self.state = BattleEnd("run", side)
         else:
             residue_text =  f"{role} and companion cannot escape from the grasp of the enemy, the battle continues"
-            self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.defend, self.run, self.potion, residue_text) if side == "enemy" else EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.defend, self.run, self.potion, residue_text)
+            self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster,self.run, residue_text) if side == "enemy" else EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.defend, self.run, self.potion, residue_text)
 
         return None
 
-    def defend(self, current):
+    def mana(self, current):
         pass
 
-
-    def potion(self, current):
-        return f"{current["name"]} prepares for a deadly blow"
+    def defense(self, current):
+        pass
 
 
 

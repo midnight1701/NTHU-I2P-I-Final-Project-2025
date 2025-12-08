@@ -28,6 +28,7 @@ class Map:
         # Prebake the map
         self._surface = pg.Surface((pixel_w, pixel_h), pg.SRCALPHA)
         self._render_all_layers(self._surface)
+
         # Prebake the collision map
         self._collision_map = self._create_collision_map()
         self.detected = False

@@ -44,6 +44,7 @@ class EnemyTrainer(Entity):
         super().__init__(x, y, game_manager)
 
         self.shop = shop
+
         self.classification = classification
         self.max_tiles = max_tiles
         if classification == EnemyTrainerClassification.STATIONARY:
@@ -62,9 +63,9 @@ class EnemyTrainer(Entity):
         self._movement.update(self, dt)
         self._has_los_to_player()
         if self.detected and input_manager.key_pressed(pygame.K_SPACE):
-            if self.shop == "False":
+            if self.shop == "False" and not self.game_manager.player.blocked:
                 scene_manager.change_scene("battle")
-            else:
+            elif self.shop == "True":
                 scene_manager._scenes["game"].shop_open_func()
 
 

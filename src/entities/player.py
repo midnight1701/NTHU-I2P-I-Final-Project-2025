@@ -1,8 +1,8 @@
 from __future__ import annotations
 import pygame as pg
-from jedi.debug import speed
 from pygame import K_SPACE
 
+from src.sprites.animation import Animation
 from .entity import Entity
 from src.core.services import input_manager, scene_manager
 from src.utils import Position, PositionCamera, GameSettings, Logger, Direction

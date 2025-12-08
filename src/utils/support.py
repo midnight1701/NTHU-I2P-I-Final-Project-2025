@@ -132,8 +132,9 @@ INFO_IMG = {
 
 ITEM_PATH = {
     "HP Potion": "ingame_ui/red-potion.png",
-    "ATK Potion": "ingame_ui/blue-potion2.png",
+    "ATK Potion": "ingame_ui/orange-potion.png",
     "DEF Potion": "ingame_ui/purple-potion2.png",
+    "Mana Potion": "ingame_ui/blue-potion2.png",
     "Coins": "ingame_ui/coin.png",
     "Pokeball": "ingame_ui/ball.png"
 }
@@ -142,7 +143,8 @@ ITEM_LIST = [
     {"name": "Pokeball", "price": 50},
     {"name": "HP Potion", "price": 45},
     {"name": "ATK Potion", "price": 35},
-    {"name": "DEF Potion", "price": 40}
+    {"name": "DEF Potion", "price": 40},
+    {"name": "Mana Potion", "price":35}
 
 ]
 
@@ -155,6 +157,7 @@ ITEM_DESCRIPTION = {
                   " in the most unexpected moment (if used at the right moment). Can be obtained via shop and, occasionally, battles with other trainers",
     "DEF Potion": "A defensive-type item, bestowed on monsters unyielding protection even against the deadliest attack (not really) by increasing their defense, thereby"
                   " decreasing the amount of damage taken",
+    "Mana Potion": "",
     "Pokeball": "The only item in the game that allows trainers to catch wild monsters. Can be obtained through shop; however, "
                 "the number of pokeballs that can be purchased is limited, so use them wisely."
 

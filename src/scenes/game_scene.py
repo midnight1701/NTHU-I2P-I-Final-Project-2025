@@ -112,11 +112,14 @@ class GameScene(Scene):
                 services.game_manager.bag.index = 0
 
         if self.setting_open:
-            self.setting_overlay._slider.synchronize()
+            if not self.setting_overlay.synchronized:
+                self.setting_overlay._slider.synchronize()
+                self.setting_overlay.synchronized = True
             self.setting_overlay.update(dt)
             if self.setting_overlay.close:
                 self.setting_open = False
                 self.setting_overlay.close = False
+                self.setting_overlay.synchronized = False
 
         if self.shop_open:
             self.shop_overlay.update(dt)

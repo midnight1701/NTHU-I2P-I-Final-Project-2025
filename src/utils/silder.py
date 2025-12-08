@@ -3,6 +3,7 @@ import math
 from src.core.managers import input_manager
 from src.core.managers import game_manager
 from src.core import engine
+from src.core.services import scene_manager, sound_manager
 from src.utils import GameSettings
 
 
@@ -26,16 +27,30 @@ class Slider:
             return False
 
     def silder_update(self):
+        if sound_manager.mute:
+            self.rect.centerx = self.left + 16
+
         mouse_pos = engine.input_manager.mouse_pos
         mouse_pressed = pg.mouse.get_pressed()
         if self.check_if_slider_update(mouse_pos[0], mouse_pos[1], mouse_pressed[0]):
             if self.left + 16 <= mouse_pos[0] <= self.right - 16:
+                if mouse_pos[0] == self.left + 16:
+                    sound_manager.mute_func()
+                else:
+                    sound_manager.unmute()
                 self.rect.centerx = mouse_pos[0]
             else:
+                if mouse_pos[0] < self.left + 16:
+                    sound_manager.mute_func()
+                else:
+                    sound_manager.unmute()
                 self.rect.centerx = self.left + 16 if mouse_pos[0] < self.left + 16 else self.right - 16
+
+
 
     def synchronize(self):
         self.rect.centerx = GameSettings.AUDIO_VOLUME * self.volume_range + 16 + self.left
+
 
     def draw(self, surface):
         pg.draw.rect(surface, "grey", self._container)

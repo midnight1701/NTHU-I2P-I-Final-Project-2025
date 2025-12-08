@@ -210,14 +210,15 @@ class BattleScene(Scene):
 
     def update(self, dt: float) -> None:
         if isinstance(self.battle.state, BattleSetup):
-            if self.battle.state.ally_selected and not self.battle.state.ally_setup:
-                self.ally_monster = self.battle.get_monster()
-                self.ally_info = BattleInfoDisplay("ally", 350, 90, self.get_monster_info(self.ally_monster))
-                self.ally_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.ally_monster["name"]]["animation_path"], True))
-            elif self.battle.state.enemy_selected and not self.battle.state.enemy_setup:
+            if self.battle.state.enemy_selected and not self.battle.state.enemy_setup:
                 self.enemy_monster = self.battle.get_monster()
                 self.enemy_info = BattleInfoDisplay("enemy", 350, 90, self.get_monster_info(self.enemy_monster))
                 self.enemy_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.enemy_monster["name"]]["animation_path"]))
+            elif self.battle.state.ally_selected and not self.battle.state.ally_setup:
+                self.ally_monster = self.battle.get_monster()
+                self.ally_info = BattleInfoDisplay("ally", 350, 90, self.get_monster_info(self.ally_monster))
+                self.ally_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.ally_monster["name"]]["animation_path"], True))
+
         else:
             self.ally_info.update(self.battle.curr_ally_monster["hp"], self.battle.curr_ally_monster["def"], self.battle.curr_ally_monster["mana"])
             self.enemy_info.update(self.battle.curr_enemy_monster["hp"], self.battle.curr_enemy_monster["def"], self.battle.curr_enemy_monster["mana"])
@@ -226,10 +227,12 @@ class BattleScene(Scene):
             self.attack_button.update(dt)
             self.defend_button.update(dt)
             self.run_button.update(dt)
-            self.potion_button.update(dt)
+            if not self.battle.state.potion_unavailable:
+                self.potion_button.update(dt)
 
         if input_manager.key_pressed(K_ESCAPE):
             scene_manager.change_scene("game")
+
 
         self.battle.update()
 
@@ -253,12 +256,12 @@ class BattleScene(Scene):
 
     def battle_setup(self, screen):
         if isinstance(self.battle.state, BattleSetup):
-            if self.battle.state.ally_setup:
-                self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect, 300)
-                self.ally_info.draw(screen)
             if self.battle.state.enemy_setup:
                 self.enemy_monster_ani.draw(screen, self.dt, self.enemy_monster_rect, 300)
                 self.enemy_info.draw(screen)
+            if self.battle.state.ally_setup:
+                self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect, 300)
+                self.ally_info.draw(screen)
                 self.displayed = True
 
         if self.displayed:
@@ -271,7 +274,7 @@ class BattleScene(Scene):
 
     def dialouge_display(self, screen):
         screen.blit(self.dialogue_box, self.dialogue_rect)
-        dialogue_text = self.font.render(self.dialogue_system(), True, (255, 255, 255), wraplength=int(GameSettings.SCREEN_WIDTH * 0.7))
+        dialogue_text = self.font.render(self.dialogue_system(), True, (255, 255, 255), wraplength=int(GameSettings.SCREEN_WIDTH * 0.7 - 30))
         screen.blit(dialogue_text, self.text_rect)
 
 
@@ -283,11 +286,12 @@ class BattleScene(Scene):
         self.background.draw(screen)
         self.dialouge_display(screen)
         if isinstance(self.battle.state, BattleSetup):
-            self.battle.state.draw(screen)
             self.battle_setup(screen)
+            self.battle.state.draw(screen)
+
         elif isinstance(self.battle.state, PlayerTurn):
-            self.battle.state.draw(screen)
             self.battle_setup(screen)
+            self.battle.state.draw(screen)
             self.action_display(screen)
         else:
             self.battle_setup(screen)
