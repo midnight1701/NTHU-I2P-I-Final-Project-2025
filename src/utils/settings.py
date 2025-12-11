@@ -9,10 +9,10 @@ class Settings:
     TITLE: str = "tohka_world"    # Title of the game window
     DEBUG: bool = True          # Debug mode
     TILE_SIZE: int = 64         # Size of each tile in pixels
-    DRAW_HITBOXES: bool = True  # Draw hitboxes for debugging
+    DRAW_HITBOXES: bool = False  # Draw hitboxes for debugging
     # Audio
     MAX_CHANNELS: int = 16
-    AUDIO_VOLUME: float = 0.5  # Volume of audio
+    AUDIO_VOLUME: float = 0.0  # Volume of audio
     # Online
     IS_ONLINE: bool = True
     ONLINE_SERVER_URL: str = "http://localhost:8989"

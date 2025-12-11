@@ -1,10 +1,9 @@
 import pygame as pg
-from pygame import K_SPACE
 
 from src.scenes.overlay import Overlay
 from src.utils import GameSettings
 from src.interface.components import Button
-from src.core.services import scene_manager, sound_manager, input_manager
+from src.core.services import scene_manager, input_manager
 from src.core import services
 
 class BagOverlay(Overlay):

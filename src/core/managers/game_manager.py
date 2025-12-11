@@ -1,10 +1,13 @@
 from __future__ import annotations
+
+
 from src.utils import Logger, GameSettings, Position, Teleport
 import json, os
 import pygame as pg
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from src.entities.shop_npc import ShopNPC
     from src.maps.map import Map
     from src.entities.player import Player
     from src.entities.enemy_trainer import EnemyTrainer
@@ -27,6 +30,7 @@ class GameManager:
     def __init__(self, maps: dict[str, Map], start_map: str, 
                  player: Player | None,
                  enemy_trainers: dict[str, list[EnemyTrainer]],
+                 npc: dict,
                  enemy_monsters,
                  bag: Bag | None = None):
                      
@@ -36,6 +40,8 @@ class GameManager:
         self.current_map_key = start_map
         self.player = player
         self.enemy_trainers = enemy_trainers
+        self.npc = npc
+
         self.enemy_monster = enemy_monsters
         self.bag = bag if bag is not None else Bag([], [])
         
@@ -51,6 +57,10 @@ class GameManager:
     @property
     def current_enemy_trainers(self) -> list[EnemyTrainer]:
         return self.enemy_trainers[self.current_map_key]
+
+    @property
+    def current_npc(self):
+        return self.npc[self.current_map_key]
         
     @property
     def current_teleporter(self) -> list[Teleport]:
@@ -77,6 +87,7 @@ class GameManager:
                     self.shop = False
                 else:
                     self.player.position = self.maps[self.current_map_key].spawn
+
             
     def check_collision(self, rect: pg.Rect) -> bool:
         if self.maps[self.current_map_key].check_collision(rect):
@@ -116,6 +127,7 @@ class GameManager:
         for key, m in self.maps.items():
             block = m.to_dict()
             block["enemy_trainers"] = [t.to_dict() for t in self.enemy_trainers.get(key, [])]
+            block["others"] = [n.to_dict() for n in self.npc.get(key, [])]
             map_blocks.append(block)
         return {
             "map": map_blocks,
@@ -126,6 +138,7 @@ class GameManager:
 
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> "GameManager":
+        from src.entities.shop_npc import ShopNPC
         from src.maps.map import Map
         from src.entities.player import Player
         from src.entities.enemy_trainer import EnemyTrainer
@@ -136,6 +149,7 @@ class GameManager:
         maps: dict[str, Map] = {}
         player_spawns: dict[str, Position] = {}
         trainers: dict[str, list[EnemyTrainer]] = {}
+        npc: dict = {}
 
         for entry in maps_data:
             path = entry["path"]
@@ -151,6 +165,7 @@ class GameManager:
             maps, current_map,
             None, # Player
             trainers,
+            npc,
             bag=None,
             enemy_monsters=None
         )
@@ -159,8 +174,10 @@ class GameManager:
         Logger.info("Loading enemy trainers")
         for m in data["map"]:
             raw_data = m["enemy_trainers"]
+            raw_data_alt = m["others"]
             gm.enemy_trainers[m["path"]] = [EnemyTrainer.from_dict(t, gm) for t in raw_data]
-        
+            gm.npc[m["path"]] = [ShopNPC.from_dict(t, gm) for t in raw_data_alt]
+
         Logger.info("Loading Player")
         if data.get("player"):
             gm.player = Player.from_dict(data["player"], gm)

@@ -3,7 +3,6 @@ import pygame as pg
 
 from src.sprites import Sprite
 from src.core.services import input_manager
-from src.utils import Logger
 from typing import Callable, override
 from src.interface.components.component import UIComponent
 

@@ -1,7 +1,7 @@
 import random
 
 import pygame as pg
-from pygame import K_ESCAPE, K_SPACE
+from pygame import K_ESCAPE
 from src.scenes.battle_system import BattleSetup, PlayerTurn
 
 from src.scenes.battle_system import BattleSystem

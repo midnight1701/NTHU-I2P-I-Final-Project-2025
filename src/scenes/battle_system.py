@@ -6,7 +6,7 @@ from src.core.services import scene_manager
 from src.utils.support import COLOR, MONSTER_PATH, DISPLAY_INFO, CHAR_MAX, ADVERSARIES
 from src.core import services
 from src.utils import GameSettings
-from src.utils.support import MonsterBattle, BattleState
+from src.utils.support import BattleState
 from src.core.services import input_manager
 import random
 
@@ -377,8 +377,9 @@ class BattleSetup(BattleState):
             elif not self.ally_selection:
                 self.ally_selection = True
             elif not self.ally_selected:
-                self.selected_monster = self.player_dict[self.index]
-                self.ally_selected = True
+                if self.player_dict[self.index]["hp"] > 0:
+                    self.selected_monster = self.player_dict[self.index]
+                    self.ally_selected = True
             elif not self.ally_setup:
                 self.ally_setup = True
             else:
@@ -512,21 +513,24 @@ class PlayerTurn(BattleState):
 
 # noinspection PyMethodMayBeStatic
 class EnemyTurn(BattleState):
-    def __init__(self, player, enemy, atk, defend, run, potion, residue_text=None):
+    def __init__(self, player, enemy, atk, defend, mana, defense, residue_text=None):
         self.state_complete = False
         self.dialogue_check = False
         self.action = None
         self.player = player
         self.enemy = enemy
         self.action_text = ""
-        self.atk, self.defend, self.run, self.potion = atk, defend, run, potion
+        self.atk, self.run, self.mana, self.defense = atk, defend, mana, defense
 
         self.residue_text = residue_text
 
 
     def get_action(self):
         action = ["attack", "run", "mana", "def"]
-        return random.choices(action, weights=[25, 25, 25, 25], k=1)
+        if self.enemy["mana"] < 10:
+            return "mana"
+
+        return random.choice(action)
 
 
     def perform_action(self):
@@ -534,11 +538,11 @@ class EnemyTurn(BattleState):
             case "attack":
                 self.action_text = self.atk(self.enemy, self.player)
             case "mana":
-                pass
+                self.action_text = self.mana(self.enemy)
             case "run":
                 self.action_text = self.run("enemy", self.enemy)
             case "def":
-                pass
+                self.action_text = self.defense(self.enemy)
 
 
     def update(self):
@@ -563,12 +567,12 @@ class EnemyTurn(BattleState):
             match self.action:
                 case "attack":
                     return f"{self.enemy["name"]} decides to go on the offensive"
-                case "defend":
-                    return f"{self.enemy["name"]} decides to go on the defensive"
+                case "mana":
+                    return f"{self.enemy["name"]} senses its energy depleting, proceed to unlock hidden power"
                 case "run":
                     return f"{self.enemy["name"]} senses a dark premonition"
-                case "potion":
-                    return f"{self.enemy["name"]} obtains a hidden power within"
+                case "def":
+                    return f"{self.enemy["name"]} defends against enemy attack"
 
         elif self.action and self.dialogue_check:
             return self.action_text
@@ -652,7 +656,7 @@ class BattleSystem:
             self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.run)
         elif isinstance(self.state, PlayerTurn):
             if self.is_enemy_alive():
-                self.state = EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.run,)
+                self.state = EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.run, self.mana, self.defense)
             else:
                 self.state = BattleEnd(status="ally_wins", side="ally")
 
@@ -660,7 +664,7 @@ class BattleSystem:
             if self.is_player_alive():
                 self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster, self.run)
             else:
-                self.state = BattleEnd(status="enemy_wins", enemy="enemy")
+                self.state = BattleEnd(status="enemy_wins", side="enemy")
 
 
 
@@ -677,7 +681,45 @@ class BattleSystem:
 
 
     def attack(self, attacker, defender):
-        pass
+        attack_type = ["Light", "Normal", "Heavy", "Ultimate"]
+        required_mana = {"Light": 10, "Normal": 15, "Heavy": 20, "Ultimate": 80}
+        attack = random.choices(attack_type, [25, 25, 25, 25], k=1)
+        enemy_element = defender["element"]
+
+        attacked = random.choices([True, False], [self.curr_enemy_monster["accuracy"], 100 - self.curr_ally_monster["accuracy"]], k=1)
+        if attacked == [True] and attacker["mana"] >= required_mana[attack[0]]:
+            attacker["mana"] -= required_mana[attack[0]]
+            match attack:
+                case ["Light"]:
+                    atk_dmg = attacker["atk"] * 0.7
+                case ["Normal"]:
+                    atk_dmg = attacker["atk"]
+                case ["Heavy"]:
+                    atk_dmg = attacker["atk"] * 1.5
+                case ["Ultimate"]:
+                    atk_dmg = attacker["atk"] * 2.5
+
+            if enemy_element in ADVERSARIES[attacker["element"]]:
+                atk_dmg = atk_dmg * 1.5
+                if defender["def"] > 0:
+                    defender["def"] -= 10
+                    atk_dmg = int(atk_dmg - 10)
+            else:
+                if defender["def"] > 0:
+                    defender["def"] -= 10
+                    atk_dmg = int(atk_dmg - 5)
+
+            defender["hp"] = defender["hp"] - atk_dmg
+            if defender["hp"] < 0:
+               defender["hp"] = 0
+
+            return f"{attacker["name"]} attacks and inflicts {int(atk_dmg)} damage upon the enemy"
+
+        else:
+            if attacker["mana"] < required_mana[attack[0]]:
+                return f"Insufficient mana. Attacking the enemy is no longer an option"
+            else:
+                return f"{attacker["name"]}'s attack misses its target, {defender["name"]} remains unscathed"
 
 
     def run(self, side, target):
@@ -688,15 +730,22 @@ class BattleSystem:
             self.state = BattleEnd("run", side)
         else:
             residue_text =  f"{role} and companion cannot escape from the grasp of the enemy, the battle continues"
-            self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster,self.run, residue_text) if side == "enemy" else EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.defend, self.run, self.potion, residue_text)
+            self.state = PlayerTurn(self.curr_ally_monster, self.curr_enemy_monster,self.run, residue_text) if side == "enemy" else EnemyTurn(self.curr_ally_monster, self.curr_enemy_monster, self.attack, self.run, self.mana, self.defense, residue_text)
 
         return None
 
+
     def mana(self, current):
-        pass
+        if current["mana"] != current["max_mana"]:
+            current["mana"] = current["max_mana"]
+
+        return f"{current["name"]}'s energy has been completely replenished"
 
     def defense(self, current):
-        pass
+        if current["def"] != current["max_def"]:
+            current["def"] = current["max_def"]
+
+        return f"{current["name"]} defensive barrier has been restored to its original state"
 
 
 

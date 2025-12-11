@@ -1,11 +1,9 @@
 import pygame as pg
 
-from src.utils.support import ITEM_PATH, ITEM_LIST, ITEM_DESCRIPTION
-from src.core import GameManager
+from src.utils.support import ITEM_PATH, ITEM_LIST, SHOP_DESCRIPTION
 from src.utils import GameSettings
-from src.sprites.background import SettingSprite
 from src.interface.components import Button
-from src.core.services import scene_manager, sound_manager, input_manager, resource_manager
+from src.core.services import input_manager, resource_manager
 from src.core import services
 from src.scenes.overlay import Overlay
 
@@ -50,11 +48,14 @@ class ShopOverlay(Overlay):
         self.buy_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                  self.button_topright[0], self.button_topright[1], 80, 40,
                                  lambda: self.buy(self.shop_data_alt[self.index]))
+        self.buy_rect = pg.Rect(0, 0, 80, 40)
+        self.buy_rect.center = (self.buy_button.hitbox.center[0] + 25, self.buy_button.hitbox.center[1] + 5)
 
         self.sell_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                  self.button_topright[0], self.button_topright[1] + 55 , 80, 40,
                                  lambda: self.sell(self.shop_data_alt[self.index]))
-
+        self.sell_rect = pg.Rect(0, 0, 80, 40)
+        self.sell_rect.center = (self.sell_button.hitbox.center[0] + 25, self.sell_button.hitbox.center[1] + 5)
 
 
     def draw(self, screen):
@@ -100,9 +101,14 @@ class ShopOverlay(Overlay):
         self.buy_button.draw(screen)
         self.sell_button.draw(screen)
 
+        buy_text = self.info_font.render("Buy", True, (0, 0, 0))
+        sell_text = self.info_font.render("Sell", True, (0, 0, 0))
+        screen.blit(buy_text, self.buy_rect)
+        screen.blit(sell_text, self.sell_rect)
+
         # UI - bottom part
         screen.blit(self.ui_bottom_bg, self.ui_bottom)
-        description = ITEM_DESCRIPTION[item["name"]]
+        description = SHOP_DESCRIPTION[item["name"]]
 
         descript_rect = pg.Rect(self.ui_bottom.topleft[0] + 16, self.ui_bottom.topleft[1] + 16, self.ui_bottom.width - 32, self.info_font.get_height())
         descript_text = self.font.render(description, True, (0, 0, 0), wraplength=descript_rect.width)

@@ -11,16 +11,16 @@ from src.core.services import input_manager, scene_manager
 from src.utils import GameSettings, Direction, Position, PositionCamera
 
 
-class EnemyTrainerClassification(Enum):
+class ShopNPCClassification(Enum):
     STATIONARY = "stationary"
 
 @dataclass
 class IdleMovement:
-    def update(self, enemy: "EnemyTrainer", dt: float) -> None:
+    def update(self, enemy, dt: float) -> None:
         return
 
-class EnemyTrainer(Entity):
-    classification: EnemyTrainerClassification
+class ShopNPC(Entity):
+    classification: ShopNPCClassification
     max_tiles: int | None
     _movement: IdleMovement
     warning_sign: Sprite
@@ -33,7 +33,7 @@ class EnemyTrainer(Entity):
         x: float,
         y: float,
         game_manager: GameManager,
-        classification: EnemyTrainerClassification = EnemyTrainerClassification.STATIONARY,
+        classification: ShopNPCClassification = ShopNPCClassification.STATIONARY,
         max_tiles: int | None = 2,
         facing: Direction | None = None,
 
@@ -45,15 +45,14 @@ class EnemyTrainer(Entity):
 
         self.classification = classification
         self.max_tiles = max_tiles
-        if classification == EnemyTrainerClassification.STATIONARY:
+        if classification == ShopNPCClassification.STATIONARY:
             self._movement = IdleMovement()
             if facing is None:
                 raise ValueError("Idle EnemyTrainer requires a 'facing' Direction at instantiation")
             self._set_direction(facing)
         else:
             raise ValueError("Invalid classification")
-        self.warning_sign = Sprite("exclamation.png", (GameSettings.TILE_SIZE // 2, GameSettings.TILE_SIZE // 2))
-        self.warning_sign.update_pos(Position(x + GameSettings.TILE_SIZE // 4, y - GameSettings.TILE_SIZE // 2))
+
         self.detected = False
 
     @override
@@ -61,7 +60,7 @@ class EnemyTrainer(Entity):
         self._movement.update(self, dt)
         self._has_los_to_player()
         if self.detected and input_manager.key_pressed(pygame.K_SPACE):
-            scene_manager.change_scene("battle")
+            scene_manager._scenes["game"].shop_open_func()
 
         self.animation.update_pos(self.position)
 
@@ -81,8 +80,6 @@ class EnemyTrainer(Entity):
     @override
     def draw(self, screen: pygame.Surface, camera: PositionCamera) -> None:
         super().draw(screen, camera)
-        if self.detected:
-            self.warning_sign.draw(screen, camera)
         if GameSettings.DRAW_HITBOXES:
             los_rect = self._get_los_rect()
             if los_rect is not None:
@@ -123,8 +120,8 @@ class EnemyTrainer(Entity):
 
     @classmethod
     @override
-    def from_dict(cls, data: dict, game_manager: GameManager) -> "EnemyTrainer":
-        classification = EnemyTrainerClassification(data.get("classification", "stationary"))
+    def from_dict(cls, data: dict, game_manager: GameManager) -> ShopNPC:
+        classification = ShopNPCClassification(data.get("classification", "stationary"))
         max_tiles = data.get("max_tiles")
         facing_val = data.get("facing")
         facing: Direction | None = None
@@ -133,7 +130,7 @@ class EnemyTrainer(Entity):
                 facing = Direction[facing_val]
             elif isinstance(facing_val, Direction):
                 facing = facing_val
-        if facing is None and classification == EnemyTrainerClassification.STATIONARY:
+        if facing is None and classification == ShopNPCClassification.STATIONARY:
             facing = Direction.DOWN
         return cls(
             data["x"] * GameSettings.TILE_SIZE,

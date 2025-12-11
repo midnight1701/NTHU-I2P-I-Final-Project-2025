@@ -3,7 +3,7 @@ from pygame import Rect
 from .settings import GameSettings
 from dataclasses import dataclass
 from enum import Enum
-from typing import overload, TypedDict, Protocol
+from typing import overload, TypedDict
 
 MouseBtn = int
 Key = int
@@ -149,19 +149,21 @@ ITEM_LIST = [
 ]
 
 ITEM_DESCRIPTION = {
-    "Coins": "An in-game currency (maybe the only in-game currency), giving player the ability to obtain consumables. This item can be "
-             "\nobtained via battles with wandering trainers, region leaders and wild monsters",
-    "HP Potion": "An incredibly powerful item, giving trainers the ability to heal their monsters during battle. This consumable item can be obtained"
-                 " via shop or occasionally, through battles with wandering trainers & region leaders",
-    "ATK Potion": "A consumable item with unlimited (not really) potential, increasing the attack damage of monsters, thus allowing them to deal the most deadly blow"
-                  " in the most unexpected moment (if used at the right moment). Can be obtained via shop and, occasionally, battles with other trainers",
-    "DEF Potion": "A defensive-type item, bestowed on monsters unyielding protection even against the deadliest attack (not really) by increasing their defense, thereby"
-                  " decreasing the amount of damage taken",
-    "Mana Potion": "",
-    "Pokeball": "The only item in the game that allows trainers to catch wild monsters. Can be obtained through shop; however, "
-                "the number of pokeballs that can be purchased is limited, so use them wisely."
+    "Coins": "The universal currency of the region. Earned by defeating wild monsters, wandering trainers, and region leaders, coin allows you to purchase valuable supplies and consumables essential for your journey.",
+    "HP Potion": "A reliable healing item capable of restoring a monster’s health during the heat of battle. HP Potions are commonly sold in shops, though they may also be awarded for triumphing over trainers or region leaders",
+    "ATK Potion": "A powerful consumable that temporarily amplifies a monster’s Attack stat. When used at the perfect moment, it enables devastating strikes capable of turning the tide of battle. ATK Potions can be purchased or occasionally obtained as rare battle rewards",
+    "DEF Potion": "A defensive enhancer that boosts a monster’s Defense, helping it endure stronger enemy attacks. This sturdy elixir is available in shops and may also be earned as a rare prize from difficult battles.",
+    "Mana Potion": "A mystical elixir that replenishes a monster’s mana, allowing it to cast skills and abilities during battle without restraint. Mana Potions are commonly sold in shops and may also be found as rare rewards from powerful opponents. A must-have item for any trainer relying on skill-heavy strategies",
+    "Pokeball": "A specialized capture device crafted for containing wild monsters. While purchasable in shops, Pokeballs are stocked in limited quantities, making each throw a strategic decision in your quest to expand your team."
+}
 
-
+SHOP_DESCRIPTION = {
+    "Coins": "Currency earned from battles; used to buy items",
+    "HP Potion": "Restores a monster’s HP",
+    "ATK Potion": "Temporarily boosts Attack",
+    "DEF Potion": "Increases Defense and reduces damage taken",
+    "Mana Potion": "Restores a monster’s energy for skills",
+    "Pokeball": "Used to catch wild monsters"
 }
 
 DISPLAY_INFO = {

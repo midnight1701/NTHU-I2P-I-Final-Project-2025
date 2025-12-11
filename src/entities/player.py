@@ -11,13 +11,15 @@ import math
 from typing import override
 
 class Player(Entity):
-    speed: float = 6.0 * GameSettings.TILE_SIZE
+    speed: float = 3.0 * GameSettings.TILE_SIZE
     game_manager: GameManager
     map_x: float
     map_y: float
 
     def __init__(self, x: float, y: float, game_manager: GameManager) -> None:
         super().__init__(x, y, game_manager)
+        self.animation = Animation("character/ow1.png", ["down", "left", "right", "up"], 4,
+            (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
         self.blocked = False
         self.bush_collide = False
 

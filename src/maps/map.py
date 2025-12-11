@@ -1,3 +1,5 @@
+from collections import deque
+
 import pygame as pg
 import pytmx
 
@@ -29,16 +31,84 @@ class Map:
         self._surface = pg.Surface((pixel_w, pixel_h), pg.SRCALPHA)
         self._render_all_layers(self._surface)
 
+        # Prebake minimap
+        self._minimap = pg.Surface((pixel_w, pixel_h))
+        self._minimap.fill((0, 0, 0))
+        self._render_all_layers(self._minimap)
+        self._minimap = pg.transform.smoothscale(self._minimap, (280, 280 * (9/16)))
+
         # Prebake the collision map
         self._collision_map = self._create_collision_map()
         self.detected = False
 
+
     def update(self, dt: float):
         return
 
+
+    def bfs(self, start, target, graph):
+        queue = deque([start])
+        visited = {start}
+        parent = {start: None}
+
+        while queue:
+            node = queue.popleft()
+            if node == target:
+                break
+            for n in graph.get(node, []):
+                if n not in visited:
+                    visited.add(n)
+                    parent[n] = node
+                    queue.append(n)
+
+        path = []
+        current = target
+        while current:
+            path.append(current)
+            current = parent.get(current)
+        path.reverse()
+        if path and path[0] == start:
+            return path
+        return None
+
+
+    def create_graph(self, enemy):
+        direction = [(-1, 0), (1, 0), (0, 1), (0, -1)]
+        graph = set()
+        bfs_graph = {}
+        for x in range(self.tmxdata.width):
+            for y in range(self.tmxdata.height):
+                tile = pg.Rect(x * GameSettings.TILE_SIZE, y * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE, GameSettings.TILE_SIZE)
+                if any(tile.colliderect(r) for r in self._collision_map) or any(tile.colliderect(r) for r in enemy) or self.check_if_bush_collision(tile):
+                    continue
+
+                graph.add((x, y))
+
+        for x, y in graph:
+            neighbors = []
+            for dx, dy in direction:
+                check_x, check_y = x + dx, y + dy
+                if (check_x, check_y) in graph:
+                    neighbors.append((check_x, check_y))
+
+            bfs_graph[(x, y)] = neighbors
+
+        return bfs_graph
+
+
+
+    def player_pos_minimap(self, pos, screen):
+        scaled_x = pos.x / (self.tmxdata.width * GameSettings.TILE_SIZE) * 280
+        scaled_y = pos.y / (self.tmxdata.height * GameSettings.TILE_SIZE) * 280 * (9/16)
+        pg.draw.rect(screen, (255, 0, 0), pg.Rect(scaled_x, scaled_y, 5, 5))
+
+    def draw_minimap(self, screen):
+        screen.blit(self._minimap, pg.Rect(0, 0, 280, 280 * (9/16)))
+
+
     def draw(self, screen: pg.Surface, camera: PositionCamera):
         screen.blit(self._surface, camera.transform_position(Position(0, 0)))
-        
+
         # Draw the hitboxes collision map
         if GameSettings.DRAW_HITBOXES:
             for rect in self._collision_map:
@@ -79,7 +149,7 @@ class Map:
             # elif isinstance(layer, pytmx.TiledImageLayer) and layer.image:
             #     target.blit(layer.image, (layer.x or 0, layer.y or 0))
 
-    def _render_tile_layer(self, target: pg.Surface, layer: pytmx.TiledTileLayer) -> None:
+    def _render_tile_layer(self, target: pg.Surface, layer: pytmx.TiledTileLayer, scale_factor=None) -> None:
         for x, y, gid in layer:
             if gid == 0:
                 continue

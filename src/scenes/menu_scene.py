@@ -4,7 +4,7 @@ from src.utils import GameSettings
 from src.sprites import BackgroundSprite
 from src.scenes.scene import Scene
 from src.interface.components import Button
-from src.core.services import scene_manager, sound_manager, input_manager
+from src.core.services import scene_manager, sound_manager
 from typing import override
 
 class MenuScene(Scene):

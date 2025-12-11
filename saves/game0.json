@@ -2,9 +2,8 @@
   "map": [
     {
       "path": "map.tmx",
-      "enemy_trainers": [
-        { "x": 24, "y": 29, "classification": "stationary", "facing": "DOWN", "max_tiles": 2, "shop": "False"}
-      ],
+      "enemy_trainers": [],
+      "others": [],
       "teleport": [
         { "x": 24, "y": 23, "destination": "gym.tmx" },
         { "x": 52, "y": 26, "destination": "shop.tmx"}
@@ -23,7 +22,8 @@
         { "x": 13, "y": 14, "destination": "map.tmx" }
       ],
       "roaming_mobs": [],
-      "enemy_trainers": [{ "x": 12, "y": 9, "classification": "stationary", "facing": "DOWN", "max_tiles": 2, "shop": "False"}],
+      "enemy_trainers": [{ "x": 12, "y": 9, "classification": "stationary", "facing": "DOWN", "max_tiles": 2}],
+      "others": [],
       "player": {"x": 12, "y": 13}
     },
 
@@ -36,7 +36,8 @@
 
       ],
       "roaming_mobs": [],
-      "enemy_trainers": [ { "x": 10, "y": 4, "classification": "stationary", "facing": "DOWN", "max_tiles": 4, "shop": "True"}],
+      "enemy_trainers": [],
+      "others": [{ "x": 10, "y": 4, "classification": "stationary", "facing": "DOWN", "max_tiles": 4}],
       "player": {
           "x": 10,
           "y": 11
@@ -54,7 +55,7 @@
 
   "bag": {
     "initial_monsters": [
-       { "name": "Pikachu", "hp": 50, "atk": 20, "def": 0, "speed": 50, "accuracy": 70, "level": 1, "mana": 50, "max_mana": 100, "max_def": 20, "max_hp": 120, "max_atk":  20,
+       { "name": "Pikachu", "hp": 0, "atk": 20, "def": 20, "speed": 50, "accuracy": 70, "level": 1, "mana": 100, "max_mana": 100, "max_def": 20, "max_hp": 120, "max_atk":  20,
         "element": "grass"}
     ],
 
@@ -73,11 +74,11 @@
 
     "items": [
       { "name": "Coins",       "count": 100},
-      { "name": "Pokeball",    "count": 2},
-      { "name": "HP Potion",   "count": 4},
-      { "name": "ATK Potion",  "count": 1},
-      { "name": "DEF Potion",  "count": 3},
-      { "name": "Mana Potion", "count": 2}
+      { "name": "Pokeball",    "count": 10},
+      { "name": "HP Potion",   "count": 10},
+      { "name": "ATK Potion",  "count": 10},
+      { "name": "DEF Potion",  "count": 10},
+      { "name": "Mana Potion", "count": 10}
 
     ]
   }

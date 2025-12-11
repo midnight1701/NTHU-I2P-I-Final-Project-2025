@@ -3,7 +3,7 @@ import pygame as pg
 from src.core.services import resource_manager, input_manager
 from src.core import services
 from src.utils import GameSettings
-from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, CHAR_MAX, ITEM_PATH, ITEM_DESCRIPTION
+from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, ITEM_PATH, ITEM_DESCRIPTION
 from src.scenes.battle_scene import get_animation_image
 
 
@@ -153,7 +153,7 @@ class Bag:
 
             item_name = self.font.render(item["name"], True, text_color)
             text_rect = item_name.get_rect()
-            text_rect.midleft = (item_rect.midleft[0] + 90 - 6, item_rect.midleft[1])
+            text_rect.midleft = (item_rect.midleft[0] + 80, item_rect.midleft[1])
 
             if item_rect.colliderect(self.background):
                 if item_rect.collidepoint(self.background.topleft):
@@ -181,16 +181,19 @@ class Bag:
         quantity = item["count"]
         quantity_text = self.font.render(f"Quantity: {quantity}", True, (0, 0, 0))
         quantity_rect = pg.Rect(info_bg_top.bottomleft[0] + 17, info_bg_top.bottomleft[1] - quantity_text.get_height() - 6, quantity_text.get_width(), quantity_text.get_height())
-
         description = ITEM_DESCRIPTION[item["name"]]
-
         descript_rect = pg.Rect(info_bg_bottom.topleft[0] + 16, info_bg_bottom.topleft[1] + 16, info_bg_bottom.width - 32, quantity_text.get_height())
         descript_text = self.font.render(description, True, (0, 0, 0), wraplength=descript_rect.width)
+
+        top_item_icon = pg.transform.scale(resource_manager.get_image(ITEM_PATH[item["name"]]), (info_bg_top.height * 0.5, info_bg_top.height * 0.5) if "Potion" not in item["name"] else (info_bg_top.height * 0.3, info_bg_top.height * 0.5))
+        rect = pg.Rect(0, 0, top_item_icon.width, top_item_icon.height)
+        rect.center = (info_bg_top.center[0] - 14, info_bg_top.center[1])
 
         screen.blit(bg_img_top, info_bg_top)
         screen.blit(bg_img_bottom, info_bg_bottom)
         screen.blit(quantity_text, quantity_rect)
         screen.blit(descript_text, descript_rect)
+        screen.blit(top_item_icon, rect)
 
 
 

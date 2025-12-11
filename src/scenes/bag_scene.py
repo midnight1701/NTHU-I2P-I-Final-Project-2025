@@ -1,12 +1,9 @@
 import pygame as pg
 from src.scenes.overlay import Overlay
 
-from src.interface.components.checkbox import Checkbox
 from src.utils import GameSettings
-from src.sprites.background import BagSprite
 from src.scenes.scene import Scene
-from src.interface.components import Button
-from src.core.services import scene_manager, sound_manager, input_manager
+from src.core.services import scene_manager, input_manager
 from typing import override
 
 class BagScene(Scene):
