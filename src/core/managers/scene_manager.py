@@ -3,6 +3,12 @@ import pygame as pg
 from src.scenes.scene import Scene
 from src.utils import Logger
 
+class FadeTransition:
+    def __init__(self):
+        pass
+
+
+
 class SceneManager:
     
     _scenes: dict[str, Scene]
@@ -14,10 +20,13 @@ class SceneManager:
         self._scenes = {}
         self.setting_enter_check = False
         self.bag_enter_check = False
+        self.evolution_check = False
         self._current_scene_name = ""
         self.current_menu = False
         self.current_game = False
         self.monster_catch = False
+
+
 
     def monster_catch_func(self):
         self.monster_catch = True
@@ -45,7 +54,8 @@ class SceneManager:
     def draw(self, screen: pg.Surface) -> None:
         if self._current_scene:
             self._current_scene.draw(screen)
-            
+
+
     def _perform_scene_switch(self) -> None:
         if self._next_scene is None:
             return
@@ -60,6 +70,7 @@ class SceneManager:
         if self._current_scene:
             Logger.info(f"Entering {self._next_scene} scene")
             self._current_scene.enter()
+
             
         # Clear the transition request
         self._next_scene = None

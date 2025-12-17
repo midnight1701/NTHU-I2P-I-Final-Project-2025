@@ -1,5 +1,7 @@
-import pygame as pg
+import time
 
+import pygame as pg
+from threading import Thread
 from src.utils import GameSettings, Logger
 from .services import scene_manager, input_manager, sound_manager
 
@@ -7,6 +9,7 @@ from src.scenes.menu_scene import MenuScene
 from src.scenes.game_scene import GameScene
 from src.scenes.setting_scene import SettingScene
 from src.scenes.battle_scene import BattleScene
+from src.scenes.evolution_scene import EvolutionScene
 
 
 class Engine:
@@ -23,6 +26,7 @@ class Engine:
         self.screen = pg.display.set_mode((GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT))
         self.clock = pg.time.Clock()
         self.running = True
+        self.transition = False
 
         pg.display.set_caption(GameSettings.TITLE)
 
@@ -30,6 +34,8 @@ class Engine:
         scene_manager.register_scene("game", GameScene())
         scene_manager.register_scene("setting", SettingScene())
         scene_manager.register_scene("battle", BattleScene())
+        scene_manager.register_scene("evolution", EvolutionScene())
+
         '''
         [TODO HACKATHON 5]
         Register the setting scene here
@@ -45,6 +51,7 @@ class Engine:
             self.update(dt)
             self.render()
 
+
     def handle_events(self):
         input_manager.reset()
         for event in pg.event.get():
@@ -56,7 +63,7 @@ class Engine:
         scene_manager.update(dt)
 
     def render(self):
-        if not scene_manager.setting_enter_check and not scene_manager.bag_enter_check:
+        if not scene_manager.setting_enter_check and not scene_manager.bag_enter_check and not scene_manager.evolution_check:
             self.screen.fill((0, 0, 0))
         scene_manager.draw(self.screen)
         pg.display.flip()

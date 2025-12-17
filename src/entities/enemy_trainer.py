@@ -60,7 +60,7 @@ class EnemyTrainer(Entity):
     def update(self, dt: float) -> None:
         self._movement.update(self, dt)
         self._has_los_to_player()
-        if self.detected and input_manager.key_pressed(pygame.K_SPACE):
+        if self.detected and input_manager.key_pressed(pygame.K_SPACE) and self.game_manager.player.check_if_battle_available():
             scene_manager.change_scene("battle")
 
         self.animation.update_pos(self.position)

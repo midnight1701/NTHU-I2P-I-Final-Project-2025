@@ -104,6 +104,8 @@ class BattleState:
         ...
 
 
+
+
 COLOR = {
     "grass": (88, 234, 66),
     "earth": (128, 96, 67),
@@ -119,7 +121,10 @@ MONSTER_PATH = {
     "Venusaur": {"sprite_path": "menu_sprites/menusprite4.png", "animation_path":"assets/images/sprites/sprite4_idle.png"},
     "Gengar": {"sprite_path": "menu_sprites/menusprite5.png", "animation_path":"assets/images/sprites/sprite5_idle.png"},
     "Dragonite": {"sprite_path": "menu_sprites/menusprite6.png", "animation_path":"assets/images/sprites/sprite6_idle.png"},
-    "Viper": {"sprite_path": "menu_sprites/menusprite11.png","animation_path":"assets/images/sprites/sprite11_idle.png"}
+    "Viper": {"sprite_path": "menu_sprites/menusprite11.png","animation_path":"assets/images/sprites/sprite11_idle.png"},
+    "Infernum": {"sprite_path": "menu_sprites/menusprite8.png", "animation_path": "assets/images/sprites/sprite8_idle.png"},
+    "Flamme": {"sprite_path": "menu_sprites/menusprite7.png", "animation_path": "assets/images/sprites/sprite7_idle.png"},
+    "Firestorm": {"sprite_path": "menu_sprites/menusprite9.png", "animation_path": "assets/images/sprites/sprite9_idle.png"}
 }
 
 INFO_IMG = {
@@ -136,7 +141,11 @@ ITEM_PATH = {
     "DEF Potion": "ingame_ui/purple-potion2.png",
     "Mana Potion": "ingame_ui/blue-potion2.png",
     "Coins": "ingame_ui/coin.png",
-    "Pokeball": "ingame_ui/ball.png"
+    "Pokeball": "ingame_ui/ball.png",
+    "Hollow Core": "ingame_ui/core_1.png",
+    "Sephira Core": "ingame_ui/core_16.png",
+    "Ultimate Aegis": "ingame_ui/ticket.png",
+    "Destined Revival": "ingame_ui/core_bypass.png"
 }
 
 ITEM_LIST = [
@@ -154,7 +163,15 @@ ITEM_DESCRIPTION = {
     "ATK Potion": "A powerful consumable that temporarily amplifies a monster’s Attack stat. When used at the perfect moment, it enables devastating strikes capable of turning the tide of battle. ATK Potions can be purchased or occasionally obtained as rare battle rewards",
     "DEF Potion": "A defensive enhancer that boosts a monster’s Defense, helping it endure stronger enemy attacks. This sturdy elixir is available in shops and may also be earned as a rare prize from difficult battles.",
     "Mana Potion": "A mystical elixir that replenishes a monster’s mana, allowing it to cast skills and abilities during battle without restraint. Mana Potions are commonly sold in shops and may also be found as rare rewards from powerful opponents. A must-have item for any trainer relying on skill-heavy strategies",
-    "Pokeball": "A specialized capture device crafted for containing wild monsters. While purchasable in shops, Pokeballs are stocked in limited quantities, making each throw a strategic decision in your quest to expand your team."
+    "Pokeball": "A specialized capture device crafted for containing wild monsters. While purchasable in shops, Pokeballs are stocked in limited quantities, making each throw a strategic decision in your quest to expand your team.",
+    "Hollow Core": "Relic from a lost time, filled with a mysterious power. Combined with Sephira Core, this item bestows upon monsters the ultimate ability to transcend their limits, thus evolving into a higher form, with drastically increased stats."
+                   " Obtained through battle or gacha system",
+    "Sephira Core": "Nobody knows how, or why it comes to existence. A mysterious remnant from unknown history, which, if combined with Hollow Core, will bestow on monsters the ultimate transformation. Can only be obtained "
+                    "through battles with region leaders, minibosses & final boss, and very rarely, gacha system",
+    "Ultimate Aegis": "The ultimate lifesaver in the darkest hours, allowing trainers to summon a companion capable of drastically increase monster's Health, Defense, Mana "
+                      "and Attack for the entire duration of the battle. Can only be used once during battle, companion summoned"
+                      " will be randomized",
+    "Destined Revival": ""
 }
 
 SHOP_DESCRIPTION = {
@@ -192,9 +209,65 @@ ADVERSARIES = {
     "earth": ["poison", "fire"],
     "wind": ["grass", "fire"],
     "ice": ["poison", "earth", "grass"],
-    "poison": []
+    "poison": [],
+    "fire": ["grass", "poison"]
 }
 
 
 RANDOM_CHAR_PATH = ["character/ow1.png", "character/ow2.png", "character/ow3.png", "character/ow5.png", "character/ow6.png", "character/ow7.png", "character/ow8.png",
                     "character/ow9.png"]
+
+PLAYER_SPAWN_TP = {
+    "navigation.tmx": "navigation",
+    "shop.tmx": "shop",
+    "gym.tmx": "gym"
+}
+
+EVOLUTION_DICT = {
+    "Pikachu": { "name": "Charizard", "hp": 300, "atk": 50, "def": 40, "speed": 70, "accuracy": 100, "level": 1, "mana": 200, "max_mana": 200, "max_def": 40, "max_hp": 300,
+                "max_atk":  50, "max_accuracy": 100, "max_speed": 70,
+                "element": "grass"}
+}
+
+HIDDEN_ITEM = {
+    "Hollow Core": { "name": "Hollow Core", "count": 1},
+    "Sephira Core": { "name": "Sephira Core", "count": 1},
+    "Ultimate Aegis": {"name": "Ultimate Aegis", "count": 1},
+    "Destined Revival": {"name": "Destined Revival", "count": 1}
+}
+
+AEGIS_IMG = {
+    "Hikari & Tairitsu": "sprites/Hikari & Tairitsu (Next Stage).png",
+    "Nell": "sprites/Nell.png",
+    "Hikari (Fatalis)": "sprites/Hikari (Fatalis).png",
+    "Tairitsu (Tempestissimo)": "sprites/Tairitsu (Tempestissimo).png"
+}
+
+AEGIS_POSITION = {
+    "Hikari & Tairitsu": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 280),
+    "Hikari (Fatalis)": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 150),
+    "Tairitsu (Tempestissimo)": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 200),
+    "Nell": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 130)
+
+
+}
+
+KEYMAP = {
+    33: "!",
+    34: "\"",
+    35: "#",
+    36: "$",
+    37: "%",
+    38: "&",
+    40: "(",
+    41: ")",
+    44: ",",
+    58: ":",
+    60: "<",
+    62: ">",
+    63: "?",
+    64: "@",
+    94: "^",
+    95: "_",
+    96: "`"
+}

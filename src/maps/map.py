@@ -136,7 +136,7 @@ class Map:
 
     def bush_generation(self):
         bush_rect = []
-        bush_pos = [(9, 30), (43, 17), (31, 16), (49, 7), (56, 22), (42, 31)]
+        bush_pos = [(9, 30), (43, 17), (31, 16), (49, 7), (56, 22), (42, 31), (42, 23), (35, 13), (49, 7)]
         for b in bush_pos:
             bush_rect.append(pg.Rect(b[0] * GameSettings.TILE_SIZE, b[1] * GameSettings.TILE_SIZE, GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
 

@@ -5,6 +5,7 @@ from src.utils import Logger, GameSettings, Position, Teleport
 import json, os
 import pygame as pg
 from typing import TYPE_CHECKING
+from src.utils.support import PLAYER_SPAWN_TP
 
 if TYPE_CHECKING:
     from src.entities.shop_npc import ShopNPC
@@ -31,8 +32,8 @@ class GameManager:
                  player: Player | None,
                  enemy_trainers: dict[str, list[EnemyTrainer]],
                  npc: dict,
-                 enemy_monsters,
-                 bag: Bag | None = None):
+                 bag: Bag | None = None,
+                 enemy_monster: dict | None = None):
                      
         from src.data.bag import Bag
         # Game Properties
@@ -41,12 +42,17 @@ class GameManager:
         self.player = player
         self.enemy_trainers = enemy_trainers
         self.npc = npc
+        self.enemy_monster = enemy_monster
 
-        self.enemy_monster = enemy_monsters
+        # Evolution
+        self.evolution = False
+        self.base_monster = None
+        self.evo_monster = None
+
         self.bag = bag if bag is not None else Bag([], [])
         
         # Check If you should change scene
-        self.shop = False
+        self.teleported = ""
         self.should_change_scene = False
         self.next_map = ""
         
@@ -57,6 +63,10 @@ class GameManager:
     @property
     def current_enemy_trainers(self) -> list[EnemyTrainer]:
         return self.enemy_trainers[self.current_map_key]
+
+    @property
+    def current_roaming_monster(self):
+        return self.enemy_monster[self.current_map_key]
 
     @property
     def current_npc(self):
@@ -73,8 +83,9 @@ class GameManager:
         
         self.next_map = target
         self.should_change_scene = True
-        if self.next_map == "shop.tmx":
-            self.shop = True
+
+        if self.current_map_key != "map.tmx":
+            self.teleported = PLAYER_SPAWN_TP[self.current_map_key]
             
     def try_switch_map(self) -> None:
         if self.should_change_scene:
@@ -83,8 +94,17 @@ class GameManager:
             self.should_change_scene = False
             if self.player:
                 if self.current_map_key == "map.tmx":
-                    self.player.position = Position(52 * 64, 27 * 64) if self.shop else Position(24 * 64, 24 * 64)
-                    self.shop = False
+                    match self.teleported:
+                        case "shop":
+                            self.player.position = Position(52 * GameSettings.TILE_SIZE, 27 * GameSettings.TILE_SIZE)
+                            self.teleported = ""
+                        case "gym":
+                            self.player.position = Position(24 * GameSettings.TILE_SIZE, 24 * GameSettings.TILE_SIZE)
+                            self.teleported = ""
+                        case "navigation":
+                            self.player.position = Position(51 * GameSettings.TILE_SIZE, 7 * GameSettings.TILE_SIZE)
+                            self.teleported = ""
+
                 else:
                     self.player.position = self.maps[self.current_map_key].spawn
 
@@ -103,7 +123,40 @@ class GameManager:
             return True
 
         return False
-        
+
+    def monster_revival(self):
+        monster = self.bag._monsters_dict[self.bag.index]
+        for i in self.bag._items_data:
+            if i["name"] == "Destined Revival" and i["count"] >= 1 and monster["hp"] == 0:
+                i["count"] -= 1
+                monster["hp"] = int(monster["max_hp"] * 0.1)
+                break
+
+    def monster_healing(self):
+        monster = self.bag._monsters_dict[self.bag.index]
+        for i in self.bag._items_data:
+            if i["name"] == "HP Potion" and i["count"] >= 1 and monster["hp"] > 0:
+                i["count"] -= 1
+                monster["hp"] += int(monster["max_hp"] * 0.1)
+                break
+
+        if monster["hp"] > monster["max_hp"]:
+            monster["hp"] = monster["max_hp"]
+
+
+    def push_evo_info(self, base, evo):
+        self.base_monster = base
+        self.evo_monster = evo
+
+    def reset_evo_info(self):
+        self.base_monster, self.evo_monster = None, None
+
+    def evolution_func(self):
+        self.evolution = True
+
+    def evolution_cancel(self):
+        self.evolution = False
+
     def save(self, path: str) -> None:
         try:
             with open(path, "w") as f:
@@ -150,6 +203,7 @@ class GameManager:
         player_spawns: dict[str, Position] = {}
         trainers: dict[str, list[EnemyTrainer]] = {}
         npc: dict = {}
+        enemy_monster: dict = {}
 
         for entry in maps_data:
             path = entry["path"]
@@ -166,8 +220,8 @@ class GameManager:
             None, # Player
             trainers,
             npc,
-            bag=None,
-            enemy_monsters=None
+            None,
+            enemy_monster,
         )
         gm.current_map_key = current_map
         
@@ -177,6 +231,7 @@ class GameManager:
             raw_data_alt = m["others"]
             gm.enemy_trainers[m["path"]] = [EnemyTrainer.from_dict(t, gm) for t in raw_data]
             gm.npc[m["path"]] = [ShopNPC.from_dict(t, gm) for t in raw_data_alt]
+            gm.enemy_monster[m["path"]] = m["roaming_mobs"]
 
         Logger.info("Loading Player")
         if data.get("player"):

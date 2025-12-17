@@ -11,7 +11,7 @@ import math
 from typing import override
 
 class Player(Entity):
-    speed: float = 3.0 * GameSettings.TILE_SIZE
+    speed: float = 6.0 * GameSettings.TILE_SIZE
     game_manager: GameManager
     map_x: float
     map_y: float
@@ -22,7 +22,6 @@ class Player(Entity):
             (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
         self.blocked = False
         self.bush_collide = False
-
 
     @override
     def update(self, dt: float) -> None:
@@ -95,4 +94,20 @@ class Player(Entity):
     @override
     def from_dict(cls, data: dict[str, object], game_manager: GameManager) -> Player:
         return cls(data["x"] * GameSettings.TILE_SIZE, data["y"] * GameSettings.TILE_SIZE, game_manager)
+
+
+    def check_if_battle_available(self):
+        if len(self.game_manager.bag._monsters_data) == 1:
+            if self.game_manager.bag._monsters_data[0]["hp"] == 0:
+                return False
+        else:
+            count = 0
+            for i in self.game_manager.bag._monsters_data:
+                if i["hp"] == 0:
+                    count += 1
+
+            if count == len(self.game_manager.bag._monsters_data):
+                return False
+
+        return True
 

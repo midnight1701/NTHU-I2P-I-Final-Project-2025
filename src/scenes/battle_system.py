@@ -10,6 +10,7 @@ from src.utils.support import BattleState
 from src.core.services import input_manager
 import random
 
+
 def get_animation_image(path, ally=False):
     animation_sprite = []
     sprite = pg.image.load(path)
@@ -21,6 +22,60 @@ def get_animation_image(path, ally=False):
         animation_sprite.append(sub_img)
 
     return animation_sprite
+
+# noinspection PyMethodMayBeStatic
+class UltimateAegis:
+    def __init__(self):
+        self.choice = ["Hikari (Fatalis)", "Hikari & Tairitsu", "Tairitsu (Tempestissimo)", "Nell"]
+        self.selection = None
+        self.aegis_selected = False
+        self.change_stat = False
+        self.end = False
+
+    def stat_changed(self):
+        self.change_stat = True
+
+    def update(self):
+        if input_manager.key_pressed(K_SPACE):
+            if not self.aegis_selected:
+                self.aegis_selected = True
+                self.selection = random.choices(self.choice, weights=[1, 1, 1, 1], k=1)
+                self.selection = self.selection[0]
+            elif self.aegis_selected and not self.change_stat:
+                self.change_stat = True
+            else:
+                self.end = True
+
+
+    def return_aegis(self):
+        if self.selection is not None:
+            return self.selection
+
+        return None
+
+
+    def dialogue(self):
+        if self.change_stat:
+            return f"{self.selection} drastically increases the power of ally's monsters, allowing them to transcend their limits"
+
+        return None
+
+    def stat_alterations(self, monster):
+        match self.selection:
+            case "Hikari (Fatalis)":
+                monster["atk"] = int(monster["atk"] * 2)
+                monster["hp"] = int(monster["max_hp"] * 1.5)
+            case "Hikari & Tairitsu":
+                monster["mana"] = int(monster["max_mana"] * 2)
+                monster["hp"] = int(monster["max_hp"] * 1.5)
+            case "Nell":
+                monster["hp"] = int(monster["max_hp"] * 1.5)
+                monster["atk"] = int(monster["atk"] * 1.5)
+                monster["mana"] = int(monster["max_mana"] * 1.5)
+            case "Tairitsu (Tempestissimo)":
+                monster["hp"] = int(monster["max_hp"] * 1.5)
+                monster["mana"] = int(monster["max_mana"] * 2)
+                monster["atk"] = int(monster["max_atk"] * 2)
 
 
 
@@ -201,7 +256,7 @@ class Potion:
             for item in self.item_lst:
                 if item["name"] == "HP Potion" and item["count"] > 0:
                     item["count"] -= 1
-                    self.monster_alt["hp"] += int((self.monster_alt["max_hp"] - self.monster_alt["hp"]) * 0.5)
+                    self.monster_alt["hp"] += int(self.monster_alt["hp"] * 0.1)
                     if self.monster_alt["hp"] > self.monster_alt["max_hp"]:
                         self.monster_alt["hp"] = self.monster_alt["max_hp"]
 
@@ -435,6 +490,7 @@ class PlayerTurn(BattleState):
 
         # Action
         self.atk, self.run, self.potion = Attack(self.player, self.enemy), run, Potion(services.game_manager.bag._items_data, monster=self.player)
+        self.aegis = UltimateAegis()
 
 
     def draw(self, screen):
@@ -455,6 +511,16 @@ class PlayerTurn(BattleState):
                 self.state_complete = True
                 self.potion_unavailable = False
                 self.player["atk"] = self.player["max_atk"]
+
+        elif self.action == "aegis":
+            self.aegis.update()
+            if self.aegis.aegis_selected and not self.aegis.change_stat:
+                self.aegis.stat_alterations(self.player)
+                self.aegis.stat_changed()
+
+            if self.aegis.end:
+                self.state_complete = True
+
 
         elif self.action == "potion":
             self.potion.update()
@@ -491,7 +557,6 @@ class PlayerTurn(BattleState):
                     elif self.atk.attacked:
                         return self.atk.final_text
 
-
                 case "run":
                     if not self.dialogue_check:
                         return f"{self.player["name"]} senses a dark premonition"
@@ -507,6 +572,12 @@ class PlayerTurn(BattleState):
                     elif self.potion.potion_usage:
                         return self.potion.final_text
 
+                case "aegis":
+                    if not self.aegis.aegis_selected:
+                        return f"By the power of the Ultimate Aegis, a companion descends to overturn the tide of battle"
+                    elif self.aegis.aegis_selected and self.aegis.change_stat:
+                        dialogue = self.aegis.dialogue()
+                        return dialogue
 
         return None
 
@@ -617,18 +688,21 @@ class BattleSystem:
         self.monster_catch = monster_catch
 
         self.curr_ally_monster, self.curr_enemy_monster = None, None
+        self.aegis_selected = False
 
 
     def update(self):
         self.state.update()
 
         if not isinstance(self.state, BattleEnd):
+            if isinstance(self.state, PlayerTurn) and self.state.action == "aegis" and self.state.aegis.aegis_selected:
+                self.aegis_selected = True
             if self.state.state_complete:
                 self.change_state()
         else:
             if scene_manager.monster_catch:
                 scene_manager.monster_catch_func()
-                if self.state.status == "ally_wins" and self.curr_enemy_monster not in services.game_manager.bag._monsters_data:
+                if self.state.status == "ally_wins" and self.curr_enemy_monster["name"] not in [i["name"] for i in services.game_manager.bag._monsters_data]:
                     services.game_manager.bag._monsters_data.append(self.curr_enemy_monster)
 
 
@@ -637,6 +711,8 @@ class BattleSystem:
         for monster in self.enemy_monster_lst:
             for info in ["hp", "def", "mana"]:
                 monster[info] = monster[f"max_{info}"]
+
+
 
 
     def get_monster(self):

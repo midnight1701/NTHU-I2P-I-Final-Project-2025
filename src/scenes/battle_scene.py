@@ -1,4 +1,5 @@
 import random
+import math
 
 import pygame as pg
 from pygame import K_ESCAPE
@@ -7,7 +8,7 @@ from src.scenes.battle_system import BattleSetup, PlayerTurn
 from src.scenes.battle_system import BattleSystem
 from src.sprites import BackgroundSprite
 from src.utils import GameSettings
-from src.utils.support import MONSTER_PATH, INFO_BAR_COLOR
+from src.utils.support import MONSTER_PATH, INFO_BAR_COLOR, AEGIS_IMG, AEGIS_POSITION
 from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager, resource_manager
@@ -43,6 +44,28 @@ def get_animation_image(path, ally=False):
     return animation_sprite
 
 
+class AnimatedAegis:
+    def __init__(self, image, center):
+        self.timer = 0
+        self.image = pg.transform.scale(image, (1400, 1400))
+        self.center = center
+
+    def draw_centered(self, surface, img, scale):
+        w = int(img.get_width() * scale)
+        h = int(img.get_height() * scale)
+        scaled = pg.transform.smoothscale(img, (w, h))
+        rect = scaled.get_rect(center=self.center)
+        surface.blit(scaled, rect)
+
+    def draw(self, screen):
+        scale = 1.0 + 0.05 * math.cos(self.timer * 3)
+        self.draw_centered(screen, self.image, scale)
+
+    def update(self, dt):
+        self.timer += dt
+
+
+
 class BattleInfoDisplay:
     def __init__(self, side, width, height, info):
         self.rect = pg.Rect(10, 10, width, height) if side == "ally" else pg.Rect(GameSettings.SCREEN_WIDTH - width - 20, 10, width, height)
@@ -61,6 +84,7 @@ class BattleInfoDisplay:
         self.sample_width = self.sample.width
         self.font_height = self.font.get_height()
         self.width, self.height = width, height
+
 
     def draw(self, screen):
         draw_info_box(screen, self.rect.topleft[0] + 15, self.rect.topleft[1], self.width, self.height)
@@ -86,19 +110,20 @@ class BattleInfoDisplay:
 
 
             if info == "hp":
-                bar = pg.transform.scale(resource_manager.get_image(INFO_BAR_COLOR[info]), (info_bar_rect.width * (val / self.info["max_hp"]), info_bar_rect.height))
+                bar = pg.transform.scale(resource_manager.get_image(INFO_BAR_COLOR[info]), ((info_bar_rect.width * (val / self.info["max_hp"]) if val <= self.info["max_hp"] else info_bar_rect.width) , info_bar_rect.height))
                 screen.blit(bar, info_bar_rect)
                 screen.blit(value, pg.Rect(info_bar_rect.topleft[0] + 3, info_bar_rect.topleft[1] + 3, info_bar_rect.width, info_bar_rect.height))
             elif info == "def":
-                bar = pg.transform.scale(resource_manager.get_image(INFO_BAR_COLOR[info]), (info_bar_rect.width * (val / self.info["max_def"]), info_bar_rect.height))
+                bar = pg.transform.scale(resource_manager.get_image(INFO_BAR_COLOR[info]), ((info_bar_rect.width * (val / self.info["max_def"]) if val <= self.info["max_def"] else info_bar_rect.width), info_bar_rect.height))
                 screen.blit(bar, info_bar_rect)
                 screen.blit(value, pg.Rect(info_bar_rect.topleft[0] + 3, info_bar_rect.topleft[1] + 3, info_bar_rect.width, info_bar_rect.height))
             else:
-                info_mana_rect.width = info_mana_rect.width * (val / self.info["max_mana"])
+                info_mana_rect.width = info_mana_rect.width * (val / self.info["max_mana"]) if val <= self.info["max_mana"] else info_mana_rect.width
                 pg.draw.rect(screen, (71, 99, 255), info_mana_rect)
                 screen.blit(value, pg.Rect(info_bar_rect.topleft[0] + 3, info_bar_rect.topleft[1] + 3, info_bar_rect.width, info_bar_rect.height))
 
             screen.blit(info_text, info_text_rect)
+
 
 
     def update(self, hp=None, defense=None, mana=None):
@@ -128,7 +153,7 @@ class BattleScene(Scene):
         super().__init__()
         random.seed(random.randint(1, 100000))
         # Background/ Display font
-        self.background = BackgroundSprite("backgrounds/background1.png")
+        self.background = BackgroundSprite("backgrounds/Testify.jpg")
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=22)
         self.box_font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=25)
         self.alt_font = pg.font.Font("assets/fonts/Minecraft.ttf", size=20)
@@ -149,21 +174,26 @@ class BattleScene(Scene):
         # Enemy monster battle setup
         self.enemy_pos = (830, 268)
         self.enemy_monster_rect = pg.Rect(self.enemy_pos[0], self.enemy_pos[1], 196 * 2, 98 * 2)
-        self.enemy_monster_rect.center = (964, 310)
+        self.enemy_monster_rect.center = (954, 310)
         self.enemy_monster = None
         self.enemy_monster_ani = None
         self.enemy_info = None
 
         # Ally monster battle setup
         self.ally_monster_rect = pg.Rect(0, 0, 196 * 2, 98 * 2)
-        self.ally_monster_rect.center = (400, 310)
+        self.ally_monster_rect.center = (410, 310)
         self.ally_monster = None
         self.ally_monster_ani = None
         self.ally_info = None
 
+        # Companion setup
+        self.companion = None
+        self.companion_img = None
+        self.companion_ani = None
+
         # Battle state...
-        self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.bag._game_monsters, True) if (
-                        scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.bag._game_monsters, False)
+        self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, True) if (
+                        scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
         self.displayed = False
 
 
@@ -172,9 +202,9 @@ class BattleScene(Scene):
         self.attack_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 50,
                                     self.dialogue_rect.topleft[1] + 50, 180, 70,
                                     lambda: self.battle.state.change_action("attack"))
-        self.defend_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 50 + self.offset,
+        self.aegis_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png", self.dialogue_rect.topleft[0] + 50 + self.offset,
                                     self.dialogue_rect.topleft[1] + 50, 180, 70,
-                                    lambda: self.battle.state.change_action("defend"))
+                                    lambda: self.battle.state.change_action("aegis"))
         self.run_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.dialogue_rect.topleft[0] + self.offset * 2 + 50,
                                     self.dialogue_rect.topleft[1] + 50, 180, 70,
@@ -185,14 +215,19 @@ class BattleScene(Scene):
                                     lambda: self.battle.state.change_action("potion"))
 
         self.attack_rect = pg.Rect(self.dialogue_rect.topleft[0] + 100, self.dialogue_rect.topleft[1] + 65, 180, 70)
-        self.defend_rect = pg.Rect(self.dialogue_rect.topleft[0] + 100 + self.offset, self.dialogue_rect.topleft[1] + 65, 180, 70)
+        self.aegis_rect = pg.Rect(self.dialogue_rect.topleft[0] + 110 + self.offset, self.dialogue_rect.topleft[1] + 65, 180, 70)
         self.potion_rect = pg.Rect(self.dialogue_rect.topleft[0] + self.offset * 3 + 105, self.dialogue_rect.topleft[1] + 65, 180, 70)
         self.run_rect = pg.Rect(self.dialogue_rect.topleft[0] + self.offset * 2 + 120, self.dialogue_rect.topleft[1] + 65, 180, 70)
-
+        self.aegis_applicable = False
 
     def reset(self):
-        self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.bag._game_monsters, True) if (
-            scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.bag._game_monsters, False)
+        self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, True) if (
+            scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+        for i in services.game_manager.bag._items_data:
+            if i["name"] == "Ultimate Aegis" and i["count"] >= 1:
+                self.aegis_applicable = True
+                break
+
 
 
     def enter(self) -> None:
@@ -205,6 +240,13 @@ class BattleScene(Scene):
             services.game_manager.bag._items_data[1]["count"] -= 1
         scene_manager.monster_catch = False
         self.displayed = False
+        self.companion = None
+        self.companion_img = None
+
+        if self.ally_monster["atk"] != self.ally_monster["max_atk"]:
+            self.ally_monster["atk"] = self.ally_monster["max_atk"]
+
+
         self.battle.reset()
 
 
@@ -225,10 +267,20 @@ class BattleScene(Scene):
 
         if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
             self.attack_button.update(dt)
-            self.defend_button.update(dt)
+            if self.aegis_applicable and not self.battle.aegis_selected:
+                self.aegis_button.update(dt)
             self.run_button.update(dt)
             if not self.battle.state.potion_unavailable:
                 self.potion_button.update(dt)
+
+        if isinstance(self.battle.state, PlayerTurn) and self.battle.state.aegis.aegis_selected and self.companion is None:
+            self.companion = self.battle.state.aegis.return_aegis()
+            self.companion_img = resource_manager.get_image(AEGIS_IMG[self.companion])
+            center = AEGIS_POSITION[self.companion]
+            self.companion_ani = AnimatedAegis(self.companion_img, center)
+
+        if self.companion_ani is not None:
+            self.companion_ani.update(dt)
 
         if input_manager.key_pressed(K_ESCAPE):
             scene_manager.change_scene("game")
@@ -241,8 +293,8 @@ class BattleScene(Scene):
         if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None and self.battle.state.residue_text is None:
             self.attack_button.draw(screen)
             attack_text = self.font.render("Attack", True, (0, 0, 0))
-            self.defend_button.draw(screen)
-            defend_text = self.font.render("Defend", True, (0, 0, 0))
+            self.aegis_button.draw(screen)
+            aegis_text = self.font.render("Aegis", True, (0, 0, 0))
             self.potion_button.draw(screen)
             potion_text = self.font.render("Potion", True, (0, 0, 0))
             self.run_button.draw(screen)
@@ -250,7 +302,7 @@ class BattleScene(Scene):
 
             screen.blit(run_text, self.run_rect)
             screen.blit(potion_text, self.potion_rect)
-            screen.blit(defend_text, self.defend_rect)
+            screen.blit(aegis_text, self.aegis_rect)
             screen.blit(attack_text, self.attack_rect)
 
 
@@ -265,6 +317,8 @@ class BattleScene(Scene):
                 self.displayed = True
 
         if self.displayed:
+            if self.companion is not None:
+                self.companion_ani.draw(screen)
             self.ally_monster_ani.draw(screen, self.dt, self.ally_monster_rect, 300)
             self.ally_info.draw(screen)
             self.enemy_monster_ani.draw(screen, self.dt, self.enemy_monster_rect, 300)
@@ -284,17 +338,18 @@ class BattleScene(Scene):
 
     def draw(self, screen: pg.Surface) -> None:
         self.background.draw(screen)
-        self.dialouge_display(screen)
         if isinstance(self.battle.state, BattleSetup):
             self.battle_setup(screen)
             self.battle.state.draw(screen)
-
+            self.dialouge_display(screen)
         elif isinstance(self.battle.state, PlayerTurn):
             self.battle_setup(screen)
             self.battle.state.draw(screen)
+            self.dialouge_display(screen)
             self.action_display(screen)
         else:
             self.battle_setup(screen)
+            self.dialouge_display(screen)
 
 
     def get_monster_info(self, monster):

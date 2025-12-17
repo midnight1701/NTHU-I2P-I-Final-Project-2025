@@ -1,7 +1,8 @@
 import pygame as pg
 
-from src.core.services import resource_manager, input_manager
+from src.core.services import resource_manager, input_manager, scene_manager
 from src.core import services
+from src.interface.components import Button
 from src.utils import GameSettings
 from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISPLAY_INFO, ITEM_PATH, ITEM_DESCRIPTION
 from src.scenes.battle_scene import get_animation_image
@@ -12,14 +13,13 @@ class Bag:
     _monsters_data: list[Monster]
     _items_data: list[Item]
 
-    def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None, game_monster_data: list[Monster] | None = None):
+    def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None):
         self._monsters_data = monsters_data if monsters_data else []
         self._items_data = items_data if items_data else []
-        self._game_monsters = game_monster_data if game_monster_data else []
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
-        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_hp", "max_def", "max_atk"]
+        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_hp", "max_def", "max_atk", "max_accuracy", "max_speed"]
         self.limit = 6
         self.clock = pg.time.Clock()
         self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
@@ -31,12 +31,52 @@ class Bag:
         self.item_rect_top = self.background.topleft
         self.item_rect_width = self.background.width * 0.3
         self.item_rect_height = self.background.height / self.limit
-
         self.main_rect = pg.Rect(self.item_rect_top[0], self.item_rect_top[1], self.item_rect_width, self.background.height)
+
+        self.reference = self.font.render("Sephira Core", True, (0, 0, 0))
+
+        # Awakening
+        self.awaken_rect = pg.Rect(0, 0, 100, 50)
+        self.awaken_rect.topright = self.background.topright[0] - 60, self.background.topright[1] + 20
+        self.awaken_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
+                                    self.awaken_rect.topleft[0], self.awaken_rect.topleft[1],
+                                    100, 50,
+                                    lambda: services.game_manager.evolution_func())
+
+        self.awaken_text = self.font.render("Awaken", True, (0, 0, 0))
+        self.awaken_text_rect = pg.Rect(0, 0, self.awaken_text.get_width(), self.awaken_text.get_height())
+        self.awaken_text_rect.center = (self.awaken_button.hitbox.center[0], self.awaken_button.hitbox.center[1] - 5)
+
+        # Revive
+        self.revive_rect = pg.Rect(0, 0, 100, 50)
+        self.revive_rect.topright = self.awaken_rect.topright[0], self.awaken_rect.topright[1] + 60
+        self.revive_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
+                                    self.revive_rect.topleft[0], self.revive_rect.topleft[1],
+                                    100, 50,
+                                    lambda: services.game_manager.monster_revival())
+
+        self.revive_text = self.font.render("Revive", True, (0, 0, 0))
+        self.revive_text_rect = pg.Rect(0, 0, self.revive_text.get_width(), self.awaken_text.get_height())
+        self.revive_text_rect.center = (self.revive_button.hitbox.center[0], self.revive_button.hitbox.center[1] - 5)
+
+
+        # Healing (outside of battle)
+        self.healing_rect = pg.Rect(0, 0, 100, 50)
+        self.healing_rect.topright = (self.revive_rect.topright[0], self.revive_rect.topright[1] + 60)
+        self.healing_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
+                                     self.healing_rect.topleft[0], self.healing_rect.topleft[1],
+                                     100, 50,
+                                     lambda: services.game_manager.monster_healing())
+
+        self.healing_text = self.font.render("Heal", True, (0, 0, 0))
+        self.healing_text_rect = pg.Rect(0, 0, self.healing_text.get_width(), self.healing_text.get_height())
+        self.healing_text_rect.center = (self.healing_button.hitbox.center[0], self.healing_button.hitbox.center[1] - 5)
+
 
         self.index = 0
         self.switch = False
         self.curr_surface = pg.display.get_surface()
+
 
 
     def switch_bag(self):
@@ -55,6 +95,13 @@ class Bag:
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
 
+        self.awaken_button.update(dt)
+        self.revive_button.update(dt)
+        self.healing_button.update(dt)
+
+    def change_monster(self, idx, evolved):
+        self._monsters_data[idx] = evolved
+
 
     def draw(self, screen: pg.Surface):
         if not self.switch:
@@ -63,6 +110,7 @@ class Bag:
         elif self.switch:
             self.draw_item(screen)
             self.draw_item_info(screen)
+        screen.blit(self.font.render("Press [Z] to switch between item and monster bag", True, (255, 255, 0)), pg.Rect(self.background.bottomleft[0], self.background.bottomleft[1] + 10, self.background.width, self.font.get_height()))
 
 
     def draw_monster(self, screen):
@@ -117,10 +165,17 @@ class Bag:
         pg.draw.rect(screen, COLOR[monster["element"]], animated_bg)
         pg.draw.rect(screen, (169, 169, 169), border)
         screen.blit(img, animated)
+        self.awaken_button.draw(screen)
+        self.revive_button.draw(screen)
+        self.healing_button.draw(screen)
+        screen.blit(self.awaken_text, self.awaken_text_rect)
+        screen.blit(self.revive_text, self.revive_text_rect)
+        screen.blit(self.healing_text, self.healing_text_rect)
+
 
 
         for index, (char, val) in enumerate(monster_info.items()):
-            if char in ["max_hp", "max_def", "max_atk"]:
+            if char in ["max_hp", "max_def", "max_atk", "max_accuracy", "max_speed"]:
                 continue
             text = self.font.render(DISPLAY_INFO[char], True, (255, 255, 255))
             char_img = resource_manager.get_image(INFO_IMG[char])
@@ -130,7 +185,7 @@ class Bag:
             img_rect.centery = char_rect.centery + 2
 
             string = "max_" + char
-            val = self.font.render(f"{val}/{monster_info[string]}", True, (255, 255, 0)) if char in ["hp", "def", "atk"] else self.font.render(f"{val}", True, (255, 255, 0))
+            val = self.font.render(f"{val}/{monster_info[string]}", True, (255, 255, 0))
             val_rect = pg.Rect(char_rect.bottomleft[0], char_rect.bottomleft[1], val.get_width(), val.get_height())
 
             screen.blit(text, char_rect)
@@ -151,9 +206,9 @@ class Bag:
             img = resource_manager.get_image(ITEM_PATH[item['name']])
             img = pg.transform.scale(img, (40, 40)) if "Potion" not in item["name"] else pg.transform.scale(img, (25, 40))
 
-            item_name = self.font.render(item["name"], True, text_color)
+            item_name = self.font.render(item["name"], True, text_color, wraplength=self.reference.get_width())
             text_rect = item_name.get_rect()
-            text_rect.midleft = (item_rect.midleft[0] + 80, item_rect.midleft[1])
+            text_rect.midleft = (item_rect.midleft[0] + 70, item_rect.midleft[1])
 
             if item_rect.colliderect(self.background):
                 if item_rect.collidepoint(self.background.topleft):
@@ -203,6 +258,7 @@ class Bag:
 
         return img
 
+
     def get_monster_info(self, monster):
         info = {}
         for i in monster:
@@ -215,16 +271,14 @@ class Bag:
     def to_dict(self) -> dict[str, object]:
         return {
             "initial_monsters": list(self._monsters_data),
-            "monsters": list(self._game_monsters),
             "items": list(self._items_data)
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, object]) -> "Bag":
         monsters = data.get("initial_monsters") or []
-        game_monsters = data.get("monsters") or []
         items = data.get("items") or []
-        bag = cls(monsters, items, game_monsters)
+        bag = cls(monsters, items)
         return bag
 
 

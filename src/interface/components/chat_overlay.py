@@ -1,6 +1,14 @@
 from __future__ import annotations
+
+from xml.sax.saxutils import escape
+
 import pygame as pg
 from typing import Optional, Callable, List, Dict
+
+from pygame import K_ESCAPE, K_BACKSPACE, K_SPACE, K_QUESTION
+from src.utils.support import KEYMAP
+
+from src.core import services
 from .component import UIComponent
 from src.core.services import input_manager
 from src.utils import Logger
@@ -35,7 +43,7 @@ class ChatOverlay(UIComponent):
 
         """
         # TODO
-        # try:
+        try:
         #     self._font_msg = pg.font.Font(..., ...)
         #     self._font_input = pg.font.Font(..., ...)
         # except Exception:
@@ -43,12 +51,18 @@ class ChatOverlay(UIComponent):
         #     self._font_input = pg.font.SysFont(..., ...)
         """
 
+
+        self._font_msg = pg.font.Font(font_path, size=22)
+        self._font_input = pg.font.Font(font_path, size=20)
+
+
     def open(self) -> None:
         if not self.is_open:
             self.is_open = True
             self._cursor_timer = 0.0
             self._cursor_visible = True
             self._just_opened = True
+
 
     def close(self) -> None:
         self.is_open = False
@@ -81,7 +95,30 @@ class ChatOverlay(UIComponent):
                 if ok:
                     self._input_text = ""
         """
-        pass
+        shift = input_manager.key_down(pg.K_LSHIFT) or input_manager.key_down(pg.K_RSHIFT)
+        for k in range(pg.K_EXCLAIM, pg.K_z + 1):
+            if input_manager.key_pressed(k):
+                ch = chr(ord('!') + (k - pg.K_EXCLAIM))
+                self._input_text += (ch.upper() if (shift and ch.isalpha()) else ch)
+
+
+        if input_manager.key_pressed(K_SPACE):
+            self._input_text += " "
+
+        if input_manager.key_pressed(K_BACKSPACE):
+            self._input_text = self._input_text[:len(self._input_text) - 1]
+
+        if input_manager.key_pressed(pg.K_RETURN):
+            txt = self._input_text.strip()
+            if txt:
+                ok = False
+                try:
+                    ok = self._send_callback(self._input_text)
+                except Exception:
+                    ok = False
+                if ok:
+                    self._input_text = ""
+
 
     def update(self, dt: float) -> None:
         if not self.is_open:
@@ -93,6 +130,11 @@ class ChatOverlay(UIComponent):
         #     self.close()
         #     return
         """
+
+        if input_manager.key_pressed(K_ESCAPE):
+            self.close()
+            return
+
         # Typing
         if self._just_opened:
             self._just_opened = False
@@ -104,12 +146,15 @@ class ChatOverlay(UIComponent):
             self._cursor_timer = 0.0
             self._cursor_visible = not self._cursor_visible
 
+
     def draw(self, screen: pg.Surface) -> None:
         # Always draw recent messages faintly, even when closed
-        msgs = self._get_messages(8) if self._get_messages else []
+        msgs = self._get_messages(2) if self._get_messages else []
         sw, sh = screen.get_size()
         x = 10
         y = sh - 100
+
+
         # Draw background for messages
         if msgs:
             container_w = max(100, int((sw - 20) * 0.6))
@@ -125,9 +170,11 @@ class ChatOverlay(UIComponent):
                 surf = self._font_msg.render(f"{sender}: {text}", True, (255, 255, 255))
                 _ = screen.blit(surf, (x + 10, draw_y))
                 draw_y += surf.get_height() + 4
+
         # If not open, skip input field
         if not self.is_open:
             return
+
         # Input box
         box_h = 28
         box_w = max(100, int((sw - 20) * 0.6))
@@ -136,12 +183,14 @@ class ChatOverlay(UIComponent):
         bg2 = pg.Surface((box_w, box_h), pg.SRCALPHA)
         bg2.fill((0, 0, 0, 160))
         _ = screen.blit(bg2, (x, box_y))
+
         # Text
-        # txt = self._input_text
-        # text_surf = self._font_input.____(..., ..., (..., ..., ...)) <- over here we need to RENDER the text, what function should we call?
-        # _ = screen.blit(text_surf, (x + 8, box_y + 4))
+        txt = self._input_text
+        text_surf = self._font_input.render(txt, True, (255, 255, 255))
+        _ = screen.blit(text_surf, (x + 8, box_y + 4))
+
         # Caret
-        # if self._cursor_visible:
-        #     cx = x + 8 + text_surf.get_width() + 2
-        #     cy = box_y + 6
-        #     pg.draw.rect(screen, (255, 255, 255), pg.Rect(cx, cy, 2, box_h - 12))
+        if self._cursor_visible:
+             cx = x + 8 + text_surf.get_width() + 2
+             cy = box_y + 6
+             pg.draw.rect(screen, (255, 255, 255), pg.Rect(cx, cy, 2, box_h - 12))
