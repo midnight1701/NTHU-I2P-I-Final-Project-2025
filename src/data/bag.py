@@ -8,6 +8,7 @@ from src.utils.support import Monster, Item, COLOR, MONSTER_PATH, INFO_IMG, DISP
 from src.scenes.battle_scene import get_animation_image
 
 
+
 # noinspection PyMethodMayBeStatic
 class Bag:
     _monsters_data: list[Monster]
@@ -19,13 +20,14 @@ class Bag:
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
-        self.info_bag = ["atk", "def", "speed", "accuracy", "max_def", "max_atk", "max_accuracy", "max_speed"]
+        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_def", "max_atk", "max_accuracy", "max_speed", "max_hp"]
         self.limit = 6
         self.clock = pg.time.Clock()
         self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
         self.frame_index = 0
 
         self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=20)
+        self.font_alt = self.font_alt = pg.font.Font("assets/fonts/Minecraft.ttf", size=20)
         self.background = pg.Rect(0, 0, 720, 540)
         self.background.center = (GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT // 2)
         self.item_rect_top = self.background.topleft
@@ -165,6 +167,9 @@ class Bag:
         pg.draw.rect(screen, COLOR[monster["element"]], animated_bg)
         pg.draw.rect(screen, (169, 169, 169), border)
         screen.blit(img, animated)
+
+
+        # Button draw
         self.awaken_button.draw(screen)
         self.revive_button.draw(screen)
         self.healing_button.draw(screen)
@@ -172,9 +177,9 @@ class Bag:
         screen.blit(self.revive_text, self.revive_text_rect)
         screen.blit(self.healing_text, self.healing_text_rect)
 
-        print(monster_info)
+
         for index, (char, val) in enumerate(monster_info.items()):
-            if char in ["max_def", "max_atk", "max_accuracy", "max_speed"]:
+            if char in ["max_def", "max_atk", "max_accuracy", "max_speed", "max_hp"]:
                 continue
             text = self.font.render(DISPLAY_INFO[char], True, (255, 255, 255))
             char_img = resource_manager.get_image(INFO_IMG[char])
@@ -190,6 +195,14 @@ class Bag:
             screen.blit(text, char_rect)
             screen.blit(char_img, img_rect)
             screen.blit(val, val_rect)
+
+        # Draw mana info
+        mana_text = self.font.render("Mana", True, (255, 255, 255))
+        mana_rect = pg.Rect(top[0] + 150, top[1], mana_text.get_width(), mana_text.get_height())
+        mana_val_text = self.font.render(f"{monster["mana"]}/{monster["max_mana"]}", True, (255, 255, 0))
+        mana_val_rect = pg.Rect(mana_rect.bottomleft[0], mana_rect.bottomleft[1], mana_val_text.get_width(), mana_val_text.get_height())
+        screen.blit(mana_text, mana_rect)
+        screen.blit(mana_val_text, mana_val_rect)
 
 
     def draw_item(self, screen):

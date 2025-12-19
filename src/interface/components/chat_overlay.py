@@ -8,10 +8,10 @@ from typing import Optional, Callable, List, Dict
 from pygame import K_ESCAPE, K_BACKSPACE, K_SPACE, K_QUESTION
 from src.utils.support import KEYMAP
 
-from src.core import services
+
 from .component import UIComponent
 from src.core.services import input_manager
-from src.utils import Logger
+
 
 
 class ChatOverlay(UIComponent):
@@ -99,7 +99,14 @@ class ChatOverlay(UIComponent):
         for k in range(pg.K_EXCLAIM, pg.K_z + 1):
             if input_manager.key_pressed(k):
                 ch = chr(ord('!') + (k - pg.K_EXCLAIM))
-                self._input_text += (ch.upper() if (shift and ch.isalpha()) else ch)
+                if shift:
+                    if ch.isalpha() and k not in KEYMAP:
+                        self._input_text += ch.upper()
+                    else:
+                        self._input_text += KEYMAP[k]
+                else:
+                    self._input_text += ch
+
 
 
         if input_manager.key_pressed(K_SPACE):

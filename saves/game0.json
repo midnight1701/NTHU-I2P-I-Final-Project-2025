@@ -86,7 +86,9 @@
   "bag": {
     "initial_monsters": [
        { "name": "Pikachu", "hp": 100, "atk":  20, "def": 20, "mana": 150, "speed": 50, "accuracy": 70, "max_mana": 150, "max_def": 20, "max_hp": 100,
-         "max_atk":  20, "max_accuracy": 70, "max_speed": 50, "element": "grass"}
+         "max_atk":  20, "max_accuracy": 70, "max_speed": 50, "element": "grass"},
+      { "name": "Ascendolph", "hp": 470, "atk": 50, "def": 50, "speed": 100, "accuracy": 100, "mana": 300, "max_mana": 300, "max_def": 50, "max_hp": 470,
+        "max_atk":  50, "max_accuracy": 100, "max_speed": 100, "element": "water"}
 
     ],
 

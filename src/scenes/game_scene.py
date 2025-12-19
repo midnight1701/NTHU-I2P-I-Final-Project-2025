@@ -230,7 +230,7 @@ class GameScene(Scene):
                     sender = int(m.get("from", -1))
                     text = str(m.get("text", ""))
                     if sender >= 0 and text:
-                        self._chat_bubbles[sender] = (text, now + 5.0)
+                        self._chat_bubbles[sender] = (text, now + 8.0)
                     if mid > max_id:
                         max_id = mid
                 self._last_chat_id_seen = max_id
