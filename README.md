@@ -2,7 +2,8 @@
 
 Final Project Template for National Tsing Hua University Introduction to Programming (I) 114 Fall
 
-This Project is inspired by classic pokemon game
+This Project is inspired by classic pokemon game and Arcaea. 
+Warmest thanks to Lowiro for the wonderful game assets, including: music, backgrounds, characters & ingame items.
 
 ## Setup Project
 1. (Recommended) Install Python 3.12.x (We use 3.12.8) from the official Python website and create virtual environment
