@@ -8,12 +8,13 @@ from src.scenes.battle_system import BattleSetup, PlayerTurn
 from src.scenes.battle_system import BattleSystem
 from src.sprites import BackgroundSprite
 from src.utils import GameSettings
-from src.utils.support import MONSTER_PATH, INFO_BAR_COLOR, AEGIS_IMG, AEGIS_POSITION
+from src.utils.support import MONSTER_PATH, INFO_BAR_COLOR, AEGIS_IMG, AEGIS_POSITION, BATTLE_BG, BATTLE_MUSIC, COLOR
 from src.scenes.scene import Scene
 from src.interface.components import Button
 from src.core.services import scene_manager, sound_manager, input_manager, resource_manager
 import src.core.services as services
 
+BG_NAME = ["Testify", "Arghena", "Designant"]
 
 def draw_info_box(surface, x, y, width, height):
     COLOR_BLACK = (0, 0, 0)
@@ -69,6 +70,9 @@ class AnimatedAegis:
 class BattleInfoDisplay:
     def __init__(self, side, width, height, info):
         self.rect = pg.Rect(10, 10, width, height) if side == "ally" else pg.Rect(GameSettings.SCREEN_WIDTH - width - 20, 10, width, height)
+        self.atk_rect = pg.Rect(0, 0, width * 0.6, height * 0.5)
+        self.atk_rect.topleft = (self.rect.bottomleft[0] + 7, self.rect.bottomleft[1] + 11)
+
         self.info = info
         self.info_img = pg.transform.scale(resource_manager.get_image(MONSTER_PATH[info["name"]]["sprite_path"]), (80, 80))
         self.info_img_rect = pg.Rect(self.rect.topleft[0] + 15, self.rect.topleft[1], self.info_img.width, self.info_img.height)
@@ -86,13 +90,26 @@ class BattleInfoDisplay:
         self.width, self.height = width, height
 
 
+
     def draw(self, screen):
         draw_info_box(screen, self.rect.topleft[0] + 15, self.rect.topleft[1], self.width, self.height)
         screen.blit(self.info_img, self.monster_img_rect)
+        pg.draw.rect(screen, (255, 255, 255), self.atk_rect)
+        pg.draw.rect(screen, (0, 0, 0), self.atk_rect, 3)
+        text_atk = self.font_alt.render(f"ATK: {self.info["atk"]}/{self.info["max_atk"]}", True, (0, 0, 0))
+        text_element = self.font_alt.render(f"{(self.info["element"]).upper()}", True, COLOR[self.info["element"]])
+        element_text_rect = text_element.get_rect()
+        element_text_rect.midleft = self.atk_rect.midleft[0] + 20, self.atk_rect.midleft[1] + 3
+        atk_text_rect = text_atk.get_rect()
+        atk_text_rect.midright = self.atk_rect.midright[0] - 5, self.atk_rect.midright[1] + 3
+        screen.blit(text_atk, atk_text_rect)
+        screen.blit(text_element, element_text_rect)
 
         for index, (info, val) in enumerate(self.info.items()):
-            if info in ["max_hp", "max_def", "max_mana", "name"]:
+            if info in ["max_hp", "max_def", "max_mana", "name", "element", "max_atk", "atk"]:
                 continue
+            if info in ["def", "mana"]:
+                index -= 1
 
             info_text = self.font.render(info.upper(), True, (0, 0, 0))
             info_text_rect = pg.Rect(self.avatar_rect.topright[0] + 20, self.avatar_rect.topright[1] - self.font_height / 2 - 3 + index * info_text.get_height() * 1.25, self.sample_width, info_text.height)
@@ -126,14 +143,15 @@ class BattleInfoDisplay:
 
 
 
-    def update(self, hp=None, defense=None, mana=None):
+    def update(self, hp=None, defense=None, mana=None, atk=None):
         if hp is not None:
             self.info["hp"] = hp
         if defense is not None:
             self.info["def"] = defense
         if mana is not None:
             self.info["mana"] = mana
-
+        if atk is not None:
+            self.info["atk"] = atk
 
 class AnimatedMonster:
     def __init__(self, sprite):
@@ -159,7 +177,7 @@ class BattleScene(Scene):
         self.alt_font = pg.font.Font("assets/fonts/Minecraft.ttf", size=20)
         self.clock = pg.time.Clock()
         self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
-        self.info_in_battle = ["hp", "max_hp", "mana", "max_mana", "def", "max_def", "name"]
+        self.info_in_battle = ["hp", "max_hp", "mana", "max_mana", "def", "max_def", "name", "atk", "max_atk", "element"]
 
 
         # Dialogue setup
@@ -172,8 +190,7 @@ class BattleScene(Scene):
 
 
         # Enemy monster battle setup
-        self.enemy_pos = (830, 268)
-        self.enemy_monster_rect = pg.Rect(self.enemy_pos[0], self.enemy_pos[1], 196 * 2, 98 * 2)
+        self.enemy_monster_rect = pg.Rect(0, 0, 196 * 2, 98 * 2)
         self.enemy_monster_rect.center = (954, 310)
         self.enemy_monster = None
         self.enemy_monster_ani = None
@@ -220,9 +237,15 @@ class BattleScene(Scene):
         self.run_rect = pg.Rect(self.dialogue_rect.topleft[0] + self.offset * 2 + 120, self.dialogue_rect.topleft[1] + 65, 180, 70)
         self.aegis_applicable = False
 
+
+
     def reset(self):
-        self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, True) if (
-            scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+        if not services.game_manager.boss_encounter:
+            self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, True) if (
+                scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+        else:
+            self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+            self.battle.boss()
         for i in services.game_manager.bag._items_data:
             if i["name"] == "Ultimate Aegis" and i["count"] >= 1:
                 self.aegis_applicable = True
@@ -231,7 +254,10 @@ class BattleScene(Scene):
 
 
     def enter(self) -> None:
-        sound_manager.play_bgm("RBY 107 Battle! (Trainer).ogg")
+        bg_name = random.choices(BG_NAME, weights=[1, 1, 1], k=1)
+        bg_name = bg_name[0]
+        self.background = BackgroundSprite(BATTLE_BG[bg_name])
+        sound_manager.play_bgm(BATTLE_MUSIC[bg_name])
         self.reset()
 
 
@@ -243,9 +269,8 @@ class BattleScene(Scene):
         self.companion = None
         self.companion_img = None
 
-        if self.ally_monster["atk"] != self.ally_monster["max_atk"]:
+        if self.ally_monster is not None and self.ally_monster["atk"] != self.ally_monster["max_atk"]:
             self.ally_monster["atk"] = self.ally_monster["max_atk"]
-
 
         self.battle.reset()
 
@@ -262,8 +287,8 @@ class BattleScene(Scene):
                 self.ally_monster_ani = AnimatedMonster(get_animation_image(MONSTER_PATH[self.ally_monster["name"]]["animation_path"], True))
 
         else:
-            self.ally_info.update(self.battle.curr_ally_monster["hp"], self.battle.curr_ally_monster["def"], self.battle.curr_ally_monster["mana"])
-            self.enemy_info.update(self.battle.curr_enemy_monster["hp"], self.battle.curr_enemy_monster["def"], self.battle.curr_enemy_monster["mana"])
+            self.ally_info.update(self.battle.curr_ally_monster["hp"], self.battle.curr_ally_monster["def"], self.battle.curr_ally_monster["mana"], self.battle.curr_ally_monster["atk"])
+            self.enemy_info.update(self.battle.curr_enemy_monster["hp"], self.battle.curr_enemy_monster["def"], self.battle.curr_enemy_monster["mana"], self.battle.curr_enemy_monster["atk"])
 
         if isinstance(self.battle.state, PlayerTurn) and self.battle.state.action is None:
             self.attack_button.update(dt)

@@ -35,8 +35,6 @@ class EvolutionScene(Scene):
         self.width, self.height = GameSettings.SCREEN_WIDTH, GameSettings.SCREEN_HEIGHT
         self.surface = pg.Surface((self.width, self.height), pg.SRCALPHA)
         self.surface.fill((0, 0, 0, 30))
-        self.awaken_text = pg.transform.scale(resource_manager.load_img("UI/awaken_text.png"), (600, ( 600 * 177 / 1339)))
-        self.awaken_rect = self.awaken_text.get_rect(center=(self.width / 2, (self.height / 2) + 130))
 
         self.base, self.evolved = None, None
         self.base_img, self.evo_img = None, None
@@ -128,7 +126,7 @@ class EvolutionScene(Scene):
         else:
             scale = 1.0 + 0.05 * math.cos(self.timer * 3)
             self.draw_centered(screen, self.evo_img, scale)
-            screen.blit(self.awaken_text, self.awaken_rect)
+
 
 
 

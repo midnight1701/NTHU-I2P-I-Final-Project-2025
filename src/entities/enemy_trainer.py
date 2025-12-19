@@ -61,7 +61,10 @@ class EnemyTrainer(Entity):
         self._movement.update(self, dt)
         self._has_los_to_player()
         if self.detected and input_manager.key_pressed(pygame.K_SPACE) and self.game_manager.player.check_if_battle_available():
+            if self.game_manager.current_map_key == "gym.tmx":
+                self.game_manager.boss()
             scene_manager.change_scene("battle")
+
 
         self.animation.update_pos(self.position)
 

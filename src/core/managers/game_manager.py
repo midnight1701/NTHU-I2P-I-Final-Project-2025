@@ -48,6 +48,7 @@ class GameManager:
         self.evolution = False
         self.base_monster = None
         self.evo_monster = None
+        self.boss_encounter = False
 
         self.bag = bag if bag is not None else Bag([], [])
         
@@ -100,9 +101,6 @@ class GameManager:
                             self.teleported = ""
                         case "gym":
                             self.player.position = Position(24 * GameSettings.TILE_SIZE, 24 * GameSettings.TILE_SIZE)
-                            self.teleported = ""
-                        case "navigation":
-                            self.player.position = Position(51 * GameSettings.TILE_SIZE, 7 * GameSettings.TILE_SIZE)
                             self.teleported = ""
 
                 else:
@@ -157,6 +155,13 @@ class GameManager:
     def evolution_cancel(self):
         self.evolution = False
 
+    def boss(self):
+        self.boss_encounter = True
+
+    def boss_cancel(self):
+        self.boss_encounter = False
+        self.base_monster, self.evo_monster = None
+
     def save(self, path: str) -> None:
         try:
             with open(path, "w") as f:
@@ -179,8 +184,10 @@ class GameManager:
         map_blocks: list[dict[str, object]] = []
         for key, m in self.maps.items():
             block = m.to_dict()
+            print(block)
             block["enemy_trainers"] = [t.to_dict() for t in self.enemy_trainers.get(key, [])]
             block["others"] = [n.to_dict() for n in self.npc.get(key, [])]
+            block["roaming_mobs"] = [k for k in self.enemy_monster.get(key, [])]
             map_blocks.append(block)
         return {
             "map": map_blocks,

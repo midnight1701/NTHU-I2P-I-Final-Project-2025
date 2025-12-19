@@ -7,7 +7,7 @@ from .entity import Entity
 from src.core.services import input_manager, scene_manager
 from src.utils import Position, PositionCamera, GameSettings, Logger, Direction
 from src.core import GameManager
-import math
+import src.core.services as services
 from typing import override
 
 class Player(Entity):
@@ -64,7 +64,7 @@ class Player(Entity):
                 self.game_manager.switch_map(dest)
 
             self.check_if_bush_collide()
-            if self.bush_collide and input_manager.key_pressed(K_SPACE):
+            if self.bush_collide and input_manager.key_pressed(K_SPACE) and services.game_manager.bag._items_data[1]["count"] >= 1:
                 scene_manager.change_scene("battle")
                 scene_manager.monster_catch = True
 

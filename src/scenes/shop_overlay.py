@@ -37,6 +37,7 @@ class ShopOverlay(Overlay):
         self.item_rect_top = self.main_rect.topleft
         self.item_rect_width, self.item_rect_height = self.main_rect.width, self.main_rect.height / self.limit
 
+
         # Item description + Buy & Sell
         self.ui_top_bg = pg.transform.scale(resource_manager.get_image("UI/UI_Flat_Frame03a.png"), (self.rect.width * 0.6, self.rect.height * 0.35))
         self.ui_top = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.rect.width * 0.6, self.rect.height * 0.35)
@@ -57,6 +58,14 @@ class ShopOverlay(Overlay):
         self.sell_rect = pg.Rect(0, 0, 80, 40)
         self.sell_rect.center = (self.sell_button.hitbox.center[0] + 25, self.sell_button.hitbox.center[1] + 5)
 
+        self.ref_rect = pg.Rect(self.ui_top.topleft[0] + 50, self.ui_top.topleft[1] + 50, 40, 40)
+        self.coin_img = pg.transform.scale(resource_manager.get_image(ITEM_PATH["Coins"]), (30, 30))
+        self.coin_rect = pg.Rect(0, 0, self.coin_img.get_width(), self.coin_img.get_height())
+        self.finance_rect = pg.Rect(0, 0, 110, 50)
+        self.finance_rect.bottomright = self.ui_top.topright[0], self.ui_top.topright[1] - 10
+        self.coin_rect.midleft = (self.finance_rect.midleft[0] + 10, self.finance_rect.midleft[1])
+        self.coin_text_rect = pg.Rect(0, 0, 110, 50)
+        self.coin_text_rect.midleft = (self.coin_rect.midright[0] + 10, self.coin_rect.midright[1] + 12)
 
     def draw(self, screen):
         super().draw(screen)
@@ -64,6 +73,12 @@ class ShopOverlay(Overlay):
         self.draw_item_ui(screen)
 
     def draw_item(self, screen):
+        pg.draw.rect(screen, (255, 255, 255), self.finance_rect)
+        pg.draw.rect(screen, (0, 0, 0), self.finance_rect, 3)
+        screen.blit(self.coin_img, self.coin_rect)
+        text = self.font.render(str(self.money), True, (0, 0, 0))
+        screen.blit(text, self.coin_text_rect)
+
         pg.draw.rect(screen, (44, 44, 44), self.main_rect)
         box_offset = 0 if self.index < self.limit else -(self.index - self.limit + 1) * self.item_rect_height
         for index, item in enumerate(self.shop_data):
@@ -96,10 +111,19 @@ class ShopOverlay(Overlay):
         item_img = pg.transform.scale(item_img, (45, 45)) if "Potion" not in item["name"] else pg.transform.scale(item_img, (31.25, 50))
         item_rect = pg.Rect(self.ui_top.topleft[0] + 50, self.ui_top.topleft[1] + 50, 40, 40) if "Potion" not in item["name"] else pg.Rect(self.ui_top.topleft[0] + 55, self.ui_top.topleft[1] + 44, 31.25, 50)
 
+        price_rect = pg.Rect(0, 0, 110, 40)
+        price_rect.midleft = (self.ref_rect.midleft[0] + 180, self.ref_rect.midleft[1] + 2)
+        price_text = self.font.render(f"Price: {item["price"]}", True, (0, 0, 0))
+        price_text_rect = pg.Rect(0, 0, 110, 40)
+        price_text_rect.midleft = (self.ref_rect.midleft[0] + 188, self.ref_rect.midleft[1] + 7)
+
         screen.blit(self.ui_top_bg, self.ui_top)
         screen.blit(item_img, item_rect)
         self.buy_button.draw(screen)
         self.sell_button.draw(screen)
+        pg.draw.rect(screen, (255, 255, 255), price_rect)
+        pg.draw.rect(screen, (0, 0, 0), price_rect, 3)
+        screen.blit(price_text, price_text_rect)
 
         buy_text = self.info_font.render("Buy", True, (0, 0, 0))
         sell_text = self.info_font.render("Sell", True, (0, 0, 0))

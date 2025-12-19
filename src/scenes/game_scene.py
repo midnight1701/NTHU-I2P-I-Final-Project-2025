@@ -258,18 +258,19 @@ class GameScene(Scene):
 
         self.sprite_online.update(dt)
 
-        if self.game_manager.evolution and self.check_evolution():
-            if self.game_manager.bag._monsters_dict[self.game_manager.bag.index]["name"] in EVOLUTION_DICT and self.game_manager.bag._monsters_dict[self.game_manager.bag.index]["hp"] > 0:
-                for i in self.game_manager.bag._items_data:
-                    if i["name"] == "Hollow Core":
-                        i["count"] -= 3
-                    elif i["name"] == "Sephira Core":
-                        i["count"] -= 1
+        if self.game_manager.evolution:
+            if self.check_evolution():
+                if self.game_manager.bag._monsters_dict[self.game_manager.bag.index]["name"] in EVOLUTION_DICT and self.game_manager.bag._monsters_dict[self.game_manager.bag.index]["hp"] > 0:
+                    for i in self.game_manager.bag._items_data:
+                        if i["name"] == "Hollow Core":
+                            i["count"] -= 3
+                        elif i["name"] == "Sephira Core":
+                            i["count"] -= 1
 
-                base = self.game_manager.bag._monsters_dict[self.game_manager.bag.index]
-                evo = EVOLUTION_DICT[base["name"]]
-                self.game_manager.push_evo_info(base, evo)
-                scene_manager.change_scene("evolution")
+                    base = self.game_manager.bag._monsters_dict[self.game_manager.bag.index]
+                    evo = EVOLUTION_DICT[base["name"]]
+                    self.game_manager.push_evo_info(base, evo)
+                    scene_manager.change_scene("evolution")
             else:
                 self.game_manager.evolution_cancel()
 
@@ -366,15 +367,6 @@ class GameScene(Scene):
              text, _ = self._chat_bubbles[local_pid]
              self._draw_chat_bubble_for_pos(screen, camera, self.game_manager.player.position, text, self.bubble_font)
 
-        # DRAW OTHER PLAYERS' BUBBLES
-        # for pid, (text, _) in self._chat_bubbles.items():
-        #     if pid == local_pid:
-        #         continue
-        #     pos_xy = self._online_last_pos.____(..., ...)
-        #     if not pos_xy:
-        #         continue
-        #     px, py = pos_xy
-        #     self._draw_bubble_for_pos(..., ..., ..., ..., ...)
 
         for pid, (text, _) in self._chat_bubbles.items():
             if pid == local_pid:
@@ -387,58 +379,7 @@ class GameScene(Scene):
             self._draw_chat_bubble_for_pos(screen, camera, pos, text, self.bubble_font)
 
 
-
-        """
-        DRAWING CHAT BUBBLES:
-        - When a player sends a chat message, the message should briefly appear above
-        that player's character in the world, similar to speech bubbles in RPGs.
-        - Each bubble should last only a few seconds before fading or disappearing.
-        - Only players currently visible on the map should show bubbles.
-
-         What you need to think about:
-            ------------------------------
-            1. **Which players currently have messages?**
-            You will have a small structure mapping player IDs to the text they sent
-            and the time the bubble should disappear.
-
-            2. **How do you know where to place the bubble?**
-            The bubble belongs above the player's *current position in the world*.
-            The game already tracks each player’s world-space location.
-            Convert that into screen-space and draw the bubble there.
-
-            3. **How should bubbles look?**
-            You decide. The visual style is up to you:
-            - A rounded rectangle, or a simple box.
-            - Optional border.
-            - A small triangle pointing toward the character's head.
-            - Enough padding around the text so it looks readable.
-
-            4. **How do bubbles disappear?**
-            Compare the current time to the stored expiration timestamp.
-            Remove any bubbles that have expired.
-
-            5. **In what order should bubbles be drawn?**
-            Draw them *after* world objects but *before* UI overlays.
-
-        Reminder:
-        - For the local player, you can use the self.game_manager.player.position to get the player's position
-        - For other players, maybe you can find some way to store other player's last position?
-        - For each player with a message, maybe you can call a helper to actually draw a single bubble?
-        """
-
     def _draw_chat_bubble_for_pos(self, screen: pg.Surface, camera: PositionCamera, world_pos: Position, text: str, font: pg.font.Font):
-        """
-        Steps:
-            ------------------
-            1. Convert a player’s world position into a location on the screen.
-            (Use the camera system provided by the game engine.)
-
-            2. Decide where "above the player" is.
-            Typically a little above the sprite’s head.
-
-            3. Measure the rendered text to determine bubble size.
-            Add padding around the text.
-        """
         bubble_pos = camera.transform_position_as_position(world_pos)
         text = font.render(text, True, (0, 0, 0))
         rect = pg.Rect(bubble_pos.x, bubble_pos.y - 24, text.get_width(), text.get_height())

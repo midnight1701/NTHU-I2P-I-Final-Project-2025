@@ -19,7 +19,7 @@ class Bag:
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
-        self.info_bag = ["hp", "atk", "def", "speed", "accuracy", "max_hp", "max_def", "max_atk", "max_accuracy", "max_speed"]
+        self.info_bag = ["atk", "def", "speed", "accuracy", "max_def", "max_atk", "max_accuracy", "max_speed"]
         self.limit = 6
         self.clock = pg.time.Clock()
         self.dt = self.clock.tick(GameSettings.FPS) / 1000.0
@@ -32,12 +32,12 @@ class Bag:
         self.item_rect_width = self.background.width * 0.3
         self.item_rect_height = self.background.height / self.limit
         self.main_rect = pg.Rect(self.item_rect_top[0], self.item_rect_top[1], self.item_rect_width, self.background.height)
-
+        animated_bg = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height * 0.4)
         self.reference = self.font.render("Sephira Core", True, (0, 0, 0))
 
         # Awakening
         self.awaken_rect = pg.Rect(0, 0, 100, 50)
-        self.awaken_rect.topright = self.background.topright[0] - 60, self.background.topright[1] + 20
+        self.awaken_rect.topright = self.background.topright[0] - 60, animated_bg.bottomright[1] + 20
         self.awaken_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.awaken_rect.topleft[0], self.awaken_rect.topleft[1],
                                     100, 50,
@@ -156,7 +156,7 @@ class Bag:
         border = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], 2, self.background.height)
         animated_bg = pg.Rect(self.main_rect.topright[0], self.main_rect.topright[1], self.background.width * 0.7, self.background.height * 0.4)
         animated = pg.Rect(0, 0, 200, 200)
-        animated.center = animated_bg.center
+        animated.center = (animated_bg.center[0], animated_bg.center[1] - 10)
 
         info_bg = pg.Rect(animated_bg.bottomleft[0], animated_bg.bottomleft[1], self.background.width * 0.35, self.background.height * 0.6)
         monster_info = self.get_monster_info(monster)
@@ -172,10 +172,9 @@ class Bag:
         screen.blit(self.revive_text, self.revive_text_rect)
         screen.blit(self.healing_text, self.healing_text_rect)
 
-
-
+        print(monster_info)
         for index, (char, val) in enumerate(monster_info.items()):
-            if char in ["max_hp", "max_def", "max_atk", "max_accuracy", "max_speed"]:
+            if char in ["max_def", "max_atk", "max_accuracy", "max_speed"]:
                 continue
             text = self.font.render(DISPLAY_INFO[char], True, (255, 255, 255))
             char_img = resource_manager.get_image(INFO_IMG[char])

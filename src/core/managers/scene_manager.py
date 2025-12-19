@@ -29,7 +29,7 @@ class SceneManager:
 
 
     def monster_catch_func(self):
-        self.monster_catch = True
+        self.monster_catch = False
 
 
     def register_scene(self, name: str, scene: Scene) -> None:

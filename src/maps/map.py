@@ -98,12 +98,14 @@ class Map:
 
 
     def player_pos_minimap(self, pos, screen):
-        scaled_x = pos.x / (self.tmxdata.width * GameSettings.TILE_SIZE) * 280
-        scaled_y = pos.y / (self.tmxdata.height * GameSettings.TILE_SIZE) * 280 * (9/16)
+        scaled_x = (pos.x / (self.tmxdata.width * GameSettings.TILE_SIZE) * 280) + 10
+        scaled_y = (pos.y / (self.tmxdata.height * GameSettings.TILE_SIZE) * 280 * (9/16)) + 10
         pg.draw.rect(screen, (255, 0, 0), pg.Rect(scaled_x, scaled_y, 5, 5))
 
     def draw_minimap(self, screen):
-        screen.blit(self._minimap, pg.Rect(0, 0, 280, 280 * (9/16)))
+        rect = pg.Rect(10, 10, 280, 280 * (9/16))
+        screen.blit(self._minimap, pg.Rect(10, 10, 280, 280 * (9/16)))
+        pg.draw.rect(screen, (0, 0, 0), rect, 3)
 
 
     def draw(self, screen: pg.Surface, camera: PositionCamera):

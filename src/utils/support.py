@@ -111,7 +111,9 @@ COLOR = {
     "earth": (128, 96, 67),
     "ice": (185, 232, 234),
     "poison": (186, 85, 211),
-    "wind": (242, 242, 242)
+    "wind": (242, 242, 242),
+    "fire": (255, 90, 0),
+    "water": (28, 163, 236)
 }
 
 MONSTER_PATH = {
@@ -124,7 +126,10 @@ MONSTER_PATH = {
     "Viper": {"sprite_path": "menu_sprites/menusprite11.png","animation_path":"assets/images/sprites/sprite11_idle.png"},
     "Infernum": {"sprite_path": "menu_sprites/menusprite8.png", "animation_path": "assets/images/sprites/sprite8_idle.png"},
     "Flamme": {"sprite_path": "menu_sprites/menusprite7.png", "animation_path": "assets/images/sprites/sprite7_idle.png"},
-    "Firestorm": {"sprite_path": "menu_sprites/menusprite9.png", "animation_path": "assets/images/sprites/sprite9_idle.png"}
+    "Firestorm": {"sprite_path": "menu_sprites/menusprite9.png", "animation_path": "assets/images/sprites/sprite9_idle.png"},
+    "Dolph": {"sprite_path": "menu_sprites/menusprite12.png", "animation_path": "assets/images/sprites/sprite12_idle.png"},
+    "Hydolph": {"sprite_path": "menu_sprites/menusprite13.png", "animation_path": "assets/images/sprites/sprite13_idle.png"},
+    "Ascendolph": {"sprite_path": "menu_sprites/menusprite14.png", "animation_path": "assets/images/sprites/sprite14_idle.png"}
 }
 
 INFO_IMG = {
@@ -149,11 +154,11 @@ ITEM_PATH = {
 }
 
 ITEM_LIST = [
-    {"name": "Pokeball", "price": 50},
-    {"name": "HP Potion", "price": 45},
-    {"name": "ATK Potion", "price": 35},
-    {"name": "DEF Potion", "price": 40},
-    {"name": "Mana Potion", "price":35}
+    {"name": "Pokeball", "price": 25},
+    {"name": "HP Potion", "price": 20},
+    {"name": "ATK Potion", "price": 20},
+    {"name": "DEF Potion", "price": 10},
+    {"name": "Mana Potion", "price": 20}
 
 ]
 
@@ -171,7 +176,8 @@ ITEM_DESCRIPTION = {
     "Ultimate Aegis": "The ultimate lifesaver in the darkest hours, allowing trainers to summon a companion capable of drastically increase monster's Health, Defense, Mana "
                       "and Attack for the entire duration of the battle. Can only be used once during battle, companion summoned"
                       " will be randomized",
-    "Destined Revival": ""
+    "Destined Revival": "\"From the remnants of a devastating battle, you are once again awaken from your eternal slumber. Your heart filled with determination, your body filled with unwavering strength,"
+                        " you swear to pulverize all enemies ahead \". \nMonsters are revived with 1/10 of their original HP "
 }
 
 SHOP_DESCRIPTION = {
@@ -210,7 +216,8 @@ ADVERSARIES = {
     "wind": ["grass", "fire"],
     "ice": ["poison", "earth", "grass"],
     "poison": [],
-    "fire": ["grass", "poison"]
+    "fire": ["grass", "poison"],
+    "water": ["fire", "poison", "grass"]
 }
 
 
@@ -224,9 +231,18 @@ PLAYER_SPAWN_TP = {
 }
 
 EVOLUTION_DICT = {
-    "Pikachu": { "name": "Charizard", "hp": 300, "atk": 50, "def": 40, "speed": 70, "accuracy": 100, "level": 1, "mana": 200, "max_mana": 200, "max_def": 40, "max_hp": 300,
-                "max_atk":  50, "max_accuracy": 100, "max_speed": 70,
-                "element": "grass"}
+    "Pikachu": { "name": "Charizard", "hp": 300, "atk": 50, "def": 40, "speed": 70, "accuracy": 100, "mana": 200, "max_mana": 200, "max_def": 40, "max_hp": 300,
+                "max_atk":  50, "max_accuracy": 100, "max_speed": 70, "element": "grass"},
+    "Charizard": { "name": "Blastoise", "hp": 450, "atk": 65, "def": 50, "speed": 100, "accuracy": 100, "mana": 250, "max_mana": 250, "max_def": 50, "max_hp": 450,
+                "max_atk":  65, "max_accuracy": 100, "max_speed": 100, "element": "grass"},
+    "Flamme": {"name": "Infernum", "hp": 170, "atk": 60, "def": 30, "speed": 100, "accuracy": 100, "mana": 150, "max_mana": 150, "max_def": 30, "max_hp": 170,
+                "max_atk":  70, "max_accuracy": 100, "max_speed": 100, "element": "fire"},
+    "Infernum": { "name": "Firestorm", "hp": 420, "atk": 70, "def": 30, "speed": 100, "accuracy": 100, "mana": 220, "max_mana": 220, "max_def": 30, "max_hp": 420,
+                "max_atk":  70, "max_accuracy": 100, "max_speed": 100, "element": "fire"},
+    "Dolph": {"name": "Hydolph", "hp": 160, "atk": 65, "def": 20, "speed": 100, "accuracy": 100, "mana": 150, "max_mana": 150, "max_def": 20, "max_hp": 160,
+          "max_atk": 65, "max_accuracy": 100, "max_speed": 100, "element": "water"},
+    "Hydolph": { "name": "Ascendolph", "hp": 470, "atk": 50, "def": 50, "speed": 100, "accuracy": 100, "mana": 300, "max_mana": 300, "max_def": 50, "max_hp": 470,
+                "max_atk":  50, "max_accuracy": 100, "max_speed": 100, "element": "water"}
 }
 
 HIDDEN_ITEM = {
@@ -248,8 +264,18 @@ AEGIS_POSITION = {
     "Hikari (Fatalis)": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 150),
     "Tairitsu (Tempestissimo)": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 200),
     "Nell": ((GameSettings.SCREEN_WIDTH / 2), (GameSettings.SCREEN_HEIGHT / 2) + 130)
+}
 
+BATTLE_BG = {
+    "Testify": "backgrounds/Testify.jpg",
+    "Designant": "backgrounds/Designant.jpg",
+    "Arghena": "backgrounds/Arghena.jpg"
+}
 
+BATTLE_MUSIC = {
+    "Testify": "TestifyBG.mp3",
+    "Designant": "DesignantBG.mp3",
+    "Arghena": "ArghenaBG.mp3"
 }
 
 KEYMAP = {

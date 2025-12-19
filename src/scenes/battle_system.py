@@ -63,10 +63,10 @@ class UltimateAegis:
     def stat_alterations(self, monster):
         match self.selection:
             case "Hikari (Fatalis)":
-                monster["atk"] = int(monster["atk"] * 2)
+                monster["atk"] = int(monster["atk"] * 2.5)
                 monster["hp"] = int(monster["max_hp"] * 1.5)
             case "Hikari & Tairitsu":
-                monster["mana"] = int(monster["max_mana"] * 2)
+                monster["mana"] = int(monster["max_mana"] * 3)
                 monster["hp"] = int(monster["max_hp"] * 1.5)
             case "Nell":
                 monster["hp"] = int(monster["max_hp"] * 1.5)
@@ -74,8 +74,8 @@ class UltimateAegis:
                 monster["mana"] = int(monster["max_mana"] * 1.5)
             case "Tairitsu (Tempestissimo)":
                 monster["hp"] = int(monster["max_hp"] * 1.5)
-                monster["mana"] = int(monster["max_mana"] * 2)
-                monster["atk"] = int(monster["max_atk"] * 2)
+                monster["mana"] = int(monster["max_mana"] * 1.25)
+                monster["atk"] = int(monster["max_atk"] * 2.25)
 
 
 
@@ -155,20 +155,20 @@ class Attack:
 
     def perform_attack(self):
         attacked = random.choices([True, False], weights=[self.attacker["accuracy"], 100 - self.attacker["accuracy"]], k=1)
-        required_mana = {"Light": 10, "Normal": 15, "Heavy": 20, "Ultimate": 80}
+        required_mana = {"Light": 10, "Normal": 15, "Heavy": 25, "Ultimate": 30}
 
         if attacked == [True] and self.attacker["mana"] >= required_mana[self.attack_type]:
             self.attacker["mana"] -= required_mana[self.attack_type]
             enemy_element = self.defender["element"]
             match self.attack_type:
                 case "Light":
-                    atk_dmg = self.attacker["atk"] * 0.7
+                    atk_dmg = self.attacker["atk"] * 0.75
                 case "Normal":
                     atk_dmg = self.attacker["atk"]
                 case "Heavy":
-                    atk_dmg = self.attacker["atk"] * 1.5
+                    atk_dmg = self.attacker["atk"] * 1.25
                 case "Ultimate":
-                    atk_dmg = self.attacker["atk"] * 2.5
+                    atk_dmg = self.attacker["atk"] * 1.75
 
             if enemy_element in ADVERSARIES[self.attacker["element"]]:
                 atk_dmg = atk_dmg * 1.5
@@ -256,7 +256,7 @@ class Potion:
             for item in self.item_lst:
                 if item["name"] == "HP Potion" and item["count"] > 0:
                     item["count"] -= 1
-                    self.monster_alt["hp"] += int(self.monster_alt["hp"] * 0.1)
+                    self.monster_alt["hp"] += int(self.monster_alt["max_hp"] * 0.2)
                     if self.monster_alt["hp"] > self.monster_alt["max_hp"]:
                         self.monster_alt["hp"] = self.monster_alt["max_hp"]
 
@@ -288,7 +288,7 @@ class Potion:
             for item in self.item_lst:
                 if item["name"] == "ATK Potion" and item["count"] > 0:
                     item["count"] -= 1
-                    self.monster_alt["atk"] += self.monster_alt["atk"] * 0.3
+                    self.monster_alt["atk"] += int(self.monster_alt["max_atk"] * 0.2)
                     return f"{self.monster_alt["name"]}'s attack now inflict {int(self.monster_alt["atk"])} base damage upon enemy"
 
             return f"Potion unavailable. Use your original strength without relying on some strange potions"
@@ -371,7 +371,8 @@ class MonsterInfoDisplay:
         pg.draw.rect(screen, (169, 169, 169), border)
 
         for index, (char, val) in enumerate(monster_info.items()):
-            text = self.font.render(f"{DISPLAY_INFO[char]}: {val}/{monster["max_hp"]}", True, (255, 255, 0)) if char == "hp" else self.font.render(f"{DISPLAY_INFO[char]}: {val}/{CHAR_MAX[char]}", True, (255, 255, 0))
+            string = "max_" + char
+            text = self.font.render(f"{DISPLAY_INFO[char]}: {val}/{monster[string]}", True, (255, 255, 0))
             text_rect = pg.Rect(info_display_bg.topleft[0] + 20, info_display_bg.topleft[1] + index * 30 + 10, text.get_width(), text.get_height())
             screen.blit(text, text_rect)
 
@@ -509,8 +510,10 @@ class PlayerTurn(BattleState):
             self.atk.update()
             if self.atk.end:
                 self.state_complete = True
-                self.potion_unavailable = False
-                self.player["atk"] = self.player["max_atk"]
+                if self.potion_unavailable:
+                    self.player["atk"] -= int(self.player["max_atk"] * 0.2)
+                    self.potion_unavailable = False
+
 
         elif self.action == "aegis":
             self.aegis.update()
@@ -686,9 +689,13 @@ class BattleSystem:
         self.player_turn = True
         self.state = BattleSetup(self.player_monster_lst, self.enemy_monster_lst)
         self.monster_catch = monster_catch
+        self.boss_encounter = False
 
         self.curr_ally_monster, self.curr_enemy_monster = None, None
         self.aegis_selected = False
+        self.item_drop = ["HP Potion", "DEF Potion", "ATK Potion", "Mana Potion", "Hollow Core", "Sephira Core", "Ultimate Aegis", "Destined Revival"]
+        self.item_weight = [40, 35, 40, 40, 20, 8, 3, 5]
+        self.item_dropped = False
 
 
     def update(self):
@@ -701,18 +708,48 @@ class BattleSystem:
                 self.change_state()
         else:
             if scene_manager.monster_catch:
+                services.game_manager.bag._items_data[1]["count"] -= 1
                 scene_manager.monster_catch_func()
-                if self.state.status == "ally_wins" and self.curr_enemy_monster["name"] not in [i["name"] for i in services.game_manager.bag._monsters_data]:
-                    services.game_manager.bag._monsters_data.append(self.curr_enemy_monster)
+                if self.state.status == "ally_wins":
+                    if self.curr_enemy_monster["name"] not in [i["name"] for i in services.game_manager.bag._monsters_data]:
+                        services.game_manager.bag._monsters_data.append(self.curr_enemy_monster)
+                    if not self.item_dropped:
+                        services.game_manager.bag._items_data[0]["count"] += 100
+                        item = random.choices(self.item_drop, self.item_weight, k=3)
+                        for i in services.game_manager.bag._items_data:
+                            if i["name"] in item:
+                                i["count"] += 1
+                        self.item_dropped = True
+
+
+            else:
+                if self.state.status == "ally_wins" and not self.item_dropped:
+                    if not self.boss_encounter:
+                        services.game_manager.bag._items_data[0]["count"] += 100
+                        item = random.choices(self.item_drop, self.item_weight, k=4)
+                        for i in services.game_manager.bag._items_data:
+                            if i["name"] in item:
+                                i["count"] += 1
+                        self.item_dropped = True
+                    else:
+                        services.game_manager.bag._items_data[0]["count"] += 300
+                        item = random.choices(self.item_drop, self.item_weight, k=5)
+                        for i in services.game_manager.bag._items_data:
+                            if i["name"] in item:
+                                i["count"] += 1
+                        self.item_dropped = True
 
 
     def reset(self):
         self.state = BattleSetup(self.player_monster_lst, self.enemy_monster_lst)
+        self.boss_encounter = False
+        self.item_dropped = False
         for monster in self.enemy_monster_lst:
             for info in ["hp", "def", "mana"]:
                 monster[info] = monster[f"max_{info}"]
 
-
+    def boss(self):
+        self.boss_encounter = True
 
 
     def get_monster(self):
@@ -758,7 +795,7 @@ class BattleSystem:
 
     def attack(self, attacker, defender):
         attack_type = ["Light", "Normal", "Heavy", "Ultimate"]
-        required_mana = {"Light": 10, "Normal": 15, "Heavy": 20, "Ultimate": 80}
+        required_mana = {"Light": 10, "Normal": 15, "Heavy": 25, "Ultimate": 30}
         attack = random.choices(attack_type, [25, 25, 25, 25], k=1)
         enemy_element = defender["element"]
 
@@ -767,13 +804,13 @@ class BattleSystem:
             attacker["mana"] -= required_mana[attack[0]]
             match attack:
                 case ["Light"]:
-                    atk_dmg = attacker["atk"] * 0.7
+                    atk_dmg = attacker["atk"] * 0.75
                 case ["Normal"]:
                     atk_dmg = attacker["atk"]
                 case ["Heavy"]:
-                    atk_dmg = attacker["atk"] * 1.5
+                    atk_dmg = attacker["atk"] * 1.25
                 case ["Ultimate"]:
-                    atk_dmg = attacker["atk"] * 2.5
+                    atk_dmg = attacker["atk"] * 1.75
 
             if enemy_element in ADVERSARIES[attacker["element"]]:
                 atk_dmg = atk_dmg * 1.5
@@ -785,7 +822,7 @@ class BattleSystem:
                     defender["def"] -= 10
                     atk_dmg = int(atk_dmg - 5)
 
-            defender["hp"] = defender["hp"] - atk_dmg
+            defender["hp"] = int(defender["hp"] - atk_dmg)
             if defender["hp"] < 0:
                defender["hp"] = 0
 

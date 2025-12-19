@@ -18,8 +18,121 @@
         "x": 16,
         "y": 30
       },
-      "enemy_trainers": [],
-      "others": []
+      "enemy_trainers": [
+        {
+          "x": 47.0,
+          "y": 25.0,
+          "classification": "stationary",
+          "facing": "DOWN",
+          "max_tiles": 2
+        },
+        {
+          "x": 47.0,
+          "y": 13.0,
+          "classification": "stationary",
+          "facing": "DOWN",
+          "max_tiles": 2
+        }
+      ],
+      "others": [],
+      "roaming_mobs": [
+        {
+          "name": "Pikachu",
+          "hp": 100,
+          "def": 20,
+          "speed": 50,
+          "accuracy": 70,
+          "mana": 150,
+          "atk": 20,
+          "max_mana": 150,
+          "max_def": 20,
+          "max_hp": 100,
+          "max_atk": 20,
+          "max_accuracy": 70,
+          "max_speed": 50,
+          "element": "grass"
+        },
+        {
+          "name": "Dolph",
+          "hp": 90,
+          "def": 20,
+          "speed": 70,
+          "accuracy": 70,
+          "mana": 150,
+          "max_mana": 150,
+          "atk": 30,
+          "max_def": 20,
+          "max_hp": 90,
+          "max_atk": 30,
+          "max_accuracy": 70,
+          "max_speed": 70,
+          "element": "water"
+        },
+        {
+          "name": "Gengar",
+          "hp": 95,
+          "def": 30,
+          "speed": 20,
+          "accuracy": 70,
+          "mana": 150,
+          "atk": 30,
+          "max_mana": 150,
+          "max_def": 30,
+          "max_hp": 95,
+          "max_atk": 30,
+          "max_accuracy": 70,
+          "max_speed": 70,
+          "element": "wind"
+        },
+        {
+          "name": "Dragonite",
+          "hp": 120,
+          "def": 10,
+          "speed": 20,
+          "accuracy": 70,
+          "mana": 150,
+          "atk": 20,
+          "max_mana": 150,
+          "max_def": 10,
+          "max_hp": 120,
+          "max_atk": 20,
+          "max_accuracy": 70,
+          "max_speed": 20,
+          "element": "ice"
+        },
+        {
+          "name": "Viper",
+          "hp": 10,
+          "def": 10,
+          "speed": 20,
+          "accuracy": 70,
+          "mana": 150,
+          "atk": 30,
+          "max_mana": 150,
+          "max_def": 10,
+          "max_hp": 100,
+          "max_atk": 30,
+          "max_accuracy": 70,
+          "max_speed": 20,
+          "element": "poison"
+        },
+        {
+          "name": "Flamme",
+          "hp": 100,
+          "def": 20,
+          "speed": 20,
+          "accuracy": 70,
+          "mana": 150,
+          "atk": 20,
+          "max_mana": 150,
+          "max_def": 20,
+          "max_hp": 100,
+          "max_atk": 20,
+          "max_accuracy": 70,
+          "max_speed": 20,
+          "element": "fire"
+        }
+      ]
     },
     {
       "path": "gym.tmx",
@@ -53,7 +166,57 @@
           "max_tiles": 2
         }
       ],
-      "others": []
+      "others": [],
+      "roaming_mobs": [
+        {
+          "name": "Charizard",
+          "hp": 200,
+          "def": 30,
+          "speed": 100,
+          "accuracy": 90,
+          "mana": 250,
+          "atk": 50,
+          "max_mana": 250,
+          "max_def": 30,
+          "max_hp": 200,
+          "max_atk": 50,
+          "max_accuracy": 90,
+          "max_speed": 100,
+          "element": "grass"
+        },
+        {
+          "name": "Infernum",
+          "hp": 170,
+          "def": 30,
+          "speed": 100,
+          "accuracy": 100,
+          "mana": 250,
+          "atk": 60,
+          "max_mana": 250,
+          "max_def": 30,
+          "max_hp": 170,
+          "max_atk": 70,
+          "max_accuracy": 100,
+          "max_speed": 100,
+          "element": "fire"
+        },
+        {
+          "name": "Hydolph",
+          "hp": 160,
+          "def": 20,
+          "speed": 100,
+          "accuracy": 100,
+          "mana": 250,
+          "atk": 65,
+          "max_mana": 250,
+          "max_def": 20,
+          "max_hp": 160,
+          "max_atk": 65,
+          "max_accuracy": 100,
+          "max_speed": 100,
+          "element": "water"
+        }
+      ]
     },
     {
       "path": "shop.tmx",
@@ -87,102 +250,112 @@
           "facing": "DOWN",
           "max_tiles": 4
         }
-      ]
+      ],
+      "roaming_mobs": []
     }
   ],
-  "current_map": "shop.tmx",
+  "current_map": "gym.tmx",
   "player": {
-    "x": 10.0,
-    "y": 6.32599999999999
+    "x": 12.0,
+    "y": 10.989999999999995
   },
   "bag": {
     "initial_monsters": [
       {
         "name": "Pikachu",
-        "hp": 0,
+        "hp": 100,
+        "def": 20,
+        "speed": 50,
+        "accuracy": 70,
+        "mana": 150,
         "atk": 20,
-        "def": 20,
-        "speed": 50,
-        "accuracy": 70,
-        "level": 1,
-        "mana": 100,
-        "max_mana": 100,
+        "max_mana": 150,
         "max_def": 20,
-        "max_hp": 120,
+        "max_hp": 100,
         "max_atk": 20,
-        "element": "grass"
-      }
-    ],
-    "monsters": [
-      {
-        "name": "Pikachu",
-        "hp": 120,
-        "atk": 100,
-        "def": 20,
-        "speed": 50,
-        "accuracy": 70,
-        "level": 1,
-        "mana": 100,
-        "max_mana": 100,
-        "max_def": 20,
-        "max_hp": 120,
+        "max_accuracy": 70,
+        "max_speed": 50,
         "element": "grass"
       },
       {
-        "name": "Venusaur",
-        "hp": 120,
-        "atk": 80,
+        "name": "Dolph",
+        "hp": 90,
         "def": 20,
-        "speed": 50,
+        "speed": 70,
         "accuracy": 70,
-        "level": 1,
-        "mana": 100,
-        "max_mana": 100,
+        "mana": 150,
+        "max_mana": 150,
+        "atk": 30,
         "max_def": 20,
-        "max_hp": 120,
-        "element": "earth"
+        "max_hp": 90,
+        "max_atk": 30,
+        "max_accuracy": 70,
+        "max_speed": 70,
+        "element": "water"
       },
       {
         "name": "Gengar",
-        "hp": 100,
-        "atk": 80,
-        "def": 15,
-        "speed": 50,
+        "hp": 95,
+        "def": 30,
+        "speed": 20,
         "accuracy": 70,
-        "level": 1,
-        "mana": 100,
-        "max_mana": 100,
-        "max_def": 15,
-        "max_hp": 100,
+        "mana": 150,
+        "atk": 30,
+        "max_mana": 150,
+        "max_def": 30,
+        "max_hp": 95,
+        "max_atk": 30,
+        "max_accuracy": 70,
+        "max_speed": 70,
         "element": "wind"
       },
       {
         "name": "Dragonite",
-        "hp": 150,
-        "atk": 80,
+        "hp": 120,
         "def": 10,
-        "speed": 50,
+        "speed": 20,
         "accuracy": 70,
-        "level": 1,
-        "mana": 100,
-        "max_mana": 100,
+        "mana": 150,
+        "atk": 20,
+        "max_mana": 150,
         "max_def": 10,
-        "max_hp": 150,
+        "max_hp": 120,
+        "max_atk": 20,
+        "max_accuracy": 70,
+        "max_speed": 20,
         "element": "ice"
       },
       {
         "name": "Viper",
-        "hp": 100,
-        "atk": 80,
-        "def": 20,
-        "speed": 50,
+        "hp": 10,
+        "def": 10,
+        "speed": 20,
         "accuracy": 70,
-        "level": 1,
-        "mana": 100,
-        "max_mana": 100,
+        "mana": 150,
+        "atk": 30,
+        "max_mana": 150,
+        "max_def": 10,
+        "max_hp": 100,
+        "max_atk": 30,
+        "max_accuracy": 70,
+        "max_speed": 20,
+        "element": "poison"
+      },
+      {
+        "name": "Flamme",
+        "hp": 100,
+        "def": 20,
+        "speed": 20,
+        "accuracy": 70,
+        "mana": 150,
+        "atk": 20,
+        "max_mana": 150,
         "max_def": 20,
         "max_hp": 100,
-        "element": "poison"
+        "max_atk": 20,
+        "max_accuracy": 70,
+        "max_speed": 20,
+        "element": "fire"
       }
     ],
     "items": [
@@ -208,6 +381,22 @@
       },
       {
         "name": "Mana Potion",
+        "count": 10
+      },
+      {
+        "name": "Hollow Core",
+        "count": 10
+      },
+      {
+        "name": "Sephira Core",
+        "count": 10
+      },
+      {
+        "name": "Ultimate Aegis",
+        "count": 10
+      },
+      {
+        "name": "Destined Revival",
         "count": 10
       }
     ]
