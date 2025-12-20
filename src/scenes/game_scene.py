@@ -152,6 +152,7 @@ class GameScene(Scene):
 
     @override
     def exit(self) -> None:
+        self.setting_overlay.close = True
         if self.online_manager:
             self.online_manager.exit()
 
