@@ -63,7 +63,6 @@ class SettingOverlay(Overlay):
 
     def change_scene(self):
         scene_manager.change_scene("menu")
-        self.close = True
 
 
     def draw(self, screen):
