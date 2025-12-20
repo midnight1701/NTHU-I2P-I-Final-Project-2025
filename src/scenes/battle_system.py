@@ -3,7 +3,7 @@ from pygame import K_SPACE
 
 
 from src.core.services import scene_manager
-from src.utils.support import COLOR, MONSTER_PATH, DISPLAY_INFO, CHAR_MAX, ADVERSARIES
+from src.utils.support import COLOR, MONSTER_PATH, DISPLAY_INFO, CHAR_MAX, ADVERSARIES, MONSTER_CATCH
 from src.core import services
 from src.utils import GameSettings
 from src.utils.support import BattleState
@@ -490,7 +490,7 @@ class PlayerTurn(BattleState):
         self.potion_unavailable = False
 
         # Action
-        self.atk, self.run, self.potion = Attack(self.player, self.enemy), run, Potion(services.game_manager.bag._items_data, monster=self.player)
+        self.atk, self.run, self.potion = Attack(self.player, self.enemy), run, Potion(scene_manager._scenes["game"].game_manager.bag._items_data, monster=self.player)
         self.aegis = UltimateAegis()
 
 
@@ -708,15 +708,15 @@ class BattleSystem:
                 self.change_state()
         else:
             if scene_manager.monster_catch:
-                services.game_manager.bag._items_data[1]["count"] -= 1
+                scene_manager._scenes["game"].game_manager.bag._items_data[1]["count"] -= 1
                 scene_manager.monster_catch_func()
                 if self.state.status == "ally_wins":
-                    if self.curr_enemy_monster["name"] not in [i["name"] for i in services.game_manager.bag._monsters_data]:
-                        services.game_manager.bag._monsters_data.append(self.curr_enemy_monster)
+                    if self.curr_enemy_monster["name"] not in [i["name"] for i in scene_manager._scenes["game"].game_manager.bag._monsters_data]:
+                        scene_manager._scenes["game"].game_manager.bag._monsters_data.append(MONSTER_CATCH[self.curr_enemy_monster["name"]])
                     if not self.item_dropped:
-                        services.game_manager.bag._items_data[0]["count"] += 100
+                        scene_manager._scenes["game"].game_manager.bag._items_data[0]["count"] += 100
                         item = random.choices(self.item_drop, self.item_weight, k=3)
-                        for i in services.game_manager.bag._items_data:
+                        for i in scene_manager._scenes["game"].game_manager.bag._items_data:
                             if i["name"] in item:
                                 i["count"] += 1
                         self.item_dropped = True
@@ -725,16 +725,16 @@ class BattleSystem:
             else:
                 if self.state.status == "ally_wins" and not self.item_dropped:
                     if not self.boss_encounter:
-                        services.game_manager.bag._items_data[0]["count"] += 100
+                        scene_manager._scenes["game"].game_manager.bag._items_data[0]["count"] += 100
                         item = random.choices(self.item_drop, self.item_weight, k=4)
-                        for i in services.game_manager.bag._items_data:
+                        for i in scene_manager._scenes["game"].game_manager.bag._items_data:
                             if i["name"] in item:
                                 i["count"] += 1
                         self.item_dropped = True
                     else:
-                        services.game_manager.bag._items_data[0]["count"] += 300
+                        scene_manager._scenes["game"].game_manager.bag._items_data[0]["count"] += 300
                         item = random.choices(self.item_drop, self.item_weight, k=5)
-                        for i in services.game_manager.bag._items_data:
+                        for i in scene_manager._scenes["game"].game_manager.bag._items_data:
                             if i["name"] in item:
                                 i["count"] += 1
                         self.item_dropped = True

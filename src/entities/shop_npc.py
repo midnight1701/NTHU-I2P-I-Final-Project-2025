@@ -36,6 +36,7 @@ class ShopNPC(Entity):
         classification: ShopNPCClassification = ShopNPCClassification.STATIONARY,
         max_tiles: int | None = 2,
         facing: Direction | None = None,
+        gacha: str = "False"
 
 
     ) -> None:
@@ -54,13 +55,18 @@ class ShopNPC(Entity):
             raise ValueError("Invalid classification")
 
         self.detected = False
+        self.gacha = gacha
 
     @override
     def update(self, dt: float) -> None:
         self._movement.update(self, dt)
         self._has_los_to_player()
         if self.detected and input_manager.key_pressed(pygame.K_SPACE):
-            scene_manager._scenes["game"].shop_open_func()
+            if self.gacha == "False":
+                scene_manager._scenes["game"].shop_open_func()
+            elif self.gacha == "True":
+                scene_manager._scenes["game"].gacha_open_func()
+
 
         self.animation.update_pos(self.position)
 
@@ -124,6 +130,7 @@ class ShopNPC(Entity):
         classification = ShopNPCClassification(data.get("classification", "stationary"))
         max_tiles = data.get("max_tiles")
         facing_val = data.get("facing")
+        gacha = data.get("gacha")
         facing: Direction | None = None
         if facing_val is not None:
             if isinstance(facing_val, str):
@@ -139,6 +146,7 @@ class ShopNPC(Entity):
             classification,
             max_tiles,
             facing,
+            gacha
         )
 
     @override
@@ -147,4 +155,5 @@ class ShopNPC(Entity):
         base["classification"] = self.classification.value
         base["facing"] = self.direction.name
         base["max_tiles"] = self.max_tiles
+        base["gacha"] = self.gacha
         return base

@@ -209,8 +209,8 @@ class BattleScene(Scene):
         self.companion_ani = None
 
         # Battle state...
-        self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, True) if (
-                        scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+        self.battle = BattleSystem(scene_manager._scenes["game"].game_manager.bag._monsters_data, scene_manager._scenes["game"].game_manager.current_roaming_monster, True) if (
+                        scene_manager.monster_catch) else BattleSystem(scene_manager._scenes["game"].game_manager.bag._monsters_data, scene_manager._scenes["game"].game_manager.current_roaming_monster, False)
         self.displayed = False
 
 
@@ -240,13 +240,13 @@ class BattleScene(Scene):
 
 
     def reset(self):
-        if not services.game_manager.boss_encounter:
-            self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, True) if (
-                scene_manager.monster_catch) else BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+        if not scene_manager._scenes["game"].game_manager.boss_encounter:
+            self.battle = BattleSystem(scene_manager._scenes["game"].game_manager.bag._monsters_data, scene_manager._scenes["game"].game_manager.current_roaming_monster, True) if (
+                scene_manager.monster_catch) else BattleSystem(scene_manager._scenes["game"].game_manager.bag._monsters_data, scene_manager._scenes["game"].game_manager.current_roaming_monster, False)
         else:
-            self.battle = BattleSystem(services.game_manager.bag._monsters_data, services.game_manager.current_roaming_monster, False)
+            self.battle = BattleSystem(scene_manager._scenes["game"].game_manager.bag._monsters_data, scene_manager._scenes["game"].game_manager.current_roaming_monster, False)
             self.battle.boss()
-        for i in services.game_manager.bag._items_data:
+        for i in scene_manager._scenes["game"].game_manager.bag._items_data:
             if i["name"] == "Ultimate Aegis" and i["count"] >= 1:
                 self.aegis_applicable = True
                 break
@@ -263,7 +263,7 @@ class BattleScene(Scene):
 
     def exit(self) -> None:
         if scene_manager.monster_catch:
-            services.game_manager.bag._items_data[1]["count"] -= 1
+            scene_manager._scenes["game"].game_manager.bag._items_data[1]["count"] -= 1
         scene_manager.monster_catch = False
         self.displayed = False
         self.companion = None

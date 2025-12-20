@@ -40,10 +40,16 @@ class EvolutionScene(Scene):
         self.base_img, self.evo_img = None, None
 
         self.fade = False
+        self.font = pg.font.Font("assets/fonts/PixeloidSans.ttf", size=30)
+        self.text = self.font.render("Awakening complete, monster has transcended its limits", True, (0, 0, 0))
+        self.box = pg.Rect(0, 0, self.text.get_width() + 10, self.text.get_height() + 10)
+        self.box.center = GameSettings.SCREEN_WIDTH // 2, GameSettings.SCREEN_HEIGHT // 2 + 150
+        self.text_rect = pg.Rect(0, 0, self.box.width, self.box.height)
+        self.text_rect.midleft = self.box.midleft[0] + 5, self.box.midleft[1] + 5
 
     def enter(self):
         sound_manager.play_bgm("RBY 116 Evolution.ogg")
-        self.base, self.evolved = services.game_manager.base_monster, services.game_manager.evo_monster
+        self.base, self.evolved = scene_manager._scenes["game"].game_manager.base_monster, scene_manager._scenes["game"].game_manager.evo_monster
         self.base_img = pg.transform.scale(get_animation_image(MONSTER_PATH[self.base["name"]]["animation_path"]), (300, 300))
         self.evo_img = pg.transform.scale(get_animation_image(MONSTER_PATH[self.evolved["name"]]["animation_path"]), (300, 300))
         scene_manager.evolution_check = True
@@ -89,14 +95,14 @@ class EvolutionScene(Scene):
                 self.animation_state = None
 
         if self.finished:
-            for i in range(len(services.game_manager.bag._monsters_data)):
-                if self.base is not None and services.game_manager.bag._monsters_data[i]["name"] == self.base["name"]:
-                    services.game_manager.bag.change_monster(i, self.evolved)
+            for i in range(len(scene_manager._scenes["game"].game_manager.bag._monsters_data)):
+                if self.base is not None and scene_manager._scenes["game"].game_manager.bag._monsters_data[i]["name"] == self.base["name"]:
+                    scene_manager._scenes["game"].game_manager.bag.change_monster(i, self.evolved)
                     break
 
         if self.finished and input_manager.key_pressed(pg.K_RETURN):
             scene_manager.change_scene("game")
-            services.game_manager.evolution_cancel()
+            scene_manager._scenes["game"].game_manager.evolution_cancel()
 
 
     def draw(self, screen):
@@ -126,7 +132,9 @@ class EvolutionScene(Scene):
         else:
             scale = 1.0 + 0.05 * math.cos(self.timer * 3)
             self.draw_centered(screen, self.evo_img, scale)
-
+            pg.draw.rect(screen, (255, 255, 255), self.box)
+            pg.draw.rect(screen, (0, 0, 0), self.box, 3)
+            screen.blit(self.text, self.text_rect)
 
 
 

@@ -35,7 +35,7 @@ class Map:
         self._minimap = pg.Surface((pixel_w, pixel_h))
         self._minimap.fill((0, 0, 0))
         self._render_all_layers(self._minimap)
-        self._minimap = pg.transform.smoothscale(self._minimap, (280, 280 * (9/16)))
+        self._minimap = pg.transform.smoothscale(self._minimap, (280, 280 * (self.tmxdata.height/self.tmxdata.width)))
 
         # Prebake the collision map
         self._collision_map = self._create_collision_map()
@@ -96,15 +96,14 @@ class Map:
         return bfs_graph
 
 
-
     def player_pos_minimap(self, pos, screen):
-        scaled_x = (pos.x / (self.tmxdata.width * GameSettings.TILE_SIZE) * 280) + 10
-        scaled_y = (pos.y / (self.tmxdata.height * GameSettings.TILE_SIZE) * 280 * (9/16)) + 10
+        scaled_x = ((pos.x + 16)  / (self.tmxdata.width * GameSettings.TILE_SIZE) * 280)
+        scaled_y = (pos.y / (self.tmxdata.height * GameSettings.TILE_SIZE) * 280 * (self.tmxdata.height/self.tmxdata.width))
         pg.draw.rect(screen, (255, 0, 0), pg.Rect(scaled_x, scaled_y, 5, 5))
 
     def draw_minimap(self, screen):
-        rect = pg.Rect(10, 10, 280, 280 * (9/16))
-        screen.blit(self._minimap, pg.Rect(10, 10, 280, 280 * (9/16)))
+        rect = pg.Rect(0, 0, 280, 280 * (self.tmxdata.height/self.tmxdata.width))
+        screen.blit(self._minimap, rect)
         pg.draw.rect(screen, (0, 0, 0), rect, 3)
 
 

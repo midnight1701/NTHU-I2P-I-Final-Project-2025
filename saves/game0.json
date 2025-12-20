@@ -3,25 +3,26 @@
     {
       "path": "map.tmx",
       "enemy_trainers": [{ "x": 47, "y": 25, "classification": "stationary", "facing": "DOWN", "max_tiles": 2},
-                         { "x": 47, "y": 13, "classification": "stationary", "facing": "DOWN", "max_tiles": 2}],
+                         { "x": 45, "y": 14, "classification": "stationary", "facing": "DOWN", "max_tiles": 2},
+        {"x": 54, "y":  13, "classification":  "stationary", "facing":  "LEFT", "max_tiles": 2}],
       "others": [],
       "roaming_mobs": [
-        { "name": "Pikachu", "hp": 100, "def": 20, "speed": 50, "accuracy": 70, "mana": 150, "atk":  20,"max_mana": 150, "max_def": 20, "max_hp": 100,
+        { "name": "Pikachu", "hp": 120, "atk":  20,"def": 20, "speed": 50, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 20, "max_hp": 120,
          "max_atk":  20, "max_accuracy": 70, "max_speed": 50, "element": "grass"},
 
-       { "name": "Dolph",  "hp": 90, "def": 20, "speed": 70, "accuracy": 70, "mana": 150, "max_mana": 150, "atk": 30,"max_def": 20, "max_hp": 90,
+        { "name": "Dolph",  "hp": 115, "atk": 30,"def": 20,"speed": 70, "accuracy": 70, "mana": 150, "max_mana": 150,"max_def": 20, "max_hp": 115,
           "max_atk": 30, "max_accuracy": 70, "max_speed": 70, "element": "water"},
 
-       { "name": "Gengar", "hp": 95, "def": 30, "speed": 20, "accuracy": 70, "mana": 150, "atk": 30,"max_mana": 150, "max_def": 30, "max_hp": 95,
+        { "name": "Gengar", "hp": 105, "atk": 30,"def": 30,"speed": 20, "accuracy": 70, "mana": 150, "max_mana": 150, "max_def": 30, "max_hp": 105,
           "max_atk": 30, "max_accuracy": 70, "max_speed": 70, "element": "wind"},
 
-        { "name": "Dragonite", "hp": 120, "def": 10, "speed": 20, "accuracy": 70, "mana": 150, "atk": 20,"max_mana": 150, "max_def": 10, "max_hp": 120,
+        { "name": "Dragonite", "hp": 130, "atk": 20,"def": 10,"speed": 20, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 10, "max_hp": 130,
           "max_atk": 20, "max_accuracy": 70, "max_speed": 20, "element": "ice"},
 
-        { "name": "Viper",  "hp": 10, "def": 10, "speed": 20, "accuracy": 70, "mana": 150, "atk": 30,"max_mana": 150, "max_def": 10, "max_hp": 100,
+        { "name": "Viper",  "hp": 120, "atk": 30,"def": 10,"speed": 20, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 10, "max_hp": 120,
           "max_atk": 30, "max_accuracy": 70, "max_speed": 20, "element": "poison"},
 
-        { "name": "Flamme", "hp": 100, "def": 20, "speed": 20, "accuracy": 70, "mana": 150, "atk": 20,"max_mana": 150, "max_def": 20, "max_hp": 100,
+        { "name": "Flamme", "hp": 125, "atk": 20,"def": 20,"speed": 20, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 20, "max_hp": 125,
           "max_atk": 20, "max_accuracy": 70, "max_speed": 20, "element": "fire"}
 
       ],
@@ -67,7 +68,8 @@
       ],
       "roaming_mobs": [],
       "enemy_trainers": [],
-      "others": [{ "x": 10, "y": 4, "classification": "stationary", "facing": "DOWN", "max_tiles": 4}],
+      "others": [{ "x": 7, "y": 4, "classification": "stationary", "facing": "DOWN", "max_tiles": 4, "gacha": "False"},
+        {"x": 13, "y":  4, "classification": "stationary", "facing":  "DOWN", "max_tiles": 4, "gacha":  "True"}],
       "player": {
           "x": 10,
           "y": 11
@@ -86,26 +88,27 @@
   "bag": {
     "initial_monsters": [
        { "name": "Pikachu", "hp": 100, "atk":  20, "def": 20, "mana": 150, "speed": 50, "accuracy": 70, "max_mana": 150, "max_def": 20, "max_hp": 100,
-         "max_atk":  20, "max_accuracy": 70, "max_speed": 50, "element": "grass"},
-      { "name": "Ascendolph", "hp": 470, "atk": 50, "def": 50, "speed": 100, "accuracy": 100, "mana": 300, "max_mana": 300, "max_def": 50, "max_hp": 470,
-        "max_atk":  50, "max_accuracy": 100, "max_speed": 100, "element": "water"}
+         "max_atk":  20, "max_accuracy": 70, "max_speed": 50, "element": "grass"}
 
     ],
 
 
     "items": [
       { "name": "Coins",       "count": 100},
-      { "name": "Pokeball",    "count": 10},
-      { "name": "HP Potion",   "count": 10},
-      { "name": "ATK Potion",  "count": 10},
-      { "name": "DEF Potion",  "count": 10},
-      { "name": "Mana Potion", "count": 10},
-      { "name": "Hollow Core", "count": 10},
-      { "name": "Sephira Core", "count": 10},
-      { "name": "Ultimate Aegis", "count":  10},
-      { "name": "Destined Revival", "count": 10}
+      { "name": "Pokeball",    "count": 0},
+      { "name": "HP Potion",   "count": 0},
+      { "name": "ATK Potion",  "count": 0},
+      { "name": "DEF Potion",  "count": 0},
+      { "name": "Mana Potion", "count": 0},
+      { "name": "Hollow Core", "count": 0},
+      { "name": "Sephira Core", "count": 0},
+      { "name": "Ultimate Aegis", "count":  0},
+      { "name": "Destined Revival", "count": 0}
 
     ]
+
+
+
   }
 }
 

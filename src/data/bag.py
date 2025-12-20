@@ -14,7 +14,7 @@ class Bag:
     _monsters_data: list[Monster]
     _items_data: list[Item]
 
-    def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None):
+    def __init__(self, monsters_data: list[Monster] | None = None, items_data: list[Item] | None = None, switch="False"):
         self._monsters_data = monsters_data if monsters_data else []
         self._items_data = items_data if items_data else []
 
@@ -43,7 +43,7 @@ class Bag:
         self.awaken_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.awaken_rect.topleft[0], self.awaken_rect.topleft[1],
                                     100, 50,
-                                    lambda: services.game_manager.evolution_func())
+                                    lambda: scene_manager._scenes["game"].game_manager.evolution_func())
 
         self.awaken_text = self.font.render("Awaken", True, (0, 0, 0))
         self.awaken_text_rect = pg.Rect(0, 0, self.awaken_text.get_width(), self.awaken_text.get_height())
@@ -55,7 +55,7 @@ class Bag:
         self.revive_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                     self.revive_rect.topleft[0], self.revive_rect.topleft[1],
                                     100, 50,
-                                    lambda: services.game_manager.monster_revival())
+                                    lambda: scene_manager._scenes["game"].game_manager.monster_revival())
 
         self.revive_text = self.font.render("Revive", True, (0, 0, 0))
         self.revive_text_rect = pg.Rect(0, 0, self.revive_text.get_width(), self.awaken_text.get_height())
@@ -68,7 +68,7 @@ class Bag:
         self.healing_button = Button("UI/UI_Flat_Button01a_3.png", "UI/UI_Flat_Button01a_1.png",
                                      self.healing_rect.topleft[0], self.healing_rect.topleft[1],
                                      100, 50,
-                                     lambda: services.game_manager.monster_healing())
+                                     lambda: scene_manager._scenes["game"].game_manager.monster_healing())
 
         self.healing_text = self.font.render("Heal", True, (0, 0, 0))
         self.healing_text_rect = pg.Rect(0, 0, self.healing_text.get_width(), self.healing_text.get_height())
@@ -76,23 +76,28 @@ class Bag:
 
 
         self.index = 0
-        self.switch = False
+        self.switch = switch
         self.curr_surface = pg.display.get_surface()
 
 
 
-    def switch_bag(self):
-        self.switch = not self.switch
+    def switch_item(self):
+        self.switch = "True"
+        self.index = 0
+
+    def switch_monster(self):
+        self.switch = "False"
         self.index = 0
 
 
     def update(self, dt: float):
-        if services.game_manager.player.blocked:
+        if scene_manager._scenes["game"].game_manager.player.blocked:
             if input_manager.key_pressed(pg.K_UP):
                 self.index = self.index - 1
             elif input_manager.key_pressed(pg.K_DOWN):
                 self.index = self.index + 1
-            self.index = (self.index % len(self._monsters_data)) if not self.switch else (self.index % len(self._items_data))
+
+        self.index = (self.index % len(self._monsters_data)) if self.switch == "False" else (self.index % len(self._items_data))
 
         self._monsters_dict = {i: k for i, k in enumerate(self._monsters_data)}
         self._items_dict = {i: k for i, k in enumerate(self._items_data)}
@@ -106,10 +111,10 @@ class Bag:
 
 
     def draw(self, screen: pg.Surface):
-        if not self.switch:
+        if self.switch == "False":
             self.draw_monster(screen)
             self.draw_monster_info_bg(screen)
-        elif self.switch:
+        elif self.switch == "True":
             self.draw_item(screen)
             self.draw_item_info(screen)
         screen.blit(self.font.render("Press [Z] to switch between item and monster bag", True, (255, 255, 0)), pg.Rect(self.background.bottomleft[0], self.background.bottomleft[1] + 10, self.background.width, self.font.get_height()))

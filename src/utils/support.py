@@ -162,6 +162,7 @@ ITEM_LIST = [
 
 ]
 
+
 ITEM_DESCRIPTION = {
     "Coins": "The universal currency of the region. Earned by defeating wild monsters, wandering trainers, and region leaders, coin allows you to purchase valuable supplies and consumables essential for your journey.",
     "HP Potion": "A reliable healing item capable of restoring a monster’s health during the heat of battle. HP Potions are commonly sold in shops, though they may also be awarded for triumphing over trainers or region leaders",
@@ -245,12 +246,6 @@ EVOLUTION_DICT = {
                 "max_atk":  50, "max_accuracy": 100, "max_speed": 100, "element": "water"}
 }
 
-HIDDEN_ITEM = {
-    "Hollow Core": { "name": "Hollow Core", "count": 1},
-    "Sephira Core": { "name": "Sephira Core", "count": 1},
-    "Ultimate Aegis": {"name": "Ultimate Aegis", "count": 1},
-    "Destined Revival": {"name": "Destined Revival", "count": 1}
-}
 
 AEGIS_IMG = {
     "Hikari & Tairitsu": "sprites/Hikari & Tairitsu (Next Stage).png",
@@ -304,4 +299,29 @@ KEYMAP = {
 
 }
 
-# Note 1
+MONSTER_CATCH = {
+        "Pikachu": { "name": "Pikachu", "hp": 120, "atk":  20,"def": 20, "speed": 50, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 20, "max_hp": 120,
+         "max_atk":  20, "max_accuracy": 70, "max_speed": 50, "element": "grass"},
+
+        "Dolph": { "name": "Dolph",  "hp": 115, "atk": 30,"def": 20,"speed": 70, "accuracy": 70, "mana": 150, "max_mana": 150,"max_def": 20, "max_hp": 115,
+          "max_atk": 30, "max_accuracy": 70, "max_speed": 70, "element": "water"},
+
+        "Gengar": { "name": "Gengar", "hp": 105, "atk": 30,"def": 30,"speed": 20, "accuracy": 70, "mana": 150, "max_mana": 150, "max_def": 30, "max_hp": 105,
+          "max_atk": 30, "max_accuracy": 70, "max_speed": 70, "element": "wind"},
+
+        "Dragonite": { "name": "Dragonite", "hp": 130, "atk": 20,"def": 10,"speed": 20, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 10, "max_hp": 130,
+          "max_atk": 20, "max_accuracy": 70, "max_speed": 20, "element": "ice"},
+
+        "Viper": { "name": "Viper",  "hp": 120, "atk": 30,"def": 10,"speed": 20, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 10, "max_hp": 120,
+          "max_atk": 30, "max_accuracy": 70, "max_speed": 20, "element": "poison"},
+
+        "Flamme": { "name": "Flamme", "hp": 125, "atk": 20,"def": 20,"speed": 20, "accuracy": 70, "mana": 150,"max_mana": 150, "max_def": 20, "max_hp": 125,
+          "max_atk": 20, "max_accuracy": 70, "max_speed": 20, "element": "fire"}
+}
+
+ITEM_FIRST_ROW = ["Pokeball", "HP Potion", "ATK Potion", "DEF Potion", "Mana Potion"]
+ITEM_SECOND_ROW = ["Sephira Core", "Hollow Core", "Ultimate Aegis", "Destined Revival"]
+
+ITEM_LIST_GACHA = ["Pokeball", "HP Potion", "ATK Potion", "DEF Potion", "Mana Potion", "Sephira Core", "Hollow Core",
+                   "Ultimate Aegis", "Destined Revival"]
+

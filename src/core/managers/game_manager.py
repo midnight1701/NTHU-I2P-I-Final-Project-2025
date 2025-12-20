@@ -44,6 +44,9 @@ class GameManager:
         self.npc = npc
         self.enemy_monster = enemy_monster
 
+        # Bag change
+        self.switched = False
+
         # Evolution
         self.evolution = False
         self.base_monster = None
@@ -84,6 +87,7 @@ class GameManager:
         
         self.next_map = target
         self.should_change_scene = True
+
 
         if self.current_map_key != "map.tmx":
             self.teleported = PLAYER_SPAWN_TP[self.current_map_key]

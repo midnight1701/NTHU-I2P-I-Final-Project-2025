@@ -2,6 +2,7 @@ import pygame as pg
 from pygame import K_SPACE
 import time
 
+from src.scenes.gacha_scene import GachaOverlay
 from src.sprites.animation import Animation
 from src.scenes.navigation_overlay import NavigationOverlay
 from src.interface.components.chat_overlay import ChatOverlay
@@ -38,8 +39,8 @@ class GameScene(Scene):
             Logger.error("Failed to load game manager")
             exit(1)
         self.game_manager = manager
-        services.game_manager = self.game_manager
         self.clock = pg.time.Clock()
+        services.game_manager = manager
 
         # Online Manager
         if GameSettings.IS_ONLINE:
@@ -83,12 +84,16 @@ class GameScene(Scene):
         self.navigation = NavigationOverlay(self.pathfinding)
         self.navigate_open = False
 
+        self.gacha_overlay = GachaOverlay()
+        self.gacha_open = False
+
         # BFS Path Drawing
         self.enemy_pos = [pg.Rect(a.position.x // GameSettings.TILE_SIZE, a.position.y // GameSettings.TILE_SIZE, GameSettings.TILE_SIZE, GameSettings.TILE_SIZE) for a in self.game_manager.enemy_trainers[self.game_manager.current_map_key]]
         self.path = None
         self.arrived = False
         self.arrow = pg.transform.scale(resource_manager.get_image("ingame_ui/navigation_mark.png"), (GameSettings.TILE_SIZE, GameSettings.TILE_SIZE))
         self.path_surface = None
+        self.shop, self.gym = False, False
 
         # Evolution
         self.evolution = None
@@ -96,7 +101,7 @@ class GameScene(Scene):
         self.evo_monster = None
 
     def pathfinding(self, target):
-        player_x, player_y = (self.game_manager.player.position.x + 32) // GameSettings.TILE_SIZE, (self.game_manager.player.position.y + 32)// GameSettings.TILE_SIZE
+        player_x, player_y = ((self.game_manager.player.position.x + 32) // GameSettings.TILE_SIZE, (self.game_manager.player.position.y + 32) // GameSettings.TILE_SIZE)
         graph = self.game_manager.current_map.create_graph(self.enemy_pos)
         self.path = self.game_manager.current_map.bfs((player_x, player_y), target, graph)
 
@@ -113,8 +118,12 @@ class GameScene(Scene):
     def shop_open_func(self):
         self.shop_open = True
 
+    def gacha_open_func(self):
+        self.gacha_open = True
+
     def navigate_func(self):
         self.navigate_open = True
+
 
     def change_path(self):
         self.path = None
@@ -149,9 +158,14 @@ class GameScene(Scene):
 
     @override
     def update(self, dt: float):
-        if self.path is not None:
-            if pg.Rect(self.game_manager.player.position.x // GameSettings.TILE_SIZE, self.game_manager.player.position.y // GameSettings.TILE_SIZE, 64, 64).collidepoint(self.path[-1][0], self.path[-1][1]) or input_manager.key_pressed(pg.K_t):
+        if self.path is not None and len(self.path) > 0:
+            player_rect = pg.Rect(self.game_manager.player.position.x, self.game_manager.player.position.y, 64, 64)
+            tile_rect = pg.Rect(self.path[0][0] * 64, self.path[0][1] * 64, 64, 64)
+            if player_rect.colliderect(tile_rect):
+                self.path.pop(0)
+            if len(self.path) == 0 or input_manager.key_pressed(pg.K_t):
                 self.path = None
+
 
         if len(self.game_manager.next_map) != 0:
             self.enemy_pos =  [pg.Rect(a.position.x // GameSettings.TILE_SIZE, a.position.y // GameSettings.TILE_SIZE, GameSettings.TILE_SIZE, GameSettings.TILE_SIZE) for a in self.game_manager.enemy_trainers[self.game_manager.next_map]]
@@ -180,10 +194,10 @@ class GameScene(Scene):
             if self.bag_overlay.close:
                 self.bag_open = False
                 self.bag_overlay.close = False
-                services.game_manager.bag.index = 0
+                scene_manager._scenes["game"].game_manager.bag.index = 0
                 self.game_manager.player.blocked = False
 
-        if self.setting_open:
+        elif self.setting_open:
             if not self.setting_overlay.synchronized:
                 self.setting_overlay._slider.synchronize()
                 self.setting_overlay.synchronized = True
@@ -194,7 +208,7 @@ class GameScene(Scene):
                 self.setting_overlay.synchronized = False
                 self.game_manager.player.blocked = False
 
-        if self.shop_open:
+        elif self.shop_open:
             self.shop_overlay.update(dt)
             if self.shop_overlay.close:
                 self.shop_open = False
@@ -202,12 +216,23 @@ class GameScene(Scene):
                 self.shop_overlay.reset()
                 self.game_manager.player.blocked = False
 
-        if self.navigate_open:
+        elif self.navigate_open:
             self.navigation.update(dt)
             if self.navigation.close:
                 self.navigate_open = False
                 self.navigation.close = False
                 self.game_manager.player.blocked = False
+
+        elif self.gacha_open:
+            self.gacha_overlay.update(dt)
+            if self.gacha_overlay.close:
+                self.gacha_open = False
+                self.gacha_overlay.close = False
+                self.game_manager.player.blocked = False
+                self.gacha_overlay.text = ""
+                self.gacha_overlay.music = False
+                sound_manager.play_bgm("RBY 103 Pallet Town.ogg")
+
 
         if self.chat_overlay:
             if input_manager.key_pressed(pg.K_y):
@@ -291,8 +316,6 @@ class GameScene(Scene):
         if self.game_manager.player:
             camera = self.game_manager.player.camera
             self.game_manager.current_map.draw(screen, camera)
-            self.game_manager.current_map.draw_minimap(screen)
-            self.game_manager.current_map.player_pos_minimap(self.game_manager.player.position, screen)
             if self.path is not None:
                 self.path_surface = self.draw_path(camera)
                 screen.blit(self.path_surface)
@@ -324,6 +347,9 @@ class GameScene(Scene):
                         self.sprite_online.switch("right")
                     self.sprite_online.draw(screen)
 
+        self.game_manager.current_map.draw_minimap(screen)
+        self.game_manager.current_map.player_pos_minimap(self.game_manager.player.position, screen)
+
         # Draw chat bubble
         if self.chat_overlay:
             self.chat_overlay.draw(screen)
@@ -347,6 +373,9 @@ class GameScene(Scene):
             self.game_manager.player.blocked = True
         elif self.navigate_open:
             self.navigation.draw(screen)
+            self.game_manager.player.blocked = True
+        elif self.gacha_open:
+            self.gacha_overlay.draw(screen)
             self.game_manager.player.blocked = True
 
 

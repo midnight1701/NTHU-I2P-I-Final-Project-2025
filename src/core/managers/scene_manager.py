@@ -21,11 +21,12 @@ class SceneManager:
         self.setting_enter_check = False
         self.bag_enter_check = False
         self.evolution_check = False
+        self.gacha_check = False
+
         self._current_scene_name = ""
         self.current_menu = False
         self.current_game = False
         self.monster_catch = False
-
 
 
     def monster_catch_func(self):

@@ -3,7 +3,7 @@ import pygame as pg
 from src.utils.support import ITEM_PATH, ITEM_LIST, SHOP_DESCRIPTION
 from src.utils import GameSettings
 from src.interface.components import Button
-from src.core.services import input_manager, resource_manager
+from src.core.services import input_manager, resource_manager, scene_manager
 from src.core import services
 from src.scenes.overlay import Overlay
 
@@ -142,7 +142,7 @@ class ShopOverlay(Overlay):
 
     def update(self, dt):
         super().update(dt)
-        self.money = services.game_manager.bag._items_data[0]["count"]
+        self.money = scene_manager._scenes["game"].game_manager.bag._items_data[0]["count"]
         self.buy_button.update(dt)
         self.sell_button.update(dt)
         if input_manager.key_pressed(pg.K_UP):
@@ -157,20 +157,20 @@ class ShopOverlay(Overlay):
 
     def buy(self, item):
         item_name, item_price = item["name"], item["price"]
-        for i in services.game_manager.bag._items_data:
+        for i in scene_manager._scenes["game"].game_manager.bag._items_data:
             if i["name"] == item_name:
                 money = self.money - item_price
                 if money >= 0:
                     i["count"] += 1
-                    services.game_manager.bag._items_data[0]["count"] = money
+                    scene_manager._scenes["game"].game_manager.bag._items_data[0]["count"] = money
 
 
     def sell(self, item):
         item_name, item_price = item["name"], item["price"]
-        for i in services.game_manager.bag._items_data:
+        for i in scene_manager._scenes["game"].game_manager.bag._items_data:
             if i["name"] == item_name and i["count"] > 0:
                 i["count"] -= 1
-                services.game_manager.bag._items_data[0]["count"] += int(item_price * 0.75)
+                scene_manager._scenes["game"].game_manager.bag._items_data[0]["count"] += int(item_price * 0.75)
 
 
 

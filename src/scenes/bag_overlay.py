@@ -20,7 +20,10 @@ class BagOverlay(Overlay):
     def update(self, dt):
         super().update(dt)
         if input_manager.key_pressed(pg.K_z):
-            services.game_manager.bag.switch_bag()
+           if scene_manager._scenes["game"].game_manager.bag.switch == "True":
+               scene_manager._scenes["game"].game_manager.bag.switch_monster()
+           else:
+               scene_manager._scenes["game"].game_manager.bag.switch_item()
 
 
     def draw(self, screen):
